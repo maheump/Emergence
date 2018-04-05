@@ -91,7 +91,10 @@ set(gca, 'Box', 'Off');
 % Add some text labels
 legend(lgd, proclab(1:2), 'Location', 'NorthWest');
 xlabel('Position w.r.t. change point');
-ylabel('p(j_k|M_i,y)');
+ylabel('p(j_k|H_i,y)');
+
+% Save the figure
+save2pdf('figs/F_CP_PredCorr.pdf');
 
 % Display precision of posterior distributions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,7 +117,7 @@ for iHyp = 1:2
     
     % Display individual data points
     scatter(iHyp+xshift, d, 'o', 'MarkerEdgeColor', 'None', ...
-        'MarkerFaceColor', tricol(iHyp,:), 'MarkerFaceAlpha', 1/2);
+        'MarkerFaceColor', tricol(iHyp,:), 'MarkerFaceAlpha', 1/3);
     
     % Display group-average and related error
     plot(repmat(iHyp,1,2), e, 'k-');
@@ -129,7 +132,7 @@ set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
 ylabel('1/std');
 
 % Save the figure
-save2pdf('figs/F_CP_Pred.pdf');
+save2pdf('figs/F_CP_PredConf.pdf');
 
 %% CORRELATION BETWEEN ESTIMATED AND REAL CHANGE POINT'S POSITION
 %  ==============================================================
