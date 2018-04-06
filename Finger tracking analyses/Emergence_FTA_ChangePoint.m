@@ -102,27 +102,8 @@ save2pdf('figs/F_CP_PredCorr.pdf');
 % Prepare a new window
 figure('Position', [342 906 120 200]);
 
-% Plot individual
-plot((1:2)'+xshift', varcppost', '-', 'Color', g, 'LineWidth', 1/2); hold('on');
-plot(1:2, mean(varcppost), 'k-', 'LineWidth', 3);
-
-% For each type of regularity
-for iHyp = 1:2
-    
-    % Get the precision levels of posterior distribution over change
-    % point's positions
-    d = varcppost(:,iHyp);
-    m = mean(d);
-    e = m+sem(d)*[-1,1];
-    
-    % Display individual data points
-    scatter(iHyp+xshift, d, 'o', 'MarkerEdgeColor', 'None', ...
-        'MarkerFaceColor', tricol(iHyp,:), 'MarkerFaceAlpha', 1/3);
-    
-    % Display group-average and related error
-    plot(repmat(iHyp,1,2), e, 'k-');
-    plot(iHyp, m, 'ko', 'MarkerFaceColor', tricol(iHyp,:), 'MarkerSize', 10);
-end
+% Display difference in precision between the two types of regularity
+Emergence_PlotSubGp(varcppost, tricol(1:2,:));
 
 % Customize the axes
 xlim([0,3]);
@@ -275,25 +256,7 @@ subplot(1,3,3);
 plot([0,3], zeros(1,2), 'k--'); hold('on');
 
 % Display difference in correlation coefficients between the two types of regularity
-plot((1:2)'+xshift', corcoef', 'Color', g, 'LineWidth', 1/2);
-plot(1:2, mean(corcoef), 'k-', 'LineWidth', 3);
-
-% For each type of regularity
-for iHyp = 1:2
-    
-    % Get distribution of correlation coefficients over subjects
-    d = corcoef(:,iHyp);
-    m = mean(d);
-    e = m+sem(d)*[-1,1];
-    
-    % Display individual correlation coefficients
-    scatter(iHyp+xshift, d, 'MarkerFaceColor', tricol(iHyp,:), ...
-        'MarkerFaceAlpha', 1/3, 'MarkerEdgeColor', 'None');
-    
-    % Display group-average and related error
-    plot(repmat(iHyp,1,2), e, 'k-');
-    plot(iHyp, m, 'ko', 'MarkerFaceColor', tricol(iHyp,:), 'MarkerSize', 10);
-end
+Emergence_PlotSubGp(corcoef, tricol(1:2,:));
 
 % Perform a paired t-test between correlation coefficients
 [~,pval,tci,stats] = ttest(diff(corcoef, 1, 2)); % between regularities
@@ -336,25 +299,7 @@ if any(avgConf(:) > 1), avgConf = avgConf ./ 100; end
 figure('Position', [342 632 120 200]);
 
 % Display difference in confidence ratings between the two types of regularity
-plot((1:2)'+xshift', avgConf', 'Color', g, 'LineWidth', 1/2); hold('on');
-plot(1:2, mean(avgConf), 'k-', 'LineWidth', 3);
-
-% For each type of regularity
-for iHyp = 1:2
-    
-    % Get distribution of confidence rations over subjects
-    d = avgConf(:,iHyp);
-    m = mean(d);
-    e = m+sem(d)*[-1,1];
-    
-    % Display individual confidence ratings
-    scatter(iHyp+xshift, d, 'MarkerFaceColor', tricol(iHyp,:), ...
-        'MarkerFaceAlpha', 1/3, 'MarkerEdgeColor', 'None');
-    
-    % Display group-average and related error
-    plot(repmat(iHyp,1,2), e, 'k-');
-    plot(iHyp, m, 'ko', 'MarkerFaceColor', tricol(iHyp,:), 'MarkerSize', 10);
-end
+Emergence_PlotSubGp(avgConf, tricol(1:2,:));
 
 % Perform a paired t-test between confidence ratings
 [h,pval,ci,stats] = ttest(diff(avgConf,1,2));
