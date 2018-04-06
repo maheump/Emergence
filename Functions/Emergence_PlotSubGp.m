@@ -22,7 +22,7 @@ function Emergence_PlotSubGp( y, col, xon, ms, aval )
 if nargin < 2 || isempty(col), col = [1 0 0]; end % red color
 if nargin < 3 || isempty(xon), xon = 0; end % no global shift
 if nargin < 4 || isempty(ms), ms = 10; end % 10 points markers
-if nargin < 5 || isempty(aval), aval = 0.3; end % transparency
+if nargin < 5 || isempty(aval), aval = 0.15; end % transparency
 
 % Wether all conditions should be displayed using the same colors or not
 ncol = size(col,1);
@@ -44,8 +44,10 @@ s = sem(y, 1);
 hold('on');
 
 % Display individual differences
-patchline(x', y', 'EdgeColor', 'k', 'LineStyle', '-', ...
-    'LineWidth', 1/2, 'EdgeAlpha', aval);
+for iSub = 1:nSub
+    patchline(x(iSub,:), y(iSub,:), 'EdgeColor', 'k', ...
+        'LineStyle', '-', 'LineWidth', 1/2, 'EdgeAlpha', aval);
+end
 
 % Display individual data points
 if ncol == 1

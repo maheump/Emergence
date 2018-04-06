@@ -188,7 +188,7 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare the figure
-figure('Position', [1 632 340 200]);
+figure('Position', [463 906 340 200]);
 subplot(1,3,1:2);
 
 % Display the generative process underlying the position of the change points
@@ -296,7 +296,7 @@ if any(avgConf(:) > 1), avgConf = avgConf ./ 100; end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %  Prepare the window
-figure('Position', [342 632 120 200]);
+figure('Position', [804 906 120 200]);
 
 % Display difference in confidence ratings between the two types of regularity
 Emergence_PlotSubGp(avgConf, tricol(1:2,:));
