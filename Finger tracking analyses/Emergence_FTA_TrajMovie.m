@@ -67,7 +67,7 @@ normtrglc = [0, sqrt(3)/2; ... % top left (P)
              1/2, 0];          % bottom (R)
 
 % Prepare the window
-figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 655 300 200]);
+figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 806 400 300]);
 markers = {'.', 'p', 'o'};
 stimcol = {'b', 'r'};
 fs = 8;
