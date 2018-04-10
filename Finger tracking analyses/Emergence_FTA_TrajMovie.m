@@ -67,12 +67,19 @@ normtrglc = [0, sqrt(3)/2; ... % top left (P)
              1/2, 0];          % bottom (R)
 
 % Prepare the window
-figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 655 700 400]);
+figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 655 300 200]);
 markers = {'.', 'p', 'o'};
+stimcol = {'b', 'r'};
+fs = 8;
+ms = 8;
+
+% Type of observer
+obslab = {'Subject', {'Ideal','observer'}};
 
 % Prepare the video file
 if strcmpi(tosave, 'gif')
     filename = 'images/Emergence_FTA_ExampleSequence.gif';
+    delete(filename);
 elseif strcmpi(tosave, 'avi')
     vidObj = VideoWriter('vid.avi');
     vidObj.FrameRate = N/seqdur;
@@ -80,7 +87,7 @@ elseif strcmpi(tosave, 'avi')
 end
 
 % After each observation
-for i = 1:N
+for iObs = 1:N
     
     % For subject's and IO's inference
     for ind = 1:2
@@ -92,69 +99,73 @@ for i = 1:N
 
         % Check whether the change point already happened or not
         J = X{ind}.Jump+1/2;
-        if i < J, J = NaN; end
+        if iObs < J, J = NaN; end
 
         % Plot the trajectory (up to sample "i") on the triangle
-        Emergence_PlotTrajOnTri(X{ind}.BarycCoord(1:i,:), J, tricol, eps, markers);
-
+        Emergence_PlotTrajOnTri(X{ind}.BarycCoord(1:iObs,:), J, ...
+            tricol, eps, markers, false, fs);
+        
+        % Display the type of observer
+        text(min(xlim), min(ylim), obslab{ind}, 'FontWeight', 'Bold', ...
+            'HorizontalAlignment', 'Left', 'FontSize', fs);
+        
         % Customize the axes
-        set(gca, 'LineWidth', 1, 'FontSize', 15);
+        set(gca, 'LineWidth', 1, 'FontSize', fs);
 
         % Add some labels
         txt = condlab{seq};
-        spaces = strfind(txt, ' ');
+        spc = strfind(txt, ' ');
 
         % Auditory sequence
         % ~~~~~~~~~~~~~~~~~
         subplot(4,3,(2:3)+shift); cla;
 
         % Display the sequence (up to sample "i")
-        col = {'b', 'r'};
         for j = 1:2
-            idx = find(X{ind}.Seq(1:i) == j);
-            plot(idx, repmat(j, [1,numel(idx)]), '.', 'Color', col{j}); hold('on');
-            text(0, j, {soundsname{j},''}, 'Color', col{j}, ...
+            idx = find(X{ind}.Seq(1:iObs) == j);
+            plot(idx, repmat(j, [1,numel(idx)]), '.', 'Color', stimcol{j}); hold('on');
+            text(0, j, {soundsname{j},''}, 'Color', stimcol{j}, 'FontSize', fs, ...
                 'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
         end
 
         % Display the change point's position if it already occured
-        if i >= J
+        if iObs >= J
             plot(repmat(X{ind}.Jump,1,2), [0,3], 'k-', 'LineWidth', 1);
-            plot(X{ind}.Jump, 3, markers{2}, 'MarkerSize', 15, ...
+            plot(X{ind}.Jump, 3, markers{2}, 'MarkerSize', ms, ...
                 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
         end    
 
         % Customize the axes
         axis([1,N,0,3]);
-        set(gca, 'XTick', [1, get(gca, 'XTick')], 'YColor', 'none');
-        set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'LineWidth', 1, 'FontSize', 12);
-        if ind == 1, title({sprintf('%s sequence (%s)', txt(1:spaces(1)-1), ...
-                txt(spaces(1)+1:end)), ''}); end
+        set(gca, 'XTick', [1,20:20:N], 'YColor', 'none');
+        set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'LineWidth', 1, 'FontSize', fs);
+        if ind == 1, title(sprintf('%s sequence (%s)', txt(1:spc(1)-1), ...
+                txt(spc(1)+1:end))); end
 
         % Barycentric coordinates
         % ~~~~~~~~~~~~~~~~~~~~~~~
-        if i > 1
+        if iObs > 1
             subplot(4,3,(5:6)+shift); cla;
 
             % Display the cumulative Barycentric coordinates
-            Emergence_PlotBarycTraj(X{ind}.BarycCoord(1:i,:), tricol);
+            Emergence_PlotBarycTraj(X{ind}.BarycCoord(1:iObs,:), tricol);
 
             % Draw help lines (change levels)
-            plot([1,i], repmat(1/3,1,2), '-', 'Color', g, 'LineWidth', 1);
-            plot([1,i], repmat(2/3,1,2), '-', 'Color', g, 'LineWidth', 1);
+            plot([1,iObs], repmat(1/3,1,2), '-', 'Color', g, 'LineWidth', 1);
+            plot([1,iObs], repmat(2/3,1,2), '-', 'Color', g, 'LineWidth', 1);
 
             % Display the change point's position if it already occured
-            if i >= J
+            if iObs >= J
                 plot(repmat(X{ind}.Jump,1,2), [0,1], 'k-', 'LineWidth', 1);
-                plot(X{ind}.Jump, 1, markers{2}, 'MarkerSize', 15, ...
+                plot(X{ind}.Jump, 1, markers{2}, 'MarkerSize', ms, ...
                     'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
             end
 
             % Customize the axes
             axis([1,N,0,1]);
-            set(gca, 'XTick', [1, get(gca, 'XTick')]);
+            set(gca, 'XTick', [1,20:20:N]);
             set(gca, 'YTick', 0:1/3:1, 'YTickLabel', {'0','1/3','2/3','1'});
-            set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'LineWidth', 1, 'FontSize', 12);
+            set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'LineWidth', 1, 'FontSize', fs);
 
             % Add some labels
             if ind == 2, xlabel('Observation (#)'); end
@@ -175,8 +186,8 @@ for i = 1:N
     if strcmpi(tosave, 'gif')
         im = frame2im(frame);
         [imind, cm] = rgb2ind(im, 256);
-        if     i == 1, imwrite(imind, cm, filename, 'gif', 'Loopcount', inf); 
-        elseif i  > 1, imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append'); 
+        if     iObs == 1, imwrite(imind, cm, filename, 'gif', 'Loopcount', inf); 
+        elseif iObs  > 1, imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append'); 
         end 
     elseif strcmpi(tosave, 'avi')
     	writeVideo(vidObj, frame);
