@@ -134,7 +134,7 @@ allcp = cellfun(@(x) x.Jump-1/2, D(cat(2, cidx{1:2}),:));
 pct = percentile(allcp, pgrid);
 
 % Prepare output variable
-corcoef = NaN(nSub,2);
+coef = NaN(nSub,2);
 dotsm = NaN(nBin,2);
 dotss = NaN(nBin,2);
 
@@ -150,8 +150,8 @@ for iHyp = 1:2
         op = cp;
         sp = cellfun(@(x) x.Questions(3), D(cidx{iHyp},:));
     elseif xp == 2 % for question about detection point's position
-        op = cellfun(@(x,c) c + find(x.BarycCoord(c:end,iHyp) > 1/2, 1, 'first'), ...
-            D(cidx{iHyp},:), num2cell(cp), 'UniformOutput', 0);
+        op = cellfun(@(x,c) c + find(x.BarycCoord(c:end,iHyp) > 1/2, 1, ...
+            'first'), D(cidx{iHyp},:), num2cell(cp), 'UniformOutput', 0);
         op(cellfun(@isempty, op)) = {NaN};        
         op = cell2mat(op);
         sp = cellfun(@(x) x.Questions(5), D(cidx{iHyp},:));
@@ -162,11 +162,11 @@ for iHyp = 1:2
     op(~detecmask) = NaN;
     sp(~detecmask) = NaN;
     
-    % Subject-specific regression between
-    corcoef(:,iHyp) = cellfun(@(y,x) nancorr(y, x), ...
+    % Subject-specific regression
+    coef(:,iHyp) = cellfun(@(toexplain,explainingvar) ...
+        Emergence_Regress(toexplain, explainingvar, 'OLS', 'R2'), ...
         mat2cell(sp, nR, ones(nSub,1)), ... % inferred change point's position
-        mat2cell(op, nR, ones(nSub,1)), ... % true change point's position
-        'UniformOutput', 1);
+        mat2cell(op, nR, ones(nSub,1)));    % true change point's position
     
     % For each bin
     for iBin = 1:nBin
@@ -207,33 +207,32 @@ plot([bot, 200-bot], [bot, 200-bot], 'k--');
 for iHyp = 1:2
     
     % Shortcuts to avoid errors
-    ocp_m = dotsm(:,1,iHyp);
-    scp_m = dotsm(:,2,iHyp);
-    ocp_s = dotss(:,1,iHyp);
-    scp_s = dotss(:,2,iHyp);
+    ocp_m = dotsm(:,1,iHyp)';
+    scp_m = dotsm(:,2,iHyp)';
+    ocp_s = dotss(:,1,iHyp)';
+    scp_s = dotss(:,2,iHyp)';
+    
+    % Group-level regression between (binned) objective and subjective
+    % positions of the change point
+    beta = Emergence_Regress(scp_m, ocp_m, 'OLS', {'beta0', 'beta1'});
+    confint = Emergence_Regress(scp_m, ocp_m, 'OLS', 'confint');
+    xval = Emergence_Regress(scp_m, ocp_m, 'OLS', 'confintx');
+    rho = Emergence_Regress(scp_m, ocp_m, 'OLS', 'R2');
     
     % Regression on binned data between objective and inferred position
-    B = regress(scp_m, [ones(nBin,1), ocp_m]);
-    [top_int, bot_int, xval] = regression_line_ci(0.05, B, ocp_m, scp_m, 100);
-    fill([xval, fliplr(xval)], [top_int, fliplr(bot_int)], 'k', ...
+    fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
         'EdgeColor', 'None', 'FaceColor', tricol(iHyp,:), 'FaceAlpha', 1/3);
-    plot(xval, B(1)+B(2).*xval, '-', 'Color', tricol(iHyp,:), 'LineWidth', 3);
+    plot(xval, beta(1)+beta(2).*xval, '-', 'Color', tricol(iHyp,:), 'LineWidth', 3);
     
-    % For each bin
-    for iBin = 1:nBin
-        
-        % Display horizontal and vertical error bars
-        plot(repmat(ocp_m(iBin),1,2), scp_m(iBin)+scp_s(iBin)*[-1,1], 'k-');
-        plot(ocp_m(iBin)+ocp_s(iBin)*[-1,1], repmat(scp_m(iBin),1,2), 'k-');
-        
-        % Display the average value in that bin
-        plot(ocp_m(iBin), scp_m(iBin), 'ko', 'MarkerFaceColor', ...
-            tricol(iHyp,:), 'MarkerSize', 7);
-    end
+    % Display horizontal and vertical error bars
+    plot(repmat(ocp_m, [2,1]), scp_m+scp_s.*[-1;1], 'k-');
+    plot(ocp_m+ocp_s.*[-1;1], repmat(scp_m, [2,1]), 'k-');
+    
+    % Display the average value in that bin
+    plot(ocp_m, scp_m, 'ko', 'MarkerFaceColor', tricol(iHyp,:), 'MarkerSize', 7);
     
     % Compute the correlation coefficient on binned data
-    rho = nancorr(scp_m, ocp_m);
-    text(xval(end), B(1)+B(2)*xval(end), sprintf(' r = %0.2f', rho), ...
+    text(xval(end), beta(1)+beta(2)*xval(end), sprintf(' \rho = %0.2f', rho), ...
         'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Middle', ...
         'Color', tricol(iHyp,:));
 end
@@ -252,23 +251,21 @@ ylabel(sprintf('Inferred %s point''s position', ptname{xp}));
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Display the scenario in which no correlation is observed
-subplot(1,3,3);
-plot([0,3], zeros(1,2), 'k--'); hold('on');
+subplot(1,3,3); hold('on');
 
 % Display difference in correlation coefficients between the two types of regularity
-Emergence_PlotSubGp(corcoef, tricol(1:2,:));
+Emergence_PlotSubGp(coef, tricol(1:2,:));
 
 % Perform a paired t-test between correlation coefficients
-[~,pval,tci,stats] = ttest(diff(corcoef, 1, 2)); % between regularities
+[~,pval,tci,stats] = ttest(diff(coef, 1, 2)); % between regularities
 disptstats(pval,tci,stats);
-[~,pval,tci,stats] = ttest(corcoef - 1); % against ideal scenario
+[~,pval,tci,stats] = ttest(coef - 1); % against ideal scenario
 disptstats(pval,tci,stats);
-[~,pval,tci,stats] = ttest(corcoef); % against an absence of correlation
+[~,pval,tci,stats] = ttest(coef); % against an absence of correlation
 disptstats(pval,tci,stats);
 
 % Customize the axes
-axis([0,3,-1,1]);
-ylim([-max(abs(ylim)),max(abs(ylim))]);
+xlim([0,3]);
 set(gca, 'XColor', 'None', 'Box', 'Off');
 
 % Save the figure
