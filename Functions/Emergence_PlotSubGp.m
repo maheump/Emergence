@@ -18,8 +18,16 @@ function Emergence_PlotSubGp( y, col, xon, ms, aval )
 % Get the size of the input data matrix
 [nSub,nCond] = size(y);
 
+% If there is only 1 condition and the array is misoriented, take care of
+% making it a column vector
+if nSub == 1
+    y = y(:);
+    nSub = nCond;
+    nCond = 1;
+end
+
 % Fill in the inputs
-if nargin < 2 || isempty(col), col = [1 0 0]; end % red color
+if nargin < 2 || isempty(col), col = 'k'; end % black
 if nargin < 3 || isempty(xon), xon = 0; end % no global shift
 if nargin < 4 || isempty(ms), ms = 10; end % 10 points markers
 if nargin < 5 || isempty(aval), aval = 0.15; end % transparency

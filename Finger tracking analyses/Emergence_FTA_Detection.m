@@ -373,7 +373,7 @@ disptstats(pval, tci, stats);
 % Prepare a new window
 figure('Position', [714 806 120 200]);
 
-% Display 
+% Display difference in d' between the two types of regularity
 Emergence_PlotSubGp(dprime(:,1:2), tricol(1:2,:));
 
 % Customize the axes
