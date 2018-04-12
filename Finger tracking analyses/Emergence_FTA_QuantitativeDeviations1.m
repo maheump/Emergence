@@ -121,6 +121,9 @@ set(gca, 'Box', 'Off');
 % Add some text labels
 ylabel('Model frequencies');
 
+% Save the figure
+save2pdf('figs/F_QD_BMS.pdf');
+
 % Display the fit at the group level
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -152,10 +155,8 @@ plot(p, fp, 'k-', 'LineWidth', 3);
 % Display averaged bins and related error
 avgbinbel = mean(binbel, 3);
 sembinbel = sem(binbel, 3);
-plot(repmat(avgbinbel(:,1), 1, 2)', ...
-    avgbinbel(:,2)'+sembinbel(:,2)'.*[-1,1]', 'k-')
-plot(avgbinbel(:,1), avgbinbel(:,2), 'ko', ...
-    'MarkerFaceColor', g, 'LineWidth', 1, 'MarkerSize', 8);
+plot(repmat(avgbinbel(:,1), 1, 2)', avgbinbel(:,2)'+sembinbel(:,2)'.*[-1,1]', 'k-')
+plot(avgbinbel(:,1), avgbinbel(:,2), 'ko', 'MarkerFaceColor', g, 'MarkerSize', 8);
 
 % Customize the axes
 axis(repmat([0,1], 1, 2)); axis('square');
@@ -166,7 +167,7 @@ set(gca, 'Box', 'Off');
 xlabel('Beliefs from the ideal observer'); ylabel('Beliefs from subjects');
 
 % Save the figure
-save2pdf('figs/F_QD_SubPWFit.pdf');
+save2pdf('figs/F_QD_AvgPWFit.pdf');
 
 % Display best parameters
 % ~~~~~~~~~~~~~~~~~~~~~~~
@@ -205,7 +206,7 @@ for iParam = 1:2
 end
 
 % Save the figure
-save2pdf('figs/F_QD_AvgPWFit.pdf');
+save2pdf('figs/F_QD_GpPWFit.pdf');
 
 %% OBSERVATION FUNCTIONS FOR VBA
 %  =============================
