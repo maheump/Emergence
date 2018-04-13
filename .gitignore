@@ -25,6 +25,36 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Ignore elements related to MATLAB
+# Ignore figures
+*.pdf
+*.png
+*.jpg
+*.ai
+
+# Ignore automatically backup MATLAB files
 *.m~
+
+# Ignore data files
+*.mat
+
+# Ignore private folders
 private
+
+# Ignore LaTeX files
+*.zip
+*.log
+*.gz
+*.toc
+*.tex
+*.aux
+
+# Ignore movies and sounds
+*.avi
+*.wav
+
+# Ignore some folders that we do not want to push online
+Behaviour*
+fMRI*
+Pupil*
+Examples
+Notes
