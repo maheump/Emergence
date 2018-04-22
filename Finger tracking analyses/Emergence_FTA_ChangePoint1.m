@@ -2,7 +2,7 @@
 % beliefs regarding the position of the change point are more precise in
 % the case of the emergence of a deterministic compared to a probabilistic
 % regularity.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 %% PREDICTIONS FROM THE IDEAL OBSERVER
@@ -23,23 +23,23 @@ varcppost = NaN(nSub, 2);
 
 % For each type of regularity
 for iHyp = 1:2
-    
+
     % Get the position of the change point
     cp = cellfun(@(x) x.Jump-1/2, G(cidx{iHyp},:), 'UniformOutput', 0);
-    
+
     % Get beliefs about the change point's position at the end of each
     % sequence
     lab = sprintf('pJkgYMs%s', lower(proclab{iHyp}(1)));
     bel = cellfun(@(x) x.(lab)(end,:), IO(cidx{iHyp},:), 'UniformOutput', 0);
-    
+
     % Look around the change point's position in the window defined earlier
     belwrtcp = cellfun(@(b,c) b(c-winwidth/2:c+winwidth/2), bel, cp, 'UniformOutput', 0);
-    
+
     % Average over sequences for each subject
     belwrtcp = mat2cell(belwrtcp, numel(cidx{iHyp}), ones(1,nSub));
     belwrtcp = cellfun(@(x) mean(cell2mat(x), 1), belwrtcp, 'UniformOutput', 0);
     cppost(:,:,iHyp) = cell2mat(belwrtcp');
-    
+
     % Measure the precision of these posterior distributions
     varcppost(:,iHyp) = cellfun(@(y) 1/std(x,y), belwrtcp);
 end
@@ -56,17 +56,17 @@ figure('Position', [1 906 340 200]);
 % For each type of regularity
 lgd = NaN(1,2);
 for iHyp = fliplr(1:2)
-    
+
     % Average posterior distributions
     d = cppost(:,:,iHyp);
     m = mean(d,1);
-    
+
     % Display the posterior distribution of change point's positions
     % centered around the real position of the change point
     lgd(iHyp) = fill([x(1), x, x(end)], [0, m, 0], 'k', 'FaceColor', ...
         tricol(iHyp,:), 'EdgeColor', 'None', 'FaceAlpha', 1/3); hold('on');
     plot(x, m, '-', 'Color', tricol(iHyp,:), 'LineWidth', 2)
-    
+
     % Perform a t-test against the uniform (prior) distribution at each
     % position around the true change point's position
     h = ttest(cppost(:,:,iHyp), 1/N, 'tail', 'right');
