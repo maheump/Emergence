@@ -1,5 +1,6 @@
-% Generate animated gif or audiovisual movie from a single example
-% sequence.
+% Generate an animated gif or an audiovisual movie of a single example
+% sequence with progressively updating beliefs from an example subject and
+% the ideal observer.
 %
 % Copyright (c) 2018 Maxime Maheu
 
@@ -78,7 +79,7 @@ obslab = {'Subject', {'Ideal','observer'}};
 
 % Prepare the video file
 if strcmpi(tosave, 'gif')
-    filename = 'images/Emergence_FTA_ExampleSequence.gif';
+    filename = 'Emergence_FTA_ExampleSequence.gif';
     delete(filename);
 elseif strcmpi(tosave, 'avi')
     vidObj = VideoWriter('vid.avi');
@@ -110,7 +111,7 @@ for iObs = 1:N
             'HorizontalAlignment', 'Left', 'FontSize', fs);
         
         % Customize the axes
-        set(gca, 'LineWidth', 1, 'FontSize', fs);
+        set(gca, 'FontSize', fs);
 
         % Add some labels
         txt = condlab{seq};
@@ -130,17 +131,18 @@ for iObs = 1:N
 
         % Display the change point's position if it already occured
         if iObs >= J
-            plot(repmat(X{ind}.Jump,1,2), [0,3], 'k-', 'LineWidth', 1);
+            plot(repmat(X{ind}.Jump,1,2), [0,3], 'k-');
             plot(X{ind}.Jump, 3, markers{2}, 'MarkerSize', ms, ...
-                'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
+                'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
         end    
 
         % Customize the axes
         axis([1,N,0,3]);
         set(gca, 'XTick', [1,20:20:N], 'YColor', 'none');
-        set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'LineWidth', 1, 'FontSize', fs);
-        if ind == 1, title(sprintf('%s sequence (%s)', txt(1:spc(1)-1), ...
-                txt(spc(1)+1:end))); end
+        set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs);
+        if ind == 1
+            title(sprintf('%s sequence (%s)', txt(1:spc(1)-1), txt(spc(1)+1:end)));
+        end
 
         % Barycentric coordinates
         % ~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,21 +153,21 @@ for iObs = 1:N
             Emergence_PlotBarycTraj(X{ind}.BarycCoord(1:iObs,:), tricol);
 
             % Draw help lines (change levels)
-            plot([1,iObs], repmat(1/3,1,2), '-', 'Color', g, 'LineWidth', 1);
-            plot([1,iObs], repmat(2/3,1,2), '-', 'Color', g, 'LineWidth', 1);
+            plot([1,iObs], repmat(1/3,1,2), '-', 'Color', g);
+            plot([1,iObs], repmat(2/3,1,2), '-', 'Color', g);
 
             % Display the change point's position if it already occured
             if iObs >= J
-                plot(repmat(X{ind}.Jump,1,2), [0,1], 'k-', 'LineWidth', 1);
+                plot(repmat(X{ind}.Jump,1,2), [0,1], 'k-');
                 plot(X{ind}.Jump, 1, markers{2}, 'MarkerSize', ms, ...
-                    'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
+                    'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
             end
 
             % Customize the axes
             axis([1,N,0,1]);
             set(gca, 'XTick', [1,20:20:N]);
             set(gca, 'YTick', 0:1/3:1, 'YTickLabel', {'0','1/3','2/3','1'});
-            set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'LineWidth', 1, 'FontSize', fs);
+            set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs);
 
             % Add some labels
             if ind == 2, xlabel('Observation (#)'); end
