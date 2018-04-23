@@ -54,7 +54,7 @@ for iHyp = 1:2
     % Consider only sequences for which regularities were correctly identified
     detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
     lag{iHyp}(~detecmask) = NaN;
-    cp{r}(~detecmask) = NaN;
+    cp{iHyp}(~detecmask) = NaN;
     dp{iHyp}(~detecmask) = NaN;
     
     % For change- and detection- points
