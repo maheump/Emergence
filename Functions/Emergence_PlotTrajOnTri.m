@@ -48,12 +48,8 @@ end
 
 % Convert barycentric coordinates to cartesian coordinates
 if nargin < 1, pMgY = NaN(1,3); end
-x = pMgY(:,1) .* tricc(1,1) + pMgY(:,2) .* tricc(2,1) + pMgY(:,3) .* tricc(3,1);
-y = pMgY(:,1) .* tricc(1,2) + pMgY(:,2) .* tricc(2,2) + pMgY(:,3) .* tricc(3,2);
-
-% Remove NaNs
-x = x(~isnan(x));
-y = y(~isnan(y));
+cartcoor = pMgY*tricc;
+cartcoor = cartcoor(any(~isnan(cartcoor), 2),:);
 
 % Plot the triangle
 % ~~~~~~~~~~~~~~~~~
@@ -76,19 +72,19 @@ if nargin < 4 || isempty(markers), markers = {'v', 'p', '^'}; end
 if nargin < 4, ms = eps; end
 
 % Plot the trajectory
-if nargin >= 1 && ~isempty(x) && ~isempty(y)
-    lout(1) = plot(x, y, 'k.-', 'MarkerSize', ms, ...
+if nargin >= 1 && ~isempty(cartcoor)
+    lout(1) = plot(cartcoor(:,1), cartcoor(:,2), 'k.-', 'MarkerSize', ms, ...
         'MarkerEdgeColor', 'k', 'LineWidth', 1);
-    lout(2) = plot(x(1), y(1), markers{1}, 'MarkerSize', 10, ...
+    lout(2) = plot(cartcoor(1,1), cartcoor(1,2), markers{1}, 'MarkerSize', 10, ...
         'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
-    lout(3) = plot(x(end), y(end), markers{3}, 'MarkerSize', 10, ...
+    lout(3) = plot(cartcoor(end,1), cartcoor(end,2), markers{3}, 'MarkerSize', 10, ...
         'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
 end
 
 % Plot the position of the change point
 if nargin < 2, J = NaN; end
 if ~isnan(J)
-    lout(4) = plot(x(J), y(J), markers{2}, 'MarkerSize', 15, ...
+    lout(4) = plot(cartcoor(J,1), cartcoor(J,2), markers{2}, 'MarkerSize', 15, ...
         'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
 else, lout = lout(1:3); lnames = lnames(1:3);
 end
