@@ -9,11 +9,11 @@ function [ marghist, bars ] = Emergence_PlotMargHist( pMgY, nBin, tricc, tricol 
 %       sqrt(3)/2 and it is drawn at (0,0).
 %   - "tricol": a 3x3 matrix specifying the RGB (columns) of each vertex of
 %       the triangle.
+% 
 % Copyright (c) 2018 Maxime Maheu
 
-% ~~~~~~~~~~~~~~~~~~ %
-% Fill in the inputs %
-% ~~~~~~~~~~~~~~~~~~ %
+% Fill in the inputs
+% ~~~~~~~~~~~~~~~~~~
 
 % Coordinates of the triangles limits (cartesian coordinates)
 if nargin < 3 || isempty(tricc)
@@ -29,9 +29,8 @@ if nargin < 4 || isempty(tricol)
               065 171 093] ./ 255; % bottom (green)
 end
 
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-% Get the three marginal histograms %
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+% Get the three marginal histograms
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Get limits of the bins
 Bins = linspace(0, 1, nBin);
@@ -54,16 +53,14 @@ axlim = NaN(3,2);
 % For each of the 3 side of the triangle
 for iDim = 1:3
     
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-    % Get the histogram for the current side of the triangle %
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+    % Get the histogram for the current side of the triangle
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     bins = marghist(:,iDim)';
     if iDim == 3, bins = fliplr(bins); end
     
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-    % Segment the limits of the triangle into equal parts %
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ % 
+    % Segment the limits of the triangle into equal parts
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     
     % Get x-coordinates of each segment
     if     iDim == 1, x = linspace(tricc(1,1), tricc(3,1), nBin+1); x = fliplr(x);
@@ -76,9 +73,8 @@ for iDim = 1:3
     else,         y = linspace(0, sqrt(3)/2, nBin+1);
     end
     
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-    % Get coordinates of the bars %
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+    % Get coordinates of the bars
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     %  2__3      __   => Example marginal histogram with nBin = 3
     %  |  |__   |  |  => with the location of points #1, #2, #3 and #4
     %  |  |  |__|  |  => whose coordinates are derived below
@@ -126,9 +122,8 @@ for iDim = 1:3
     x4 = x(2:nBin+1);
     y4 = y(2:nBin+1);
     
-    % ~~~~~~~~~~~~~~~~~~ %
-    % Draw the histogram %
-    % ~~~~~~~~~~~~~~~~~~ %
+    % Draw the histogram
+    % ~~~~~~~~~~~~~~~~~~
     
     % Draw all the bars at the same time
     xcoord = [x1; x2; x3; x4]; % each row is one of the vertex of the bars

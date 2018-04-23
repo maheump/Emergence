@@ -15,7 +15,7 @@ function out = Emergence_Regress( y, x, method, outvar )
 % same size
 if numel(x) ~= numel(y), error('Inputs must have the same size'); end
 
-% If one 
+% If only one output variable is provided, make sure it is in a cell array
 if nargin > 3 && ~iscell(outvar), outvar = {outvar}; end
 
 % Remove NaNs
