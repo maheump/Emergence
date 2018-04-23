@@ -330,7 +330,7 @@ end
 % ~~~~~~~~~~~~~~~~~~~~
 function [g, dgdx, dgdP] = g_SIGM(x, P, u, in)
 
-% Make sure 
+% Make sure that the values at which to evaluate the function are within a structure
 if ~isstruct(in)
     p = in;
     in = [];
@@ -342,7 +342,7 @@ slope = exp(P(1)); % E [0,+inf[
 intcp = P(2); % E ]-inf,+inf[
 y = slope .* in.p + intcp; % linear relationship
 
-% Make it a sigmoidal relationship
+% Compute predictions of the sigmoid functions
 g = 1 ./ (1 + exp(-y));
 
 % If provided, allows the sigmoid to start above zero

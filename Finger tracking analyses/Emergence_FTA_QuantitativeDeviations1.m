@@ -217,14 +217,22 @@ save2pdf('figs/F_QD_GpPWFit.pdf');
 % See: Gonzalez, R., & Wu, G. (1999). On the shape of the probability
 %   weighting function. Cognitive psychology, 38(1), 129-166.
 function [g, dgdx, dgdP] = g_PW(x, P, u, in)
+
+% Make sure that the values at which to evaluate the function are within a structure
 if ~isstruct(in)
     p = in;
     in = [];
     in.p = p;
 end
+
+% Get parameters
 gamma = P(1);
 p0 = P(2);
+
+% Compute predictions of the probabilistic weighting function
 g = logitinv(gamma .* logit(in.p) + (1 - gamma) * logit(p0));
+
+% Rely on numerical derivatives
 dgdx = [];
 dgdP = [];
 end
@@ -233,8 +241,14 @@ end
 % ~~~~~~~~~~~~~~~~~~~~
 % See: https://en.wikipedia.org/wiki/General_linear_model
 function [g,dgdx,dgdP] = g_LM(x, P, u, in)
+
+% Add an offset to the design matrix 
 X = [in.p, ones(numel(in.p),1)];
+
+% Compute predictions of the linear regression
 g = X*P;
+
+% Use analytical derivatives
 dgdx = [];
 dgdP = X';
 end
