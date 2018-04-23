@@ -23,6 +23,7 @@ Here is an example sequence with the beliefs from an example subject and from th
 
 * [Custom functions for sequence processing](https://github.com/maheump/matlab/tree/master/sequences)
 * [VBA toolbox](http://mbb-team.github.io/VBA-toolbox/)
+* [cbrewer2](https://github.com/scottclowe/cbrewer2)
 * [avconv](https://libav.org/avconv.html)
 
 ## Related toolboxes
