@@ -24,7 +24,7 @@ if strcmpi(binmeth, 'unif') % bins uniformed on the probability space
 elseif strcmpi(binmeth, 'equil') % bins uniformed on the probability space
     iobel = cellfun(@(x) x.BarycCoord(:), IO, 'UniformOutput', 0);
     iobel = cell2mat(iobel(:));
-    pgrid = percentile(iobel, linspace(0, 100, nBin));
+    pgrid = prctile(iobel, linspace(0, 100, nBin));
 else, error('Please check the binnig method that is provided');
 end
 
@@ -207,9 +207,6 @@ end
 
 % Save the figure
 save2pdf('figs/F_QD_GpPWFit.pdf');
-
-%% OBSERVATION FUNCTIONS FOR VBA
-%  =============================
 
 % Probability weighting function
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
