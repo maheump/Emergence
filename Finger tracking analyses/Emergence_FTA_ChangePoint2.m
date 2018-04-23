@@ -177,7 +177,7 @@ end
 
 % Average over regularities for each condition (proba. & deter.)
 avgConf = NaN(nSub,2);
-for iHyp = 1:2, avgConf(:,iHyp) = nanmean(conf(cidx{iHyp},:),1)'; end
+for iHyp = 1:2, avgConf(:,iHyp) = mean(conf(cidx{iHyp},:), 1, 'OmitNaN')'; end
 if any(avgConf(:) > 1), avgConf = avgConf ./ 100; end
 
 % Display reported confidence in the estimation for the two types of regularities

@@ -266,7 +266,7 @@ plot(xcp([1,end]), 2.*ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
 for iHyp = 1:2
     
     % Average sigmoid parameters over sequences
-    param = squeeze(nanmean(sigparam{iHyp},1));
+    param = squeeze(mean(sigparam{iHyp}, 1, 'OmitNaN'));
     avgparam = mean(param, 1, 'OmitNaN');
     semparam = sem(param, 1);
     
