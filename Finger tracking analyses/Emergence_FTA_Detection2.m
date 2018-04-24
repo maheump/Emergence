@@ -64,7 +64,7 @@ set(gca, 'XTick', 1:2, 'XTickLabel', {'Undetected', 'Detected'}, ...
 set(gca, 'Box', 'Off');
 
 % Add some text labels
-xlabel({'probabilistic', 'regularities'});
+xlabel({'Probabilistic', 'regularities'});
 ylabel('Belief p(M_P|y) from the IO');
 
 % Save the figure

@@ -219,7 +219,7 @@ Cpd = gavgcrit(3); % criterion between probabilistic and deterministic sequences
 Apsd = acosd((Dsd^2 + Dsp^2 - Dpd^2) / (2*Dsd*Dsp)); % "fully-stochastic" angle
 Aspd = acosd((Dpd^2 + Dsp^2 - Dsd^2) / (2*Dpd*Dsp)); % "probabilistic" angle
 Apds = acosd((Dpd^2 + Dsd^2 - Dsp^2) / (2*Dpd*Dsd)); % "deterministic" angle
-theta = Apsd; % 
+theta = Apsd;
 
 % A useful angle (for trigonometry below) that specify the rotation of the
 % triangle from its horizontal position (in which the S/D axis is along the
