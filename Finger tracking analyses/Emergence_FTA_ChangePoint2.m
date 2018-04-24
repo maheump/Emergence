@@ -121,11 +121,6 @@ for iHyp = 1:2
     
     % Display the average value in that bin
     plot(ocp_m, scp_m, 'ko', 'MarkerFaceColor', tricol(iHyp,:), 'MarkerSize', 7);
-    
-    % Compute the correlation coefficient on binned data
-    text(xval(end), beta(1)+beta(2)*xval(end), sprintf(' \rho = %0.2f', rho), ...
-        'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Middle', ...
-        'Color', tricol(iHyp,:));
 end
 
 % Customize the axes
