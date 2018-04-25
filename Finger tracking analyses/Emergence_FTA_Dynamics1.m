@@ -148,6 +148,10 @@ end
 % Display the same trajectories but in the triangular space
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% Properties of the triangle
+tricc  = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
+tricol = [066 146 198; 239 059 033; 065 171 093] ./ 255;
+
 % Prepare a new window
 figure('Position', [1 906 200 400]);
 
