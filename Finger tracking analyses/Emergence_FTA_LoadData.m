@@ -22,6 +22,9 @@ G = G(:,goodsubs);
 S = S(goodsubs);
 IO = IO(:,goodsubs);
 
+% By default, analyse subjects' data
+D = G;
+
 % Get the number of subjects and the number of conditions
 [nCond, nSub] = size(G);
 
