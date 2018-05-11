@@ -1,14 +1,11 @@
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-% Exponentialy time-decaying weights to approximate a leaky memory %
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 function leak = Emergence_IO_Leak( pErr, N )
-%COMPUTELEAK returns a 1xN vector of exponentialy decaying weights. This
-%can be use to implement a leaky memory.
+% EMERGENCE_IO_LEAK returns a 1xN vector of exponentialy decaying weights.
+% This can be use to implement a leaky memory.
 %   - "pErr": the probability of making a mistake at each observation put
 %       in memory (a scalar E [0,1]). 
 %   - "N": the number of observations in the sequence (an integer > 0).
 % 
-%Example:
+% Example:
 %   >> leak = ComputeLeak(1/5, 10);
 %   => [.51 .51 .51 .52 .54 .56 .61 .68 .80  1]
 %        #1  #2  #3  #4  #5  #6  #7  #8  #9 #10
@@ -39,8 +36,6 @@ for k = 1:N
     leak(k) = pnochange + pchange;
 end
 
-end
-
 % Custom nchoosek function (see the MATLAB function)
 function c = BinCoef( n, k )
 
@@ -48,5 +43,7 @@ nums = (n-k+1):n;
 dens = 1:k;
 nums = nums./dens;
 c = round(prod(nums));
+
+end
 
 end
