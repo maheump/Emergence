@@ -197,7 +197,7 @@ end
 %% Probability distribution
 %  ========================
 
-% Way more faster than the regular MATLAB "betapdf" function because:
+% Way faster than the regular MATLAB "betapdf" function because:
 %   - it does not check the inputs, but directly "repmat" the coefficients
 %   - it does not have to check whether the inputs are smaller than 0
 %   - it does not have to check the size of x
