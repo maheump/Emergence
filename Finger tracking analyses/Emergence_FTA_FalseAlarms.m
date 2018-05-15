@@ -102,7 +102,7 @@ for iBin = 1:nBin-1
 end
 
 % Customize the colormap and add a colorbar
-colormap(cmap); caxis(p([1,end]));
+colormap(cmap); caxis(pgrid([1,end]));
 cbr = colorbar('Location', 'SouthOutside');
 cbr.Label.String = sprintf('p(M_%s|y) from the ideal observer', proclab{iHyp}(1));
 
@@ -161,6 +161,9 @@ Emergence_PlotSubGp(coef, tricol(iHyp,:));
 % Customize the axes
 set(gca, 'Box', 'Off', 'XTick', []);
 axis([0,2,-1,1]);
+
+% Display whether the difference is significant or not
+Emergence_DispStatTest(coef);
 
 % Add some text label
 ylabel('Correlation coefficient');

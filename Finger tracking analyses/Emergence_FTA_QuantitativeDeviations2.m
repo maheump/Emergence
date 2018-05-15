@@ -135,6 +135,9 @@ Emergence_PlotSubGp(param(submaxidxavgR2), 'k');
 axis([0, 2, -10, 50]);
 set(gca, 'Box', 'Off', 'XColor', 'None');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(param(submaxidxavgR2));
+
 % Add some text labels
 ylabel('Estimated delay (# obs.)');
 

@@ -373,6 +373,9 @@ Emergence_PlotSubGp(dprime(:,1:2), tricol(1:2,:));
 xlim([0,3]);
 set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(dprime(:,1:2));
+
 % Add some text labels
 ylabel('Detection d''');
 

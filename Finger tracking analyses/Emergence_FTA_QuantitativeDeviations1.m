@@ -196,6 +196,9 @@ for iParam = 1:2
     end
     set(gca, 'Box', 'Off', 'XTick', [], 'XColor', 'none');
     
+    % Display whether the difference is significant or not
+    Emergence_DispStatTest(PWparams(iParam,:));
+    
     % Add some text labels
     ylabel(['$', pwparamname{iParam}, '$'], 'Interpreter', 'LaTeX', ...
         'Rotation', 0, 'VerticalAlignment', 'Bottom');

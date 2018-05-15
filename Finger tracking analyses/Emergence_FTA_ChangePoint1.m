@@ -105,6 +105,9 @@ Emergence_PlotSubGp(varcppost, tricol(1:2,:));
 xlim([0,3]);
 set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(varcppost);
+
 % Add some text labels
 ylabel('1/std');
 

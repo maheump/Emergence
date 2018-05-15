@@ -136,6 +136,7 @@ for lock = 1:2
             Emergence_PlotSubGp(avglag{iHyp}, tricol(iHyp,:));
             axis([0, 2, x([1,end])]); axis('off');
             view([90,90]);
+            Emergence_DispStatTest(avglag{iHyp});
         end
     end
 end
@@ -321,6 +322,9 @@ Emergence_PlotSubGp(slope, tricol(1:2,:));
 % Customize the axes
 set(gca, 'XTick', [], 'Box', 'Off');
 axis([0,3,0,1.2]);
+
+% Display whether the difference is significant or not
+Emergence_DispStatTest(slope);
 
 % Add some text labels
 ylabel('Slope parameter');

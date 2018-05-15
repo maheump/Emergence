@@ -63,6 +63,9 @@ set(gca, 'XTick', 1:2, 'XTickLabel', {'Undetected', 'Detected'}, ...
     'XTickLabelRotation', 30);
 set(gca, 'Box', 'Off');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(avgbel);
+
 % Add some text labels
 xlabel({'Probabilistic', 'regularities'});
 ylabel('Belief p(M_P|y) from the IO');
@@ -104,6 +107,9 @@ axis([0,3,0,1]);
 set(gca, 'XTick', 1:2, 'XTickLabel', entgpttl, 'XTickLabelRotation', 30);
 set(gca, 'Box', 'Off');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(entdetecrate);
+
 % Add some labels
 xlabel('Entropy levels');
 ylabel('Average detection rate');
@@ -129,6 +135,9 @@ Emergence_PlotSubGp(biasdetecrate, tricol(1,:));
 axis([0,4,0,1]);
 set(gca, 'XTick', 1:nGp, 'XTickLabel', biasgpttl, 'XTickLabelRotation', 30);
 set(gca, 'Box', 'Off');
+
+% Display whether the difference is significant or not
+Emergence_DispStatTest(entdetecrate);
 
 % Add some labels
 xlabel('Biased dimension');
@@ -166,6 +175,9 @@ axis([0,nGp+1,0,1]);
 set(gca, 'XTick', 1:nGp, 'XTickLabel', num2cell(unique(len)));
 set(gca, 'Box', 'Off');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(lendetecrate);
+
 % Add some labels
 xlabel('Rules'' length');
 ylabel('Average detection rate');
@@ -190,6 +202,9 @@ Emergence_PlotSubGp(cplxetecrate, tricol(2,:));
 axis([0,4,0,1]);
 set(gca, 'XTick', 1:numel(cplxidx), 'XTickLabel', cplxttl, 'XTickLabelRotation', 30);
 set(gca, 'Box', 'Off');
+
+% Display whether the difference is significant or not
+Emergence_DispStatTest(lendetecrate);
 
 % Add some labels
 xlabel('Rule''s difficulty');

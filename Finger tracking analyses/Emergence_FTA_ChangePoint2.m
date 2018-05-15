@@ -154,6 +154,9 @@ disptstats(pval,tci,stats);
 xlim([0,3]);
 set(gca, 'XColor', 'None', 'Box', 'Off');
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(coef);
+
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_CorrS.pdf');
 else, save2pdf('figs/F_CP_CorrIO.pdf');
@@ -191,6 +194,9 @@ disptstats(pval,tci,stats);
 % Customize the axes
 axis([0,3,0,1]);
 set(gca, 'XColor', 'None', 'Box', 'Off');
+
+% Display whether the difference is significant or not
+Emergence_DispStatTest(avgConf);
 
 % Add some labels
 ylabel('Confidence in the estimate');
