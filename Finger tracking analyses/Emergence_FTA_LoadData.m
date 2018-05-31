@@ -54,6 +54,3 @@ set(groot, 'DefaultAxesLayer', 'Top'); % axes on top of the plot
 set(groot, 'DefaultAxesTickDir', 'In'); % ticks oriented outside the plot
 set(groot, 'DefaultAxesTickLength', repmat(0.01, [1 2])); % length of ticks
 set(groot, 'DefaultAxesTickDirMode', 'Auto'); % otherwise the previous commands do not work
-
-% Some useful colour
-g = repmat(0.7,1,3); % grey

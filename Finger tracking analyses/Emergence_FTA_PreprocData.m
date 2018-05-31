@@ -311,9 +311,10 @@ rightcol = [239 059 033]; % 2: deterministic component (red)
 downcol  = [065 171 093]; % 3: stochastic component (green)
 tricol   = [leftcol; rightcol; downcol] ./ 255;
 letters  = {'A','B'};
+g = repmat(0.7,1,3); % grey
 
 % Save the group data file
 filename = fullfile(homedir, 'Finger tracking analyses/ppdata/Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'homedir', ...
     'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...
-    'tricol', 'letters', 'downcol', 'leftcol', 'rightcol');
+    'tricol', 'letters', 'downcol', 'leftcol', 'rightcol', 'prob', 'det', 'g');
