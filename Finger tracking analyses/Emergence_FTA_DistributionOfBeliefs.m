@@ -50,6 +50,9 @@ filtSigma = 2;
 filtWidth = 2*ceil(2*filtSigma)+1;
 imageFilter = fspecial('Gaussian', filtWidth, filtSigma);
 
+% Define the degree of interpolation that we apply on the trajectory
+dtint = 1/3; % must be <= 1, 1 is no interpolation
+
 % Perform the analysis
 % ~~~~~~~~~~~~~~~~~~~~
 
@@ -67,14 +70,19 @@ for iMap = 1:nMap
     % Get the finger's positions in the current condition
     points = cellfun(@(x,y) x.BarycCoord(y,:), ...
         D, idxtrimap{iMap}, 'UniformOutput', 0);
+    
+    % Get finger's positions of each subjects
     for iSub = 1:nSub
         subpoints{iSub,iMap} = cell2mat(points(:,iSub));
     end
-    gppoints{iMap} = cell2mat(points(:));
     
-    % Make sure it evolves between 0 and 1
-    gppoints{iMap}(gppoints{iMap} < 0) = 0;
-    gppoints{iMap}(gppoints{iMap} > 1) = 1;
+    % Interpolate the trajectories
+    idx = find(sum(~cellfun(@isempty, points), 2) > 0);
+    lists  = idxtrimap{iMap}(idx,:);
+    points = points(idx,:);
+    interppoints = cellfun(@(x,v) interp1(x', v, x(1):dtint:x(end)), ...
+        lists, points, 'UniformOutput', 0);
+    gppoints{iMap} = cell2mat(interppoints(:));
     
     % Compute the density map
     cc = gppoints{iMap}*tcn;
@@ -126,7 +134,7 @@ for iMap = 1:nMap+1
     cbr.Label.String = {'Normalized density map', '(in log scale)'};
     
     % Draw marginal histograms on the limits of the triangle
-    if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
+    %if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
     
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
