@@ -69,6 +69,9 @@ options             = [];
 options.DisplayWin  = 0;
 options.verbose     = 0;
 options             = repmat({options}, [nSub,1]);
+optiongp            = [];
+optiongp.DisplayWin = 0;
+optiongp.verbose    = 0;
 
 % Explaining variable: IO's binned beliefs
 for iSub = 1:nSub, options{iSub}.inG.p = binbel(:,1,iSub); end
@@ -85,7 +88,7 @@ o_sub = cell(2,nSub); o_gp = cell(2,1); % quality of fit
 % order to estimate the best parameters for each model and each subject
 for m = 1:2
     [p_sub(m,:), o_sub(m,:), p_gp{m}, o_gp{m}] = ...
-        VBA_MFX(y, [], [], g_fname{m}, dim, options);
+        VBA_MFX(y, [], [], g_fname{m}, dim, options, [], optiongp);
 end
 
 % Perform model comparison
@@ -136,6 +139,7 @@ plot(ones(1,2)./2, [0,1], 'k:');
 plot([0,1], ones(1,2)./2, 'k:');
 
 % Average best parameters over subjects
+PWparams = cell2mat(cellfun(@(x) x.muPhi, p_sub(1,:), 'UniformOutput', 0));
 mP = mean(PWparams,2);
 sP = sem(PWparams,2);
 
