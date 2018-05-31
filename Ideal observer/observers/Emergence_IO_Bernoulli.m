@@ -105,11 +105,11 @@ elseif usegrid
 
     % Non-informative Jeffreys prior
     elseif isa(prior, 'char') && strcmpi(prior, 'Jeffreys')
-        pT = mybetapdf(theta, 1/2, 1/2, nt);
+        pT = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt);
 
     % Custom prior
     elseif isa(prior, 'double') && numel(prior) == 4
-        pT = mybetapdf(theta, prior(1), prior(2), nt);
+        pT = Emergence_IO_BetaPDF(theta, prior(1), prior(2), nt);
 
     % Catch possible mistakes
     else, error('The prior input has the wrong form.');
@@ -149,7 +149,7 @@ if ~usegrid
     
     % If asked, return the posterior distribution
     if returnpost
-        pTgY = mybetapdf(theta, nX(1), nX(2), nt); % beta distribution
+        pTgY = Emergence_IO_BetaPDF(theta, nX(1), nX(2), nt); % beta distribution
         pTgY = pTgY ./ sum(pTgY(:)); % normalize the posterior
     end
     
@@ -192,42 +192,6 @@ end
 % Compute the likelihood that the next observation will be a A
 if    ~usegrid, pAgTs = nX(1) / sum(nX); % analytical formula (a ratio)
 elseif usegrid, pAgTs = pTgY * theta';   % based on the grid
-end
-
-%% Probability distribution
-%  ========================
-
-% Way faster than the regular MATLAB "betapdf" function because:
-%   - it does not check the inputs, but directly "repmat" the coefficients
-%   - it does not have to check whether the inputs are smaller than 0
-%   - it does not have to check the size of x
-function  y = mybetapdf(x,a,b,n)
-
-y = zeros(1, n);
-
-a = repmat(a, [1, n]);
-b = repmat(b, [1, n]);
-
-y(a==1 & x==0) = b(a==1 & x==0);
-y(b==1 & x==1) = a(b==1 & x==1);
-y(a<1 & x==0) = Inf;
-y(b<1 & x==1) = Inf;
-
-k = a>0 & b>0 & x>0 & x<1;
-a = a(k);
-b = b(k);
-x = x(k);
-
-smallx = x<0.1;
-
-loga = (a-1).*log(x);
-
-logb = zeros(size(x), 'like', y);
-logb( smallx) = (b( smallx)-1) .* log1p(-x( smallx));
-logb(~smallx) = (b(~smallx)-1) .*  log(1-x(~smallx));
-
-y(k) = exp(loga+logb - (gammaln(a)+gammaln(b)-gammaln(a+b)));
-
 end
 
 end

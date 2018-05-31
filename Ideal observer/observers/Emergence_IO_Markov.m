@@ -112,14 +112,14 @@ elseif usegrid
         
     % Non-informative Jeffreys prior
     elseif isa(prior, 'char') && strcmpi(prior, 'Jeffreys')
-        pTgA = mybetapdf(theta, 1/2, 1/2, nt); % p(X|A), x-axis
-        pTgB = mybetapdf(theta, 1/2, 1/2, nt); % p(X|B), y-axis
+        pTgA = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt); % p(X|A), x-axis
+        pTgB = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt); % p(X|B), y-axis
         pT = pTgA'*pTgB;
         
     % Custom prior
     elseif isa(prior, 'double') && numel(prior) == 4
-        pTgA = mybetapdf(theta, prior(1,2), prior(1,1), nt); % p(X|A), x-axis
-        pTgB = mybetapdf(theta, prior(2,1), prior(2,2), nt); % p(X|B), y-axis
+        pTgA = Emergence_IO_BetaPDF(theta, prior(1,2), prior(1,1), nt); % p(X|A), x-axis
+        pTgB = Emergence_IO_BetaPDF(theta, prior(2,1), prior(2,2), nt); % p(X|B), y-axis
         pT = pTgA'*pTgB;
         
     % Catch possible mistakes
@@ -173,20 +173,16 @@ if ~usegrid
     nXgA = [nAgA + p_nAgA, nBgA + p_nBgA]; % N(A|A) + pN(A|A) & N(B|A) + pN(B|A)
     nXgB = [nAgB + p_nAgB, nBgB + p_nBgB]; % N(A|B) + pN(A|B) & N(B|B) + pN(B|B)
     
-    % Get the number of observations that followed an A versus a B
-    ngA = sum(nXgA);
-    ngB = sum(nXgB);
-    
     % The integral of a beta distribution with parameters that are
     % (pseudo-) transitions' counts can be solved analytically by the
     % means of gamma distributions
     % p(y|Msp) = p(y(1)) int[p(y_2:K|t(A|B),t(B|A))] dt
     if strcmpi(scaleme, 'lin')
-        pYp2gTgA = prod(gamma(nXgA)) ./ gamma(ngA);
-        pYp2gTgB = prod(gamma(nXgB)) ./ gamma(ngB);
+        pYp2gTgA = prod(gamma(nXgA)) ./ gamma(sum(nXgA));
+        pYp2gTgB = prod(gamma(nXgB)) ./ gamma(sum(nXgB));
     elseif strcmpi(scaleme, 'log')
-        pYp2gTgA = sum(gammaln(nXgA)) - gammaln(ngA);
-        pYp2gTgB = sum(gammaln(nXgB)) - gammaln(ngB);
+        pYp2gTgA = sum(gammaln(nXgA)) - gammaln(sum(nXgA));
+        pYp2gTgB = sum(gammaln(nXgB)) - gammaln(sum(nXgB));
     end
     
     % The likelihood is the product of the two integrals and the
@@ -199,15 +195,15 @@ if ~usegrid
     
     % If asked, return the posterior distribution
     if returnpost
-        pTgA = mybetapdf(theta, nXgA(1,2), nXgA(1,1), nt); % p(X|A), x-axis
-        pTgB = mybetapdf(theta, nXgB(1,1), nXgB(1,2), nt); % p(X|B), y-axis
+        pTgA = Emergence_IO_BetaPDF(theta, nXgA(1,2), nXgA(1,1), nt); % p(X|A), x-axis
+        pTgB = Emergence_IO_BetaPDF(theta, nXgB(1,1), nXgB(1,2), nt); % p(X|B), y-axis
         pTgY = pTgA' * pTgB; % create the 2D probability distribution
         pTgY = pTgY ./ sum(pTgY(:)); % normalize the posterior
     end
     
     % Compute the expected value of each transition
-    pXgA = nXgA ./ ngA; % p(A|A) & p(B|A)
-    pXgB = nXgB ./ ngB; % p(A|B) & p(B|B)
+    pXgA = nXgA ./ sum(nXgA); % p(A|A) & p(B|A)
+    pXgB = nXgB ./ sum(nXgB); % p(A|B) & p(B|B)
 
 % Compute the model evidence in case of a leaky integration
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,41 +264,5 @@ end
 pAgX  = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
 X     = y(end);  % get the identity of the last observation
 pAgTs = pAgX(X); % returns p(A) conditionaly on the last observation
-
-%% Probability distribution
-%  ========================
-
-% Way faster than the regular MATLAB "betapdf" function because:
-%   - it does not check the inputs, but directly "repmat" the coefficients
-%   - it does not have to check whether the inputs are smaller than 0
-%   - it does not have to check the size of x
-function  y = mybetapdf(x,a,b,n)
-
-y = zeros(1, n);
-
-a = repmat(a, [1, n]);
-b = repmat(b, [1, n]);
-
-y(a==1 & x==0) = b(a==1 & x==0);
-y(b==1 & x==1) = a(b==1 & x==1);
-y(a<1 & x==0) = Inf;
-y(b<1 & x==1) = Inf;
-
-k = a>0 & b>0 & x>0 & x<1;
-a = a(k);
-b = b(k);
-x = x(k);
-
-smallx = x<0.1;
-
-loga = (a-1).*log(x);
-
-logb = zeros(size(x), 'like', y);
-logb( smallx) = (b( smallx)-1) .* log1p(-x( smallx));
-logb(~smallx) = (b(~smallx)-1) .*  log(1-x(~smallx));
-
-y(k) = exp(loga+logb - (gammaln(a)+gammaln(b)-gammaln(a+b)));
-
-end
 
 end
