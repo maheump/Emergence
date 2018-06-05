@@ -137,12 +137,12 @@ end
 % ~~~~~~~~~~~~~~
 
 % The likelihood of the first event is simply 1 over the number of
-% different possible stimuli in the sequence.
+% different possible stimuli in the sequence
 % p(y_1) = 1/2 <=> log(p(y_1)) = -log(2)
 pY1 = 1/2;
 
 % Get the identity of the previous observations of each observation in the
-% sequence. This eases the frequency counts of transitions.
+% sequence. This eases the frequency counts of transitions
 cond = cat(2, NaN, y(1:end-1));
 
 % Get events' positions
@@ -169,28 +169,28 @@ nBgB = sum(BgB);
 % N.B. We can resort on analytical solutions
 if ~usegrid
     
-    % Combined observational and prior (pseudo-) counts.
+    % Combined observational and prior (pseudo-) counts
     nXgA = [nAgA + p_nAgA, nBgA + p_nBgA]; % N(A|A) + pN(A|A) & N(B|A) + pN(B|A)
     nXgB = [nAgB + p_nAgB, nBgB + p_nBgB]; % N(A|B) + pN(A|B) & N(B|B) + pN(B|B)
     
-    % The integral of a beta distribution with parameters that are
-    % (pseudo-) transitions' counts can be solved analytically by the
-    % means of gamma distributions
-    % p(y|Msp) = p(y(1)) int[p(y_2:K|t(A|B),t(B|A))] dt
+    % The integral of a beta distribution whose parameters are transitions'
+    % counts. This can be solved analytically by the means of gamma
+    % distributions:
+    % p(y|Msp) = p(y_1) int[p(y_2:K|t(A|B),t(B|A))] dt
     if strcmpi(scaleme, 'lin')
-        pYp2gTgA = prod(gamma(nXgA)) ./ gamma(sum(nXgA));
-        pYp2gTgB = prod(gamma(nXgB)) ./ gamma(sum(nXgB));
+        pYgTgA = prod(gamma(nXgA)) ./ gamma(sum(nXgA));
+        pYgTgB = prod(gamma(nXgB)) ./ gamma(sum(nXgB));
     elseif strcmpi(scaleme, 'log')
-        pYp2gTgA = sum(gammaln(nXgA)) - gammaln(sum(nXgA));
-        pYp2gTgB = sum(gammaln(nXgB)) - gammaln(sum(nXgB));
+        pYgTgA = sum(gammaln(nXgA)) - gammaln(sum(nXgA));
+        pYgTgB = sum(gammaln(nXgB)) - gammaln(sum(nXgB));
     end
     
     % The likelihood is the product of the two integrals and the
     % likelihood of the first event:
-    % p(y|t(A|B),t(B|A)) = p(y2(1)) * p(y|t(X|A)) * p(y2|t(X|B))
-    % <=> log(p(y2|t(A|B),t(B|A))) = log(p(y2(1))) + log(p(y2|t(X|A))) + log(p(y2|t(X|B)))
-    if     strcmpi(scaleme, 'lin'), pYgTs =     pY1  * pYp2gTgA * pYp2gTgB;
-    elseif strcmpi(scaleme, 'log'), pYgTs = log(pY1) + pYp2gTgA + pYp2gTgB;
+    % p(y|t(A|B),t(B|A)) = p(y_1) * p(y_2:K|t(X|A)) * p(y_2:K|t(X|B))
+    % <=> log(p(y|t(A|B),t(B|A))) = log(p(y_1)) + log(p(y_2:K|t(X|A))) + log(p(y_2:K|t(X|B)))
+    if     strcmpi(scaleme, 'lin'), pYgTs =     pY1  * pYgTgA * pYgTgB;
+    elseif strcmpi(scaleme, 'log'), pYgTs = log(pY1) + pYgTgA + pYgTgB;
     end
     
     % If asked, return the posterior distribution
