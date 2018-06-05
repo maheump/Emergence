@@ -88,6 +88,7 @@ ylabel('Surprise');
 % Posterior marginal distributions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+if N < 5
 figure('Units', 'Normalized', 'Position', [0.5 0.07 0.3 0.8]);
 
 pgrid = linspace(0, 1, size(post, 2));
@@ -107,3 +108,4 @@ for t = 1:ntrans
 end
 ScaleAxis('c');
 xlabel('Observation #');
+end
