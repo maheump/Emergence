@@ -1,4 +1,4 @@
-function [ pYgTs, pAgTs, pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
+function [ pYgMp, pAgYMp, pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_MARKOV implements an observer learning parameters (i.e.
 % frequency of transitions) of a first-order binary Markov chain from a
 % binary sequence.
@@ -8,7 +8,7 @@ function [ pYgTs, pAgTs, pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prio
 %       evidence sould be computed on a linear or logarithmic scale.
 %   - "usegrid": a boolean specifing whether use grid-based or analytical
 %       solutions.
-%   - "prior": can ba a string ('Bayes-Laplace' or 'Jeffreys') or a 2x2
+%   - "prior": can be a string ('Bayes-Laplace' or 'Jeffreys') or a 2x2
 %       matrix specifying the prior knowledge regarding the frequency of
 %       transitions (expressed in pseudo-counts).
 %   - "decw": a  Nx1 or 1xN array of (decaying) weights that will weight
@@ -189,8 +189,8 @@ if ~usegrid
     % likelihood of the first event:
     % p(y|t(A|B),t(B|A)) = p(y_1) * p(y_2:K|t(X|A)) * p(y_2:K|t(X|B))
     % <=> log(p(y|t(A|B),t(B|A))) = log(p(y_1)) + log(p(y_2:K|t(X|A))) + log(p(y_2:K|t(X|B)))
-    if     strcmpi(scaleme, 'lin'), pYgTs =     pY1  * pYgTgA * pYgTgB;
-    elseif strcmpi(scaleme, 'log'), pYgTs = log(pY1) + pYgTgA + pYgTgB;
+    if     strcmpi(scaleme, 'lin'), pYgMp =     pY1  * pYgTgA * pYgTgB;
+    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY1) + pYgTgA + pYgTgB;
     end
     
     % If asked, return the posterior distribution
@@ -239,8 +239,8 @@ elseif usegrid
     pTgY = BayesNum ./ pY; % posterior distribution over theta using Bayes' rule
     
     % Derive (log-) model evidence
-    if     strcmpi(scaleme, 'lin'), pYgTs = pY / (nt^2);
-    elseif strcmpi(scaleme, 'log'), pYgTs = log(pY) - 2*log(nt);
+    if     strcmpi(scaleme, 'lin'), pYgMp = pY / (nt^2);
+    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY) - 2*log(nt);
     end
     % N.B. We use sum(X) / N(X) instead of the MATLAB "mean" function
     % because it is much faster (it avoids checks that are useless in the
@@ -263,6 +263,6 @@ end
 % N.B. This depends on the identity of the previously received observation.
 pAgX  = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
 X     = y(end);  % get the identity of the last observation
-pAgTs = pAgX(X); % returns p(A) conditionaly on the last observation
+pAgYMp = pAgX(X); % returns p(A) conditionaly on the last observation
 
 end

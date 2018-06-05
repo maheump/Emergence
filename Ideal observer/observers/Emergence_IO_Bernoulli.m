@@ -1,4 +1,4 @@
-function [ pYgTs, pAgTs, pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegrid, prior, decw, dt )
+function [ pYgMp, pAgYMp, pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_BERNOULLI implements an observer learning the frequency of
 % items from a binary sequence.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
@@ -143,8 +143,8 @@ if ~usegrid
     
     % Since we use a conjugate prior, the model evidence is a beta
     % distribution, and its integral can be analytically computed.
-    if     strcmpi(scaleme, 'lin'), pYgTs =   beta(nX(1), nX(2));
-    elseif strcmpi(scaleme, 'log'), pYgTs = betaln(nX(1), nX(2));
+    if     strcmpi(scaleme, 'lin'), pYgMp =   beta(nX(1), nX(2));
+    elseif strcmpi(scaleme, 'log'), pYgMp = betaln(nX(1), nX(2));
     end
     
     % If asked, return the posterior distribution
@@ -175,23 +175,23 @@ elseif usegrid
     pTgY = BayesNum ./ pY; % posterior distribution over theta using Bayes' rule
 
     % Derive (log-) model evidence
-    if     strcmpi(scaleme, 'lin'), pYgTs = pY / nt;
-    elseif strcmpi(scaleme, 'log'), pYgTs = log(pY) - log(nt);
+    if     strcmpi(scaleme, 'lin'), pYgMp = pY / nt;
+    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY) - log(nt);
     end
     % N.B. We use sum(X) / N(X) instead of the MATLAB "mean" function
     % because it is much faster (it avoids checks that are useless in the
     % context of this function).
 
     % Compute the likelihood that the next observation will be a A
-    pAgTs = pTgY * theta';
+    pAgYMp = pTgY * theta';
 end
 
 %% Predictions
 %  ===========
 
 % Compute the likelihood that the next observation will be a A
-if    ~usegrid, pAgTs = nX(1) / sum(nX); % analytical formula (a ratio)
-elseif usegrid, pAgTs = pTgY * theta';   % based on the grid
+if    ~usegrid, pAgYMp = nX(1) / sum(nX); % analytical formula (a ratio)
+elseif usegrid, pAgYMp = pTgY * theta';   % based on the grid
 end
 
 end

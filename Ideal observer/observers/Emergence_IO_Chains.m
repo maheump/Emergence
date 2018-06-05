@@ -1,4 +1,4 @@
-function [ pYgT, pAgY, pTgY, pXgX ] = Emergence_IO_Chains( y, scaleme, prior, i, dt )
+function [ pYgMp, pAgYMp, pTgY, pXgX ] = Emergence_IO_Chains( y, scaleme, prior, i, dt )
 % EMERGENCE_IO_CHAINS implements a N-order Markov chain that is estimated
 % from a binary sequence.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
@@ -104,8 +104,8 @@ end
 % Combine both likelihoods together
 % p(y|chain) = p(y_1:i) * prod_k_2^i (p(y_i+1:K|theta_k))
 % <=> log(p(y|chain)) = log(p(y_1:i)) + sum__k_2^i (p(y_i+1:K|theta_k))
-if     strcmpi(scaleme, 'lin'), pYgT = L1 * prod(L2);
-elseif strcmpi(scaleme, 'log'), pYgT = L1 + sum(L2);
+if     strcmpi(scaleme, 'lin'), pYgMp = L1 * prod(L2);
+elseif strcmpi(scaleme, 'log'), pYgMp = L1 + sum(L2);
 end
 
 % Return marginal posterior distributions
@@ -141,11 +141,11 @@ if K > i
     
     % Get the corresponding probability of observing a A after this
     % history of observation, the trasition X => A
-    pAgY = pXgX(1, currtrans);
+    pAgYMp = pXgX(1, currtrans);
 else
     
 	% For the first observations, predictions are simply at chance level
-	pAgY = 1/2;
+	pAgYMp = 1/2;
 end
 
 end
