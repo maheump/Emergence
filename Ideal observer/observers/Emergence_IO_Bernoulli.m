@@ -108,7 +108,7 @@ elseif usegrid
         pT = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt);
 
     % Custom prior
-    elseif isa(prior, 'double') && numel(prior) == 4
+    elseif isa(prior, 'double') && numel(prior) == 2
         pT = Emergence_IO_BetaPDF(theta, prior(1), prior(2), nt);
 
     % Catch possible mistakes
