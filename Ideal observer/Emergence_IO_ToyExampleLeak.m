@@ -11,6 +11,9 @@
 clear;
 close('all');
 
+% For the sake of reproducibility
+rng('default');
+
 % Array of forgetting parameters to test
 pMemError = [0, 0.003, 0.009, 0.025, 0.07, 0.185, 0.5];
 nParam = numel(pMemError);
