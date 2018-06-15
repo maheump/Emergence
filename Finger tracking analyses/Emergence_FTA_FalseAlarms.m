@@ -18,7 +18,7 @@ iHyp = 1;
 nBin = 31;
 
 % Define the type of binning method
-binmeth = 'unif';
+binmeth = 'equil';
 
 % Average subjects' trajectories in fully-stochastic parts according to the
 % ideal observer's beliefs in the probabilistic hypothesis
@@ -102,7 +102,7 @@ for iBin = 1:nBin-1
 end
 
 % Customize the colormap and add a colorbar
-colormap(cmap); caxis(pgrid([1,end]));
+colormap(cmap); caxis(avgiotraj([1,end],iHyp)');
 cbr = colorbar('Location', 'SouthOutside');
 cbr.Label.String = sprintf('p(M_%s|y) from the ideal observer', proclab{iHyp}(1));
 
@@ -135,8 +135,9 @@ plot(avgiotraj(:,iHyp)'+semiotraj(:,iHyp)'.*[-1;1], repmat(avgsubtraj(:,iHyp)', 
 plot(avgiotraj(:,iHyp), avgsubtraj(:,iHyp), 'ko', 'MarkerFaceColor', tricol(iHyp,:));
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XTick', 0:1/5:1, 'YTick', 0:1/5:1);
-axis('square');
+axis('square'); set(gca, 'Box', 'Off');
+axis([0,avgiotraj(end,iHyp),0,avgiotraj(end,iHyp)]);
+set(gca, 'XTick', get(gca, 'YTick'));
 
 % Add some text labels
 xlabel('Ideal observer');
