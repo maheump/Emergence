@@ -114,10 +114,12 @@ for lock = 1:2
         if lock == 2, plot(zeros(1,2), [0,1], 'k'); end
         
         % Draw barycentric coordinates
+        lt = repmat({'--'}, 1, 3);
+        lt{iHyp} = '-';
         for iDim = 1:3
             plotMSEM(x, avgsubtraj{iHyp,lock}(:,iDim), ...
                         semsubtraj{iHyp,lock}(:,iDim), ...
-                0.15, tricol(iDim,:), tricol(iDim,:), 3, 1, '-', 'none');
+                0.15, tricol(iDim,:), tricol(iDim,:), 1+1*(iDim == iHyp), 1, lt{iDim}, 'none');
         end
         
         % Customize the axes
@@ -193,12 +195,21 @@ end
 % Fit a sigmoid function to beliefs recorded for each individual trial 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% Fit trajectories locked on detection point
+lock = 1;
+
+% Try to load results from the previous analysis
+try
+funname = @(x) fullfile(homedir, 'Finger tracking analyses', ...
+    'ppdata', sprintf('Dyn1_MFX_%s.mat', x));
+if isfield(D{1}, 'Seq'), load(funname('S'));
+else, load(funname('IO'));
+end
+catch
+
 % Prepare output variables
 p_sub = cell(1,2); p_gp = cell(1,2); % posterior over parameters
 o_sub = cell(1,2); o_gp = cell(1,2); % quality of fit
-
-% Fit trajectories locked on detection point
-lock = 1;
 
 % For each sequence that entailed a regularity
 for iHyp = 1:2
@@ -216,6 +227,9 @@ for iHyp = 1:2
         options.DisplayWin  = 0;
         options.verbose     = 0;
         options             = repmat({options}, [nSub,1]);
+        optiongp            = [];
+        optiongp.DisplayWin = 0;
+        optiongp.verbose    = 0;
         
         % Variable to explain: barycentric coordinates along the relevant
         % dimension
@@ -235,8 +249,14 @@ for iHyp = 1:2
         % model, each condition and each subject
         [p_sub{iHyp}(iSeq,:), o_sub{iHyp}(iSeq,:), ...
          p_gp{iHyp}(iSeq,:),  o_gp{iHyp}(iSeq,:)] = ...
-            VBA_MFX(y, [], [], @g_SIGM, dim, options);
+            VBA_MFX(y, [], [], @g_SIGM, dim, options, [], optiongp);
     end
+end
+
+% Save the result of this analysis in a MATLAB file
+if isfield(D{1}, 'Seq'), save(funname('S'), 'p_sub', 'o_sub', 'p_gp', 'o_gp');
+else, save(funname('IO'), 'p_sub', 'o_sub', 'p_gp', 'o_gp');
+end
 end
 
 % Get back the fitted parameters of the sigmoid
@@ -288,7 +308,7 @@ end
 
 % Customize the axes
 set(gca, 'Box', 'Off');
-axis([xcp([1,end]), 0, 1]);
+axis([xcp([1,end]), 0, 1.001]);
 
 % Add some text labels
 xlabel('# observation w.r.t. change point');
