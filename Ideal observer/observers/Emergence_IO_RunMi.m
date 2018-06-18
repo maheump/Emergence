@@ -9,7 +9,7 @@ function [ seqLH, post, predA, surp, entr, update ] = ...
 %       and 2s).
 %   - "inputs": a cell array specifying the options to pass to the ideal
 %       observer function.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 % Number of observation in the sequence
@@ -26,13 +26,13 @@ update = NaN(1,N);
 % Loop over observations of the sequence
 for k = 1:N
     
-	% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
     % Compute expectations-related quantities %
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-    
+
     % Identity of the current observation (1 for A, 2 for B)
     obs = seq(k);
-    
+
     % Estimated probability of receiving this observation
     if k == 1, pObs = 1/2; % chance
     elseif k > 1 % prediction derived from the most recent inference
@@ -40,13 +40,13 @@ for k = 1:N
         elseif obs == 2, pObs = 1 - predA(k-1); % p(y_k = B) = 1 - p(y_k = A)
         end
     end
-    
+
     % Theoretical Shannon surprise
     surp(k) = -log2(pObs);
-    
+
     % Entropy of the prediction
     entr(k)  = -(pObs .* log2(pObs) + (1-pObs) .* log2(1-pObs));
-    
+
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
     % Update the beliefs of the ideal observer %
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
@@ -54,26 +54,26 @@ for k = 1:N
      predA(k), ...  % probability that the k+1-th observation will be a A
      post{k}] = ... % posterior probability distribution over model's parameters
      IOfun(seq(1:k), inputs{:});
-    
+
     % ~~~~~~~~~~~~~~~~~~~~ %
     % Compute model update %
     % ~~~~~~~~~~~~~~~~~~~~ %
     if k > 1 && ~isempty(post{k})
-    
+
     % Get probability distributions to compare
     cB = post{k}(:)';   % current beliefs
     pB = post{k-1}(:)'; % previous beliefs
-    
+
     % Make sure there is no zeros or NaNs in the posterior distributions
     pB(isnan(pB)) = 1/numel(pB); % uniform prior
     cB(isnan(cB)) = 1/numel(cB); % uniform prior
     pB(pB == 0) = eps; % smallest non-zero positive double
     cB(cB == 0) = eps; % smallest non-zero positive double
-    
+
     % Normalize the distributions
     pB = pB ./ sum(pB);
     cB = cB ./ sum(cB);
-    
+
     % Compute the update between the current (updated) posterior and
     % the previous one (before receiving the current k-th observation)
     % using the Jensen-Shannon divergence
