@@ -26,6 +26,7 @@ Temporary Items
 .apdisk
 
 # Ignore figures
+*.gif
 *.pdf
 *.png
 *.jpg
