@@ -1,6 +1,6 @@
 function traj = Emergence_ProjOnTri( traj, tripxl )
 % EMERGENCE_PROJONTRI projects finger's positions onto the triangle borders
-% (based on minimal, orthogonal, Euclidean distance) when the those
+% (based on minimal, orthogonal, Euclidean distance) when those
 % positions are (rarely) outside the triangle (mostly because of finger's
 % imprecision).
 %   - traj: a Nx2 matrix specifying the cartesian coordinates of the
