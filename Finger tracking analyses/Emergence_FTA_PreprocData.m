@@ -54,9 +54,9 @@ prob = {[1/3 1/3], ... % p(A|B) = 1/3 & p(B|A) = 1/3 => Rep. freq. (low)
 %  =======================================================
 
 % Get data from the first subject
-subloc  = sprintf('%s%s%s%s', homedir, filesep, subjects{1});
-datfile = dir(sprintf('%s%s%s', subloc, filesep, '*_Experiment_All.mat'));
-subfile = load(sprintf('%s%s%s%s', subloc, filesep, datfile.name));
+subloc  = fullfile(homedir, subjects{1});
+datfile = dir(fullfile(subloc, '*_Experiment_All.mat'));
+subfile = load(fullfile(subloc, datfile.name));
 
 % Screen matrix
 % (0,0) is bottom left
@@ -98,9 +98,9 @@ for iSub = 1:nSub
     % ~~~~~~~~
     
     % Get subject's data
-    subloc  = sprintf('%s%s%s%s', homedir, filesep, subjects{iSub});
-    datfile = dir(sprintf('%s%s%s', subloc, filesep, '*_Experiment_All.mat'));
-    subfile = load(sprintf('%s%s%s%s', subloc, filesep, datfile.name));
+    subloc  = fullfile(homedir, subjects{iSub});
+    datfile = dir(fullfile(subloc, '*_Experiment_All.mat'));
+    subfile = load(fullfile(subloc, datfile.name));
     
     % Order conditions
     % ~~~~~~~~~~~~~~~~
@@ -111,7 +111,7 @@ for iSub = 1:nSub
     % Stochastic condition first
     stochidx = find(strcmpi(rules, 'Stochastic'))';
     
-    % Probabilistic conditions sorted per proba
+    % Probabilistic conditions sorted per entropy level and bias type
     tmp = find(strcmpi(rules, 'Probabilistic'));
 	transproba = cellfun(@(x) x.Rule, subfile.D(tmp), 'UniformOutput', 0);
     probaidx = NaN(1,numel(prob));
@@ -152,7 +152,7 @@ for iSub = 1:nSub
     % Save data in a group variable
     G(:,iSub) = subfile.D(ortrlist)';
     
-    % Do not forgot to save "S"
+    % Do not forgot to save the "S" variable
     % (0,0) is bottom left
     S{iSub} = subfile.S;
     S{iSub}.Tri.w = S{iSub}.Tri.CoordRev(2,1) - S{iSub}.Tri.CoordRev(1,1);
@@ -211,11 +211,11 @@ IO = cell(size(G)); % conditions x subjects cell matrix with IO's inference
 
 % Define options for the observer
 stat  = 'Transitions'; % statistic to be learned by the probabilistic model
-treed = 200; % depth of the rules' tree to explore
+treed = 10; % depth of the rules' tree to explore
 pEp   = 0; % probability of making a memory error at each observation
 pEd   = 0; % probability of making a memory error at each observation
-pJ    = 'Uniform'; %[100, 15]; % prior over change point's position
-pR    = 'Size-principle'; % 
+pJ    = 'Uniform'; % prior over change point's position
+pR    = 'Size-principle'; % the prior probability of each rule depends on its length
 comp  = 'all'; % compute after each observation
 scale = 'log'; % scale of the model evidence
 verb  = 0; % do not output messages in the command window
@@ -283,18 +283,18 @@ end
 %% CREATE LABELS FOR THE DIFFERENT CONDITIONS
 %  ==========================================
 
-% Get conditions
+% Get the different conditions
 c = cellfun(@(x) x.Cond, G(:,1), 'UniformOutput', 0);
 c = cellfun(@(x) sprintf('%s', x), c, 'UniformOutput', 0);
 
-% Get rules
+% Get the different regularities
 r = cellfun(@(x) x.Rule, G(:,1), 'UniformOutput', 0);
 sr = repmat({''}, 1, sum(strcmpi(c, 'Stochastic')))';
 pr = cellfun(@(x) sprintf('p(A|B) = %1.2f & p(B|A) = %1.2f', x(1), ...
     x(2)), r(strcmpi(c, 'Probabilistic')), 'UniformOutput', 0);
 dr = cellfun(@pat2str, r(strcmpi(c, 'Deterministic')), 'UniformOutput', 0);
 
-% Combine conditions and rules
+% Combine conditions and regularities
 condlab = cellfun(@(x,y) sprintf('%s %s', x, y), c, [sr;pr;dr], 'UniformOutput', 0);
 
 % Create indices variables
@@ -310,6 +310,7 @@ leftcol  = [066 146 198]; % 1: probabilistic component (blue)
 rightcol = [239 059 033]; % 2: deterministic component (red)
 downcol  = [065 171 093]; % 3: stochastic component (green)
 tricol   = [leftcol; rightcol; downcol] ./ 255;
+tricc    = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
 letters  = {'A','B'};
 g = repmat(0.7,1,3); % grey
 
@@ -317,4 +318,5 @@ g = repmat(0.7,1,3); % grey
 filename = fullfile(homedir, 'Finger tracking analyses/ppdata/Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'homedir', ...
     'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...
-    'tricol', 'letters', 'downcol', 'leftcol', 'rightcol', 'prob', 'det', 'g');
+    'tricol', 'tricc', 'letters', 'downcol', 'leftcol', 'rightcol', ...
+    'prob', 'det', 'g');
