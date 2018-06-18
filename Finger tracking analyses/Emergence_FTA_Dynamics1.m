@@ -31,8 +31,8 @@ xdp = -nSamp/2:nSamp/2;
 % Threshold for detection on the relevant dimension
 detecthr = 1/2;
 
-% Get the trajctories around the points of interest
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Get the trajectories around the points of interest
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare the output variable
 cp = cell(1,2); dp = cell(1,2); lag = cell(1,2);
