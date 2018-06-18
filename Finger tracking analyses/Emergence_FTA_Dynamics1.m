@@ -88,7 +88,7 @@ avglag = cellfun(@(x) mean(x, 'OmitNaN'), lag, 'UniformOutput', 0);
 avgsubtraj = cellfun(@(x) mean(x, 3), avgfingerwrtp, 'UniformOutput', 0);
 semsubtraj = cellfun(@(x) sem(x ,3),  avgfingerwrtp, 'UniformOutput', 0);
 avgsublag = cellfun(@mean, avglag);
-semsublag = cellfun(@sem, avglag);
+semsublag = cellfun(@sem,  avglag);
 
 % Display beliefs in each hypothesis locked to both change- and detection- points
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -195,7 +195,7 @@ end
 % Fit a sigmoid function to beliefs recorded for each individual trial 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Fit trajectories locked on detection point
+% Fit the trajectories that are locked on the detection point
 lock = 1;
 
 % Try to load results from the previous analysis

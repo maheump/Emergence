@@ -125,7 +125,7 @@ for iObs = 1:N
         for j = 1:2
             idx = find(X{ind}.Seq(1:iObs) == j);
             plot(idx, repmat(j, [1,numel(idx)]), '.', 'Color', stimcol{j}); hold('on');
-            text(0, j, {soundsname{j},''}, 'Color', stimcol{j}, 'FontSize', fs, ...
+            text(0, j, {letters{j},''}, 'Color', stimcol{j}, 'FontSize', fs, ...
                 'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
         end
 
@@ -204,5 +204,5 @@ if strcmpi(tosave, 'avi'), close(vidObj); end
 
 % Combine auditory and visual files into a movie
 if strcmpi(tosave, 'avi')
-    system('avconv -i vid.avi -i aud.wav -c copy Emergence_FTA_ExampleSequence.avi');
+    system('avconv -i vid.avi -i aud.wav -c copy figs/F_M.avi');
 end
