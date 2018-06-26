@@ -17,7 +17,7 @@ clear; close('all');
 homedir = '/Users/Maxime/Documents/My projects/Emergence';
 
 % Get subjects' list
-subjects = dir(fullfile(homedir, 'Stimulation/bhv/data/Subject*'));
+subjects = dir(fullfile(homedir, 'Stimulation', 'bhv', 'data', 'Subject*'));
 subjects = {subjects.name};
 nSub = numel(subjects);
 
@@ -47,7 +47,7 @@ prob = {[1/3 1/3], ... % p(A|B) = 1/3 & p(B|A) = 1/3 => Rep. freq. (low)
         [3/4 1/2]};    % p(A|B) = 3/4 & p(B|A) = 1/2 => Square (right)
 %         [1/2 3/4], ... % p(A|B) = 1/2 & p(B|A) = 3/4 => Square (top)
 %         [1/4 1/2], ... % p(A|B) = 1/4 & p(B|A) = 1/2 => Square (left)
-% The last two were used only to asses within-subjects reliability (they
+% The last two were used only to assess within-subjects reliability (they
 % are discarded for the analyses).
 
 %% PREPARE A TRIANGLE ON WHICH TO PROJECT THE TRAJECTORIES
@@ -315,7 +315,7 @@ letters  = {'A','B'};
 g = repmat(0.7,1,3); % grey
 
 % Save the group data file
-filename = fullfile(homedir, 'Finger tracking analyses/ppdata/Emergence_Behaviour_GroupData.mat');
+filename = fullfile(homedir, 'Finger tracking analyses', 'ppdata', 'Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'homedir', ...
     'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...
     'tricol', 'tricc', 'letters', 'downcol', 'leftcol', 'rightcol', ...
