@@ -366,12 +366,14 @@ disptstats(pval, tci, stats);
 % Prepare a new window
 figure('Position', [714 806 120 200]);
 
+% Display chance level
+plot([0,3], zeros(1,2), '-', 'Color', g, 'LineWidth', 1); hold('on');
+
 % Display difference in d' between the two types of regularity
 Emergence_PlotSubGp(dprime(:,1:2), tricol(1:2,:));
 
 % Customize the axes
-xlim([0,3]);
-set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
+set(gca, 'Xlim', [0,3], 'XTick', [], 'XColor', 'None', 'Box', 'Off');
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(dprime(:,1:2));

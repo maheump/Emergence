@@ -51,7 +51,7 @@ disptstats(pval, tci, stats);
 figure('Position', [835 806 120 200]);
 
 % Display chance level
-plot([0,3], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1/2); hold('on');
+plot([0,3], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
 
 % Display difference in IO's beliefs between missed versus detected
 % regulartieis
@@ -98,8 +98,11 @@ entdetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{1}(x),:) == 1, 1)', ..
 % Prepare a window
 figure('Position', [956 806 240 200]);
 
-% Display difference in detection rate according to entropy levels
+% Display chance level
 subplot(1,2,1);
+plot([0,3], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
+
+% Display difference in detection rate according to entropy levels
 Emergence_PlotSubGp(entdetecrate, tricol(1,:));
 
 % Customize the axes
@@ -127,8 +130,11 @@ nGp = numel(biasgpidx);
 biasdetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{1}(x),:) == 1, 1)', ...
     biasgpidx, 'UniformOutput', 0));
 
-% Display difference in detection rate according to biased dimensions
+% Display chance level
 subplot(1,2,2);
+plot([0,4], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
+
+% Display difference in detection rate according to biased dimensions
 Emergence_PlotSubGp(biasdetecrate, tricol(1,:));
 
 % Customize the axes
@@ -166,8 +172,11 @@ lendetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{2}(x),:) == 2, 1)', ..
 % Prepare a new window
 figure('Position', [1196 806 240 200]);
 
-% Display difference in detection rate according to rules' length
+% Display chance level
 subplot(1,2,1);
+plot([0,5], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
+
+% Display difference in detection rate according to rules' length
 Emergence_PlotSubGp(lendetecrate, tricol(2,:));
 
 % Customize the axes
@@ -194,8 +203,11 @@ nGp = numel(cplxidx);
 cplxetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{2}(x),:) == 2, 1)', ...
     cplxidx, 'UniformOutput', 0));
 
-% Display difference in detection rate according to rules' difficulty
+% Display chance level
 subplot(1,2,2);
+plot([0,4], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
+
+% Display difference in detection rate according to rules' difficulty
 Emergence_PlotSubGp(cplxetecrate, tricol(2,:));
 
 % Customize the axes
