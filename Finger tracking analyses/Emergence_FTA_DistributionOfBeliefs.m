@@ -182,7 +182,7 @@ sembins = sem(bins, 3);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [802 797 200 300]); lgd = NaN(1,2);
+figure('Position', [802 805 200 300]); lgd = NaN(1,2);
 
 % Useful variables
 x = pg+1/(nBin-1)/2; % x-axis
