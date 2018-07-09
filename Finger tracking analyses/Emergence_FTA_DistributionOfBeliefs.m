@@ -134,7 +134,7 @@ for iMap = 1:nMap+1
     cbr.Label.String = {'Normalized density map', '(in log scale)'};
     
     % Draw marginal histograms on the limits of the triangle
-    %if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
+    % if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
     
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
@@ -193,7 +193,8 @@ for iHyp = 1:2
     lgd(iHyp) = bar(x, d(iHyp).*avgbins(iHyp,:), 0.9, 'FaceColor', ...
         tricol(iHyp,:), 'EdgeColor', 'none'); hold('on');
     plot(repmat(x', 2, 1), d(iHyp).*avgbins(iHyp,:) + ...
-        sembins(iHyp,:).*[-1;1], 'k-', 'LineWidth', 1/2);    
+        sembins(iHyp,:).*[-1;1], 'k-', 'LineWidth', 1/2);
+    plot([0,1], (-2*(iHyp==2)+ones(1,2))/nBin, '-', 'Color', g, 'LineWidth', 1);
 end
 
 % Overlap a line along zero 
