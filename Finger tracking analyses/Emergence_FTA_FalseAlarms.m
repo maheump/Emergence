@@ -119,7 +119,8 @@ save2pdf('figs/F_FA_Tri.pdf');
 figure('Position', [202 905 200 200]);
 
 % Display the identity line
-plot([0,1], [0,1], 'k--'); hold('on');
+plot([0,1], [0,1], '-', 'Color', g); hold('on');
+text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
 
 % Display the regression line between beliefs from subjects and IO
 beta = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'OLS', {'beta0', 'beta1'});
@@ -160,7 +161,7 @@ plot([0,2], zeros(1,2), 'k--'); hold('on');
 Emergence_PlotSubGp(coef, tricol(iHyp,:));
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XTick', []);
+set(gca, 'Box', 'Off', 'XTick', [], 'XColor', 'None');
 axis([0,2,-1,1]);
 
 % Display whether the difference is significant or not
