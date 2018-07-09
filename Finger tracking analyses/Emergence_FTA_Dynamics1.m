@@ -34,9 +34,13 @@ detecthr = 1/2;
 % Get the trajectories around the points of interest
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% Get sequence's length
+N = S{1}.Nstims;
+
 % Prepare the output variable
-cp = cell(1,2); dp = cell(1,2); lag = cell(1,2);
-fingerwrtp = cell(2);
+cp = cell(1,2); dp = cell(1,2); lag = cell(1,2); speed = cell(1,2);
+fingerposwrtp = cell(2); % movement
+fingerspdwrtp = cell(2); % first-order derivative of movement
 
 % For each type of regularity
 for iHyp = 1:2
@@ -47,46 +51,59 @@ for iHyp = 1:2
     % Get the position of the subjective detection point
     lag{iHyp} = cell2mat(cellfun(@(x,y) nanmin([NaN, ...
         find(x.BarycCoord( x.Jump - 1/2 : end, iHyp) ...
-        > detecthr, 1, 'first') - 1]), ... % 
+        > detecthr, 1, 'first') - 1]), ... % in # of observations
         D(cidx{iHyp},:), G(cidx{iHyp},:), 'UniformOutput', 0));
     dp{iHyp} = cp{iHyp} + lag{iHyp}; % detection point = change point + lag
+    
+    % Get first-order derivative
+    speed{iHyp} = cellfun(@(x,c) trapz(x.BarycCoord(c:end,iHyp) - ...
+        x.BarycCoord(c,iHyp)) / (N-c), D(cidx{iHyp},:), num2cell(cp{iHyp}));
     
     % Consider only sequences for which regularities were correctly identified
     detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
     lag{iHyp}(~detecmask) = NaN;
     cp{iHyp}(~detecmask) = NaN;
     dp{iHyp}(~detecmask) = NaN;
+    speed{iHyp}(~detecmask) = NaN;
     
     % For change- and detection- points
     for lock = 1:2
     
         % Beginning and ending of the window to look in
         if lock == 1 % lock on change point
-            begwin = cp{iHyp} + xcp(1); % in number of samples
+            begwin = cp{iHyp} + xcp(1);   % in number of samples
             endwin = cp{iHyp} + xcp(end); % in number of samples
         elseif lock == 2 % lock on detection point
-            begwin = dp{iHyp} + xdp(1); % in number of samples
+            begwin = dp{iHyp} + xdp(1);   % in number of samples
             endwin = dp{iHyp} + xdp(end); % in number of samples
         end
-        endwin(endwin > 200) = 200;
+        endwin(endwin > N) = N;
         
         % Get trajectory (i.e. beliefs in each hypothesis) in that window
         % of interest
-        fing = cellfun(@(x,b,e) x.BarycCoord(nanmin([200,b]):nanmin([199,e]),:), ...
+        fing = cellfun(@(x,b,e) x.BarycCoord(nanmin([N,b]):nanmin([N-1,e]),:), ...
             D(cidx{iHyp},:), num2cell(begwin), num2cell(endwin), 'UniformOutput', 0);
         fing(cellfun(@isempty, fing)) = {NaN(nSamp+1,3)};
         fing = cellfun(@(x) [x; NaN(nSamp-size(x,1)+1,3)], fing, 'UniformOutput', 0);
-        fingerwrtp{iHyp,lock} = cell2mat(reshape(fing, [1, 1, size(fing)]));
+        fingerposwrtp{iHyp,lock} = cell2mat(reshape(fing, [1, 1, size(fing)]));
+        
+        % Compute the corresponding 
+        fingerspdwrtp{iHyp,lock} = cat(1, NaN([1, 3, size(G(cidx{iHyp},:))]), ...
+            diff(fingerposwrtp{iHyp,lock}, 1, 1));
     end
 end
 
+% For deterministic regularities, also express the lag in terms of the
+% number of repetitions of the rule
+lag2 = lag{iHyp} ./ cellfun(@numel, dr);
+
 % Average over sequences for each type of regularity
-avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerwrtp, 'UniformOutput', 0);
+avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerposwrtp, 'UniformOutput', 0);
 avglag = cellfun(@(x) mean(x, 'OmitNaN'), lag, 'UniformOutput', 0);
 
 % Average finger trajectory over subjects
 avgsubtraj = cellfun(@(x) mean(x, 3), avgfingerwrtp, 'UniformOutput', 0);
-semsubtraj = cellfun(@(x) sem(x ,3),  avgfingerwrtp, 'UniformOutput', 0);
+semsubtraj = cellfun(@(x) sem( x ,3), avgfingerwrtp, 'UniformOutput', 0);
 avgsublag = cellfun(@mean, avglag);
 semsublag = cellfun(@sem,  avglag);
 
@@ -189,6 +206,54 @@ if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_TriS.pdf');
 else, save2pdf('figs/F_Dyn_TriIO.pdf');
 end
 
+%% DISPLAY TRIAL-BY-TRIAL UPDATES OF BELIEFS IN THE CORRECT HYPOTHESIS
+%  ===================================================================
+
+% Prepare a new window
+figure('Position', [202 231 500 400]);
+
+% For sequences with a probabilistic/deterministic regularity
+for iHyp = 1:2
+    
+    % Keep only sequences with the current type of regularity that were
+    % correctly labelled
+    detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
+    
+    % Get the beliefs in the corresponding (correct) hypothesis
+    iodetec = cellfun(@(x) x.BarycCoord(:,iHyp)', D(cidx{iHyp},:), 'UniformOutput', 0);
+    iodetec = cell2mat(iodetec(detecmask));
+    
+    % Get the position of change points
+    cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'UniformOutput', 1) - 1/2;
+    cp = cp(detecmask);
+    [~,idx] = sort(cp, 'descend');
+    
+    % Order trials according to the position the change point
+    iodetec = iodetec(idx,:);
+    
+    % Verticaly (ovser trials) smooth the map to make it easier to read
+    iodetec = smoothdata(iodetec, 1, 'movmean', 'SmoothingFactor', 0.3);
+    
+    % Display the change in beliefs as a heatmap 
+    sp = subplot(1,2,iHyp);
+    imagesc(iodetec); hold('on');
+    
+    % Customize the colormap
+    colorbar('Location', 'SouthOutside');
+    colormap(sp, inferno); caxis([0,1]);
+    if     iHyp == 1, colormap(sp, cbrewer2('Blues'));
+    elseif iHyp == 2, colormap(sp, cbrewer2('Reds'));
+    end
+    
+    % Display the position of the change points
+    plot(cp(idx), 1:numel(idx), 'k-');
+    
+    % Add some text labels
+    xlabel('Observation #');
+    ylabel('Sequence # (sorted by change point''s position');
+    title(sprintf('%s sequences', proclab{iHyp}));
+end
+
 %% FIT INDIVIDUAL TRAJECTORIES USING SIGMOID FUNCTIONS
 %  ===================================================
 
@@ -233,7 +298,7 @@ for iHyp = 1:2
         
         % Variable to explain: barycentric coordinates along the relevant
         % dimension
-        y = mat2cell(squeeze(fingerwrtp{iHyp,lock}(:,iHyp,iSeq,:)), ...
+        y = mat2cell(squeeze(fingerposwrtp{iHyp,lock}(:,iHyp,iSeq,:)), ...
             nSamp+1, ones(nSub,1))';
         
         % Remove NaNs
@@ -325,11 +390,11 @@ end
 
 % Average the slope parameter over sequences for each subject and each type
 % of regularity (probabilistic and deterministic ones)
-slope = cell2mat(cellfun(@(x) mean(exp(x(:,:,1)), 1, 'OmitNaN')', ...
-    sigparam, 'UniformOutput', 0));
+slope = cellfun(@(x) exp(x(:,:,1)), sigparam, 'UniformOutput', 0);
+avgslope = cell2mat(cellfun(@(x) mean(x, 1, 'OmitNaN')', slope, 'UniformOutput', 0));
 
 % Paired t-test
-[~,pval,tci,stats] = ttest(diff(slope, 1, 2));
+[~,pval,tci,stats] = ttest(diff(avgslope, 1, 2));
 disptstats(pval,tci,stats);
 
 % Prepare a new window
@@ -337,14 +402,14 @@ figure('Position', [924 905 100 200]);
 
 % Display the difference of the sigmoids' slope in the two types of
 % regularity
-Emergence_PlotSubGp(slope, tricol(1:2,:));
+Emergence_PlotSubGp(avgslope, tricol(1:2,:));
 
 % Customize the axes
 set(gca, 'XTick', [], 'Box', 'Off');
 axis([0,3,0,1.2]);
 
 % Display whether the difference is significant or not
-Emergence_DispStatTest(slope);
+Emergence_DispStatTest(avgslope);
 
 % Add some text labels
 ylabel('Slope parameter');
