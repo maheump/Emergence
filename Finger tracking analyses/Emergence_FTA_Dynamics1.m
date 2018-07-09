@@ -254,6 +254,11 @@ for iHyp = 1:2
     title(sprintf('%s sequences', proclab{iHyp}));
 end
 
+% Save the figure
+if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_MapS.pdf');
+else, save2pdf('figs/F_Dyn_MapIO.pdf');
+end
+
 %% FIT INDIVIDUAL TRAJECTORIES USING SIGMOID FUNCTIONS
 %  ===================================================
 
