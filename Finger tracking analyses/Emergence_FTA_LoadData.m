@@ -1,5 +1,8 @@
-% Convenient tiny script to setup the MATLAB environment and figures'
-% preferences required to run Emergence_FAT_* analysis scripts.
+function [ D, nCond, nSub ] = Emergence_FTA_LoadData( rmbadsub )
+% EMERGENCE_FTA_LOADDATA setups the MATLAB environment and figures'
+% preferences required to run Emergence_FTA_* analysis scripts.
+%   - "rmbadsub": a boolean specifying whether to remove data of bad
+%       subjects.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
@@ -18,9 +21,11 @@ badsubs = [1, 7, 13, 14, 19];
 goodsubs = setdiff(1:nSub, badsubs);
 
 % Remove data from bad subjects
-G = G(:,goodsubs);
-S = S(goodsubs);
-IO = IO(:,goodsubs);
+if rmbadsub || ~exist('rmbadsub', 'var')
+    G = G(:,goodsubs);
+    S = S(goodsubs);
+    IO = IO(:,goodsubs);
+end
 
 % By default, analyse subjects' data
 D = G;
@@ -28,10 +33,9 @@ D = G;
 % Get the number of subjects and the number of conditions
 [nCond, nSub] = size(G);
 
-%% CUSTOMIZE DEFAULT FIGURES
-%  =========================
+%% DEFINE DEFAULT FIGURE OPTIONS
+%  =============================
 
-% Set default properties for the figure
 set(groot, 'DefaultAxesLineWidth', 1); % axes
 set(groot, 'DefaultBarLineWidth', 1); % bars
 set(groot, 'DefaultColorbarLineWidth', 1); % colorbar
@@ -54,3 +58,6 @@ set(groot, 'DefaultAxesLayer', 'Top'); % axes on top of the plot
 set(groot, 'DefaultAxesTickDir', 'In'); % ticks oriented outside the plot
 set(groot, 'DefaultAxesTickLength', repmat(0.01, [1 2])); % length of ticks
 set(groot, 'DefaultAxesTickDirMode', 'Auto'); % otherwise the previous commands do not work
+
+end
+
