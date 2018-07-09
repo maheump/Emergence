@@ -22,7 +22,7 @@ for iSeq = 1:nseq
     
     % For both the subject and the ideal observer
     for iObs = 1:2        
-        if     iObs == 1, X = D{conds(iSeq),subs(iSeq)};
+        if     iObs == 1, X = G{conds(iSeq),subs(iSeq)};
         elseif iObs == 2, X = IO{conds(iSeq),subs(iSeq)};
         end
         
