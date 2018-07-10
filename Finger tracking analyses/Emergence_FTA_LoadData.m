@@ -1,8 +1,5 @@
-function [ D, nCond, nSub ] = Emergence_FTA_LoadData( rmbadsub )
-% EMERGENCE_FTA_LOADDATA setups the MATLAB environment and figures'
-% preferences required to run Emergence_FTA_* analysis scripts.
-%   - "rmbadsub": a boolean specifying whether to remove data of bad
-%       subjects.
+% This script setups the MATLAB environment and figures' preferences
+% required to run Emergence_FTA_* analysis scripts.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
@@ -26,9 +23,6 @@ if rmbadsub || ~exist('rmbadsub', 'var')
     S = S(goodsubs);
     IO = IO(:,goodsubs);
 end
-
-% By default, analyse subjects' data
-D = G;
 
 % Get the number of subjects and the number of conditions
 [nCond, nSub] = size(G);
@@ -58,6 +52,3 @@ set(groot, 'DefaultAxesLayer', 'Top'); % axes on top of the plot
 set(groot, 'DefaultAxesTickDir', 'In'); % ticks oriented outside the plot
 set(groot, 'DefaultAxesTickLength', repmat(0.01, [1 2])); % length of ticks
 set(groot, 'DefaultAxesTickDirMode', 'Auto'); % otherwise the previous commands do not work
-
-end
-
