@@ -55,20 +55,21 @@ confint = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confint');
 xval = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confintx');
 
 % Display identity line
-plot([0,1]./2, [0,1]./2, 'k--', 'LineWidth', 1); hold('on');
+plot([0,1]./2, [0,1]./2, '-', 'Color', g, 'LineWidth', 1); hold('on');
+text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
 
 % Display the regression line
-plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
 fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
        'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2);
+plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
 
 % Display each individual rule, with its corresponding SEM, and colored
 % according to its entropy level (computed on transition probabilities)
 for iR = 1:nR
-    plot(m(iR,1)+[-s(iR,1),s(iR,1)], repmat(m(iR,2), 1, 2), '-', 'Color', g);
-    plot(repmat(m(iR,1), 1, 2), m(iR,2)+[-s(iR,2),s(iR,2)], '-', 'Color', g);
+    plot(m(iR,1)+[-s(iR,1),s(iR,1)], repmat(m(iR,2), 1, 2), '-', 'Color', 'k');
+    plot(repmat(m(iR,1), 1, 2), m(iR,2)+[-s(iR,2),s(iR,2)], '-', 'Color', 'k');
     plot(m(iR,1), m(iR,2), 'o', 'MarkerEdgeColor', 'k', ...
-        'MarkerFaceColor', entcol(iR,:), 'MarkerSize', 7, 'LineWidth', 1);
+        'MarkerFaceColor', EntCol(iR,:), 'MarkerSize', 7, 'LineWidth', 1);
 end
 
 % Customize the axes
@@ -87,14 +88,15 @@ save2pdf('figs/F_HW_GpCorr.pdf');
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [172 632 130 200]);
+figure('Position', [172 632 120 200]);
+plot([0,3], zeros(1,2), 'k--'); hold('on');
 
 % Display the dispersion of correlation coefficients across subjects
 Emergence_PlotSubGp(coef, zeros(1,3));
 
 % Customize the axes
 axis([0,2,-1,1]);
-set(gca, 'Box', 'Off', 'XTick', [], 'XAxisLocation', 'Origin');
+set(gca, 'Box', 'Off', 'XTick', [], 'XColor', 'None');
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(coef);
