@@ -15,7 +15,7 @@
 % Create the parameter grid, i.e. the value of shift between the subjects
 % and the ideal observer to be considered in the following parameter
 % estimation loop
-param = -140:140;
+param = -50:50;
 nParam = numel(param);
 
 % Length of the sequence
@@ -27,7 +27,7 @@ bchm = NaN(nParam, nCond, nSub); % benchmark R2
 
 % For each subject
 for iSub = 1:nSub
-    disp(iSub);
+    fprintf('Performing correlation for subject #%2.0f/%2.0f.\n', iSub, nSub);
 
     % For each considered value of the shift (in # of observations)
     % between subject and ideal observer beliefs
@@ -40,10 +40,6 @@ for iSub = 1:nSub
             % Get relevant trajectories
             subbel = G{iCond,iSub}.BarycCoord; % from the subject
             iobel  = IO{iCond,iSub}.BarycCoord; % from the ideal observer
-            
-            % Make sure probabilities do evolve between 0 and 1
-            subbel(subbel < 0) = 0; subbel(subbel > 1) = 1;
-            iobel(iobel   < 0) = 0; iobel(iobel   > 1) = 1;
             
             % Shift the subject's trajectory with respect to the ideal
             % observer's trajectory
@@ -84,12 +80,14 @@ avgR2 = squeeze(mean(coef, 2));
 
 % Display averaged R2 and corresponding best shift parameter for each subject
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+%%
 % Create a new window
 figure('Position', [1 906 200 200]);
 
 % Display a no-shift line
-plot(zeros(1,2), [0,1], 'k--'); hold('on');
+plot(zeros(1,2), [0,1], '-', 'Color', g); hold('on');
+text(0, 1/2, ' Identity', 'Color', g, 'VerticalAlignment', 'Bottom', ...
+    'HorizontalAlignment', 'Left', 'Rotation', 90);
 
 % Display the benchmark scenario (fitting the IO against itself)
 avgBM = squeeze(mean(bchm, 3));
@@ -108,7 +106,7 @@ text(param(gpmaxidxavgR2), gpmaxavgR2, sprintf('   delay = %1.0f', ...
     param(gpmaxidxavgR2)), 'VerticalAlignment', 'Bottom', 'HorizontalAlignment', 'Left');
 
 % Customize the axes
-axis([param(1), param(end), 0, 1]);
+axis([param(1), param(end), 1/2, 1]);
 set(gca, 'Box', 'Off');
 
 % Add some text labels
@@ -125,14 +123,16 @@ save2pdf('figs/F_QD_CorrSubIO.pdf');
 figure('Position', [202 906 120 200]);
 
 % Display the ideal scenario: no delay
-plot([0,2], zeros(1,2), 'k--'); hold('on');
+plot([0,2], zeros(1,2), '-', 'Color', g); hold('on');
+text(0, 0, ' Identity', 'Color', g, 'VerticalAlignment', 'Top', ...
+    'HorizontalAlignment', 'Left');
 
 % Display subject-level best shift parameters
 [submaxavgR2, submaxidxavgR2] = max(avgR2, [], 1);
 Emergence_PlotSubGp(param(submaxidxavgR2), 'k');
 
 % Customize the axes
-axis([0, 2, -10, 50]);
+axis([0, 2, -5, 20]);
 set(gca, 'Box', 'Off', 'XColor', 'None');
 
 % Display whether the difference is significant or not
