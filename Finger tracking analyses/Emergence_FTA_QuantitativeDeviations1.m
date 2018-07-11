@@ -6,7 +6,7 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% EXPLAIN SUBJECTS' TRAJECTORIES USING IO'S BELIEFS USING A MIXED EFFECT APPROACH
+%% EXPLAIN SUBJECTS' TRAJECTORIES USING IO'S BELIEFS WITH A MIXED EFFECT APPROACH
 %  ===============================================================================
 
 % Define the number of bins to use
@@ -79,6 +79,12 @@ for iSub = 1:nSub, options{iSub}.inG.p = binbel(:,1,iSub); end
 % Variable to explain
 y = mat2cell(squeeze(binbel(:,2,:)), nBin, ones(nSub,1))';
 
+% Try to load results from the previous analysis
+try
+filename = fullfile(homedir, 'Finger tracking analyses', 'ppdata', 'QD1_MFX.mat');
+load(filename);
+catch
+
 % Prepare output variables
 p_sub = cell(2,nSub); p_gp = cell(2,1); % posterior over parameters
 o_sub = cell(2,nSub); o_gp = cell(2,1); % quality of fit
@@ -91,12 +97,19 @@ for m = 1:2
         VBA_MFX(y, [], [], g_fname{m}, dim, options, [], optiongp);
 end
 
+% Save the result of this analysis in a MATLAB file
+save(filename, 'p_sub', 'o_sub', 'p_gp', 'o_gp');
+    
+end
+
 % Perform model comparison
 % ~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Perform Bayesian model selection
 L = cellfun(@(x) x.F, o_sub);
-[posterior,out] = VBA_groupBMC(L);
+options = [];
+options.DisplayWin = 0;
+[posterior,out] = VBA_groupBMC(L, options);
 
 % Get individual model frequencies
 pmf = posterior.r';
@@ -108,9 +121,12 @@ funlab = cellfun(@(x) x(3:end), funlab, 'UniformOutput', 0);
 % Prepare a new window
 figure('Position', [1 906 120 200]);
 
+% Display chance level
+plot([0,3], ones(1,2)/2, '-', 'Color', g); hold('on');
+
 % Display estimated model frequencies
 avgpmf = mean(pmf);
-bar(1:2, avgpmf, 'EdgeColor', 'k', 'FaceColor', repmat(1/2,1,3)); hold('on');
+bar(1:2, avgpmf, 'EdgeColor', 'k', 'FaceColor', repmat(1/2,1,3));
 
 % Display estimated model frequencies
 sempmf = sem(pmf);
@@ -134,9 +150,8 @@ save2pdf('figs/F_QD_BMS.pdf');
 figure('Position', [122 906 220 200]);
 
 % Display identity line and help lines
-plot([0,1], [0,1], 'k--'); hold('on');
-plot(ones(1,2)./2, [0,1], 'k:');
-plot([0,1], ones(1,2)./2, 'k:');
+plot([0,1], [0,1], '-', 'Color', g); hold('on');
+text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
 
 % Average best parameters over subjects
 PWparams = cell2mat(cellfun(@(x) x.muPhi, p_sub(1,:), 'UniformOutput', 0));
