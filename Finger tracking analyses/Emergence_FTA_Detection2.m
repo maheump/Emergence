@@ -71,7 +71,9 @@ xlabel({'Probabilistic', 'regularities'});
 ylabel('Belief p(M_P|y) from the IO');
 
 % Save the figure
-save2pdf('figs/F_D_BelUndet.pdf');
+if isfield(D{1}, 'Seq'), save2pdf('figs/F_D_BelUndetS.pdf');
+else, save2pdf('figs/F_D_BelUndetIO.pdf');
+end
 
 %% DETERMINANTS OF DETECTION FOR PROBABILISTIC REGULARITIES
 %  ========================================================
