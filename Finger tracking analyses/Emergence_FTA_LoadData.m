@@ -27,6 +27,9 @@ end
 % Get the number of subjects and the number of conditions
 [nCond, nSub] = size(G);
 
+% By default, look at subjects' data
+D = G;
+
 %% DEFINE DEFAULT FIGURE OPTIONS
 %  =============================
 
