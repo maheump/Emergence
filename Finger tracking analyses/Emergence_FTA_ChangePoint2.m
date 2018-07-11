@@ -92,7 +92,9 @@ if xp == 1
 end
 
 % Display the identity relation (i.e. a diagonal)
-plot([bot, 200-bot], [bot, 200-bot], 'k--');
+plot([bot, 200-bot], [bot, 200-bot], '-', 'Color', g);
+text(bot, bot, '     Identity', 'Color', g, 'HorizontalAlignment', 'Left', ...
+    'VerticalAlignment', 'Bottom', 'Rotation', 45);
 
 % For each type of regularity
 for iHyp = 1:2
@@ -105,10 +107,9 @@ for iHyp = 1:2
     
     % Group-level regression between (binned) objective and subjective
     % positions of the change point
-    beta = Emergence_Regress(scp_m, ocp_m, 'OLS', {'beta0', 'beta1'});
+    beta    = Emergence_Regress(scp_m, ocp_m, 'OLS', {'beta0', 'beta1'});
     confint = Emergence_Regress(scp_m, ocp_m, 'OLS', 'confint');
-    xval = Emergence_Regress(scp_m, ocp_m, 'OLS', 'confintx');
-    rho = Emergence_Regress(scp_m, ocp_m, 'OLS', 'R2');
+    xval    = Emergence_Regress(scp_m, ocp_m, 'OLS', 'confintx');
     
     % Regression on binned data between objective and inferred position
     fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
@@ -125,12 +126,20 @@ end
 
 % Customize the axes
 axis('square');
-axis(repmat([bot, 200-bot], 1, 2));
+axis(repmat([bot, N-bot], 1, 2));
 set(gca, 'XTick', get(gca, 'YTick'), 'Box', 'Off');
 
 % Add some labels
 xlabel(sprintf('Objective %s point''s position', ptname{xp}));
 ylabel(sprintf('Inferred %s point''s position', ptname{xp}));
+
+% Display the real distribution of change points
+yyaxis('right');
+y = linspace(bot, N-bot, 13);
+[n,x] = histcounts(allcp(:), y, 'Normalization', 'Probability');
+bar((x(1:end-1) + x(2:end)) / 2, n, 'EdgeColor', 'None', 'FaceColor', 'k', 'FaceAlpha', 1/4);
+set(gca, 'YColor', 'None');
+axis([x([1,end]), 0, 1]);
 
 % Display individual correlation coefficient from the correlation between
 % real and estimated change point's position

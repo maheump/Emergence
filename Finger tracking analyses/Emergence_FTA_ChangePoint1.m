@@ -78,7 +78,7 @@ end
 plot(zeros(1,2), ylim, 'k--');
 
 % Display the uniform scenario over change point's position
-plot(x([1,end]), repmat(1/N,1,2), 'k:');
+plot(x([1,end]), repmat(1/N,1,2), '-', 'Color', g);
 
 % Customize the axes
 xlim(x([1,end]));
