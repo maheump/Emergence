@@ -245,7 +245,7 @@ ylabel('Posterior beliefs p(M_i|y)');
 
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf('figs/F_HW_DynS.pdf');
-else, save2pdf('figs/F_HW_TriIO.pdf');
+else, save2pdf('figs/F_HW_DynIO.pdf');
 end
 
 % Average beliefs in the probabilistic hypothesis between the change and
