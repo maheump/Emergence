@@ -11,14 +11,14 @@
 tosave = 'gif'; % can be '', 'gif' or 'avi'
 
 % Which trajectory to use
-sub = 23; % subject number
-seq = cidx{2}(1); % sequence number
+seq = 28; % subject number
+sub = 22; % sequence number
 
 % Get corresponding data
 X = cell(1,2);
-X{1} = G{seq,sub};
-X{2} = IO{seq,sub};
-X{2}.Seq = G{seq,sub}.Seq;
+X{1} = G{sub,seq};
+X{2} = IO{sub,seq};
+X{2}.Seq = G{sub,seq}.Seq;
 N = numel(X{1}.Seq);
 
 % Colors
@@ -68,7 +68,7 @@ normtrglc = [0, sqrt(3)/2; ... % top left (P)
              1/2, 0];          % bottom (R)
 
 % Prepare the window
-figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 806 400 300]);
+ff = figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 806 400 300]);
 markers = {'.', 'p', 'o'};
 stimcol = {'b', 'r'};
 fs = 8;
@@ -114,7 +114,7 @@ for iObs = 1:N
         set(gca, 'FontSize', fs);
 
         % Add some labels
-        txt = condlab{seq};
+        txt = condlab{sub};
         spc = strfind(txt, ' ');
 
         % Auditory sequence
@@ -182,7 +182,7 @@ for iObs = 1:N
     drawnow;
     
     % Get the image
-    frame = getframe(gcf);
+    frame = getframe(ff);
     
     % Append to the file
     if strcmpi(tosave, 'gif')
