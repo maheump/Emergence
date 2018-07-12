@@ -410,7 +410,7 @@ figure('Position', [924 905 100 200]);
 Emergence_PlotSubGp(avgslope, tricol(1:2,:));
 
 % Customize the axes
-set(gca, 'XTick', [], 'Box', 'Off');
+set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
 axis([0,3,0,1.2]);
 
 % Display whether the difference is significant or not

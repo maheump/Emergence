@@ -287,6 +287,9 @@ set(gca, 'XTick', 1:nEnt, 'XTickLabel', EntLab);
 % Display whether the difference is significant or not
 Emergence_DispStatTest(data);
 
+% Add some text labels
+ylabel('Posterior beliefs p(M_P|y)');
+
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf('figs/F_HW_EntS.pdf');
 else, save2pdf('figs/F_HW_EntIO.pdf');

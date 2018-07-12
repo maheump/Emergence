@@ -89,7 +89,7 @@ save2pdf('figs/F_HW_GpCorr.pdf');
 
 % Prepare a new window
 figure('Position', [172 632 120 200]);
-plot([0,3], zeros(1,2), 'k--'); hold('on');
+plot([0,3], zeros(1,2), '-', 'Color', g, 'LineWidth', 1); hold('on');
 
 % Display the dispersion of correlation coefficients across subjects
 Emergence_PlotSubGp(coef, zeros(1,3));

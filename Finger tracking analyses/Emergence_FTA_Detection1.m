@@ -373,7 +373,7 @@ plot([0,3], zeros(1,2), '-', 'Color', g, 'LineWidth', 1); hold('on');
 Emergence_PlotSubGp(dprime(:,1:2), tricol(1:2,:));
 
 % Customize the axes
-set(gca, 'Xlim', [0,3], 'XTick', [], 'XColor', 'None', 'Box', 'Off');
+set(gca, 'Xlim', [0,3], 'XTick', [], 'XColor', 'None', 'YLim', [-0.5,3.5], 'Box', 'Off');
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(dprime(:,1:2));
