@@ -83,11 +83,11 @@ semiotraj  = sem(iotraj,  ndims(iotraj));
 figure('Position', [1 805 200 300]);
 
 % Create a colormap whose length equals the number of bins
-cmap = [flipud(cbrewer2('Greens', ceil(nBin/2))); ...
-               cbrewer2('Blues', floor(nBin/2))];
+cmap = cbrewer2('Blues', nBin);
 
 % Display the triangle
 Emergence_PlotTrajOnTri; alpha(0);
+Emergence_PlotGridOnTri(10, iHyp, tricol(iHyp,:));
 
 % Convert beliefs in each hypothesis to cartesian coordinates
 tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
@@ -106,9 +106,6 @@ colormap(cmap); caxis(avgiotraj([1,end],iHyp)');
 cbr = colorbar('Location', 'SouthOutside');
 cbr.Label.String = sprintf('p(M_%s|y) from the ideal observer', proclab{iHyp}(1));
 
-% Add some text labels
-title({'Subjects'' beliefs', 'during random parts'});
-
 % Save the figure
 save2pdf('figs/F_FA_Tri.pdf');
 
@@ -123,9 +120,9 @@ plot([0,1], [0,1], '-', 'Color', g); hold('on');
 text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
 
 % Display the regression line between beliefs from subjects and IO
-beta = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'OLS', {'beta0', 'beta1'});
-confint  = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'OLS', 'confint');
-confintx = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'OLS', 'confintx');
+beta = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'TLS', {'beta0', 'beta1'});
+confint  = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'TLS', 'confint');
+confintx = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'TLS', 'confintx');
 fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
     'k', 'EdgeColor', 'none', 'FaceColor', tricol(iHyp,:), 'FaceAlpha', 0.15); hold('on');
 plot(avgiotraj(:,iHyp), beta(1)+avgiotraj(:,iHyp)*beta(2), '-', 'Color', tricol(iHyp,:), 'LineWidth', 3);
@@ -133,7 +130,9 @@ plot(avgiotraj(:,iHyp), beta(1)+avgiotraj(:,iHyp)*beta(2), '-', 'Color', tricol(
 % Display averaged beliefs in each probability bin with its error bars
 plot(repmat(avgiotraj(:,iHyp)', [2,1]), avgsubtraj(:,iHyp)'+semsubtraj(:,iHyp)'.*[-1;1], 'k-');
 plot(avgiotraj(:,iHyp)'+semiotraj(:,iHyp)'.*[-1;1], repmat(avgsubtraj(:,iHyp)', [2,1]), 'k-');
-plot(avgiotraj(:,iHyp), avgsubtraj(:,iHyp), 'ko', 'MarkerFaceColor', tricol(iHyp,:));
+for iBin = 1:nBin-1
+    plot(avgiotraj(iBin,iHyp), avgsubtraj(iBin,iHyp), 'ko', 'MarkerFaceColor', cmap(iBin,:));
+end
 
 % Customize the axes
 axis('square'); set(gca, 'Box', 'Off');
@@ -143,7 +142,6 @@ set(gca, 'XTick', get(gca, 'YTick'));
 % Add some text labels
 xlabel('Ideal observer');
 ylabel('Subjects');
-title(sprintf('Beliefs in the %s hypothesis', proclab{iHyp}(1)));
 
 % Save the figure
 save2pdf('figs/F_FA_Corr.pdf');
@@ -155,7 +153,7 @@ save2pdf('figs/F_FA_Corr.pdf');
 figure('Position', [403 905 120 200]);
 
 % Display chance level
-plot([0,2], zeros(1,2), 'k--'); hold('on');
+plot([0,2], zeros(1,2), '-', 'Color', g); hold('on');
 
 % Display distribution of correlation coefficients
 Emergence_PlotSubGp(coef, tricol(iHyp,:));
