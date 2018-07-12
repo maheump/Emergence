@@ -66,7 +66,7 @@ Emergence_PlotTriInfo(tricc, tricol, fs);
 % Get information about important moments of the sequence
 lout = NaN(1,4);
 lnames = {'Trajectory', 'Starting point', 'Ending point', 'Change point'};
-if nargin < 4 || isempty(markers), markers = {'v', 'p', '^'}; end
+if nargin < 5 || isempty(markers), markers = {'v', 'p', '^'}; end
 if nargin < 4, ms = eps; end
 
 % Plot the trajectory

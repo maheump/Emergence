@@ -30,7 +30,8 @@ for iSeq = 1:nseq
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ipos = iSeq + 3*(iObs-1) + 5*(iSeq-1);
         subplot(nseq, 2*(1+2), ipos);
-        Emergence_PlotTrajOnTri(X.BarycCoord, X.Jump+1/2, tricol);
+        Emergence_PlotTrajOnTri(X.BarycCoord, X.Jump+1/2, tricol, 6);
+        Emergence_PlotGridOnTri(3);
         
         % Plot the Barycentric coordinates
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
