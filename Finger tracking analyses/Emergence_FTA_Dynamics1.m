@@ -107,6 +107,47 @@ semsubtraj = cellfun(@(x) sem( x ,3), avgfingerwrtp, 'UniformOutput', 0);
 avgsublag = cellfun(@mean, avglag);
 semsublag = cellfun(@sem,  avglag);
 
+% Display same trajectories in the triangular space
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Properties of the triangle
+tricc  = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
+tricol = [066 146 198; 239 059 033; 065 171 093] ./ 255;
+
+% Prepare a new window
+figure('Position', [1 906 200 400]);
+
+% For change- and detection- points
+for lock = 1:2
+    subplot(2,1,lock);
+    
+    % Display the triangle
+    Emergence_PlotTriInfo(tricc, tricol);
+    
+    % Display a useful custom grid on the triangle
+    for k = 1:3
+        lgd = Emergence_PlotGridOnTri(2, k, tricol(k,:), tricc);
+        set(lgd(1,k), 'EdgeAlpha', 3/4);
+        lgd = Emergence_PlotGridOnTri(3, k, tricol(k,:), tricc);
+        for kk = 1:3, set(lgd(kk,k), 'LineStyle', '--', 'EdgeAlpha', 3/4); end
+    end
+    
+    % Display the trajectories
+    for iHyp = 1:2
+        cc = avgsubtraj{iHyp,lock}*tricc; % cartesian coordinates
+        plot(cc(:,1), cc(:,2), '.-', 'Color', tricol(iHyp,:), ...
+            'LineWidth', 1, 'MarkerSize', 10);
+        
+        % Make sure the triangle is equilateral and we don't see the axes
+        axis('equal'); axis('off');
+    end
+end
+
+% Save the figure
+if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_TriS.pdf');
+else, save2pdf('figs/F_Dyn_TriIO.pdf');
+end
+
 % Display beliefs in each hypothesis locked to both change- and detection- points
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -165,52 +206,11 @@ if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_CoordS.pdf');
 else, save2pdf('figs/F_Dyn_CoordIO.pdf');
 end
 
-% Display the same trajectories but in the triangular space
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Properties of the triangle
-tricc  = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-tricol = [066 146 198; 239 059 033; 065 171 093] ./ 255;
-
-% Prepare a new window
-figure('Position', [1 906 200 400]);
-
-% For change- and detection- points
-for lock = 1:2
-    subplot(2,1,lock);
-    
-    % Display the triangle
-    Emergence_PlotTriInfo(tricc, tricol);
-    
-    % Display a useful custom grid on the triangle
-    for k = 1:3
-        avglag = Emergence_PlotGridOnTri(2, k, tricol(k,:), tricc);
-        set(avglag(1,k), 'EdgeAlpha', 3/4);
-        avglag = Emergence_PlotGridOnTri(3, k, tricol(k,:), tricc);
-        for kk = 1:3, set(avglag(kk,k), 'LineStyle', '--', 'EdgeAlpha', 3/4); end
-    end
-    
-    % Display the trajectories
-    for iHyp = 1:2
-        cc = avgsubtraj{iHyp,lock}*tricc; % cartesian coordinates
-        plot(cc(:,1), cc(:,2), '.-', 'Color', tricol(iHyp,:), ...
-            'LineWidth', 1, 'MarkerSize', 10);
-        
-        % Make sure the triangle is equilateral and we don't see the axes
-        axis('equal'); axis('off');
-    end
-end
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_TriS.pdf');
-else, save2pdf('figs/F_Dyn_TriIO.pdf');
-end
-
 %% DISPLAY TRIAL-BY-TRIAL UPDATES OF BELIEFS IN THE CORRECT HYPOTHESIS
 %  ===================================================================
 
 % Prepare a new window
-figure('Position', [202 231 500 400]);
+figure('Position', [703 905 500 200]);
 
 % For sequences with a probabilistic/deterministic regularity
 for iHyp = 1:2
@@ -220,8 +220,8 @@ for iHyp = 1:2
     detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
     
     % Get the beliefs in the corresponding (correct) hypothesis
-    iodetec = cellfun(@(x) x.BarycCoord(:,iHyp)', D(cidx{iHyp},:), 'UniformOutput', 0);
-    iodetec = cell2mat(iodetec(detecmask));
+    detec = cellfun(@(x) x.BarycCoord(:,iHyp)', D(cidx{iHyp},:), 'UniformOutput', 0);
+    detec = cell2mat(detec(detecmask));
     
     % Get the position of change points
     cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'UniformOutput', 1) - 1/2;
@@ -229,17 +229,17 @@ for iHyp = 1:2
     [~,idx] = sort(cp, 'descend');
     
     % Order trials according to the position the change point
-    iodetec = iodetec(idx,:);
+    detec = detec(idx,:);
     
     % Verticaly (ovser trials) smooth the map to make it easier to read
-    iodetec = smoothdata(iodetec, 1, 'movmean', 'SmoothingFactor', 0.3);
+    detec = smoothdata(detec, 1, 'movmean', 'SmoothingFactor', 0.3);
     
     % Display the change in beliefs as a heatmap 
     sp = subplot(1,2,iHyp);
-    imagesc(iodetec); hold('on');
+    imagesc(detec); hold('on');
     
     % Customize the colormap
-    colorbar('Location', 'SouthOutside');
+    colorbar('Location', 'EastOutside');
     colormap(sp, inferno); caxis([0,1]);
     if     iHyp == 1, colormap(sp, cbrewer2('Blues'));
     elseif iHyp == 2, colormap(sp, cbrewer2('Reds'));
@@ -250,7 +250,7 @@ for iHyp = 1:2
     
     % Add some text labels
     xlabel('Observation #');
-    ylabel('Sequence # (sorted by change point''s position');
+    ylabel({'Sequence # (sorted by', 'change point''s position)'});
     title(sprintf('%s sequences', proclab{iHyp}));
 end
 
@@ -350,7 +350,7 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [703 905 220 200]); lgd = NaN(1,2); hold('on');
+figure('Position', [1204 905 220 200]); lgd = NaN(1,2); hold('on');
 
 % Draw some help lines
 plot(xcp([1,end]),    ones(1,2)./2, '-',  'Color', g, 'LineWidth', 1/2); 
@@ -403,7 +403,7 @@ avgslope = cell2mat(cellfun(@(x) mean(x, 1, 'OmitNaN')', slope, 'UniformOutput',
 disptstats(pval,tci,stats);
 
 % Prepare a new window
-figure('Position', [924 905 100 200]);
+figure('Position', [1425 905 120 200]);
 
 % Display the difference of the sigmoids' slope in the two types of
 % regularity
