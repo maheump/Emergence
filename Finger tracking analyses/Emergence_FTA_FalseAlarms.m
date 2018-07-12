@@ -15,7 +15,7 @@
 iHyp = 1;
 
 % Define the number of bins to use
-nBin = 31;
+nBin = 11;
 
 % Define the type of binning method
 binmeth = 'equil';
@@ -38,9 +38,9 @@ else, error('Please check the binnig method that is provided');
 end
 
 % Prepare output variables
-subtraj = NaN(nBin-1,3,nSub);
-iotraj  = NaN(nBin-1,3,nSub);
-coef    = NaN(nSub,1);
+binsubtraj = NaN(nBin-1,3,nSub);
+biniotraj  = NaN(nBin-1,3,nSub);
+coef       = NaN(nSub,1);
 
 % For each subject
 for iSub = 1:nSub
@@ -52,6 +52,10 @@ for iSub = 1:nSub
     iobel  = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), IO(:,iSub), ...
         randidx(:,iSub), 'UniformOutput', 0));
     
+    % Correlate subject's and ideal observer's beliefs in the probabilistic
+    % hypothesis
+    coef(iSub) = Emergence_Regress(subbel(:,iHyp), iobel(:,iHyp), 'CC', 'r');
+    
     % Get indices of moments at which the ideal observer's beliefs in the
     % probabilistic hypothesis fell into some binned probability values
     condidx = cellfun(@(i,j) iobel(:,iHyp) >= i & iobel(:,iHyp) < j, ...
@@ -59,21 +63,17 @@ for iSub = 1:nSub
     
     % Average both subject's and ideal observer's beliefs over those
     % moments for each bin
-    subtraj(:,:,iSub) = cell2mat(cellfun(@(i) mean(subbel(i,:), 1), ...
+    binsubtraj(:,:,iSub) = cell2mat(cellfun(@(i) mean(subbel(i,:), 1), ...
         condidx, 'UniformOutput', 0));
-    iotraj(:,:,iSub)  = cell2mat(cellfun(@(i) mean(iobel(i,:), 1), ...
+    biniotraj(:,:,iSub)  = cell2mat(cellfun(@(i) mean(iobel(i,:), 1), ...
         condidx, 'UniformOutput', 0));
-    
-    % Correlate subject's and ideal observer's beliefs in the probabilistic
-    % hypothesis across different probability bins
-    coef(iSub) = Emergence_Regress(subtraj(:,iHyp,iSub), iotraj(:,iHyp,iSub), 'CC', 'r');
 end
 
 % Average over subjects
-avgsubtraj = mean(subtraj, ndims(subtraj), 'OmitNaN');
-avgiotraj  = mean(iotraj,  ndims(subtraj), 'OmitNaN');
-semsubtraj = sem(subtraj, ndims(iotraj));
-semiotraj  = sem(iotraj,  ndims(iotraj));
+avgsubtraj = mean(binsubtraj, ndims(binsubtraj), 'OmitNaN');
+avgiotraj  = mean(biniotraj,  ndims(binsubtraj), 'OmitNaN');
+semsubtraj = sem(binsubtraj, ndims(biniotraj));
+semiotraj  = sem(biniotraj,  ndims(biniotraj));
 
 % Display the position of different false alarms in the triangle depending
 % on the corresponding ideal observer's strength in that false alarm
@@ -98,7 +98,7 @@ for iBin = 1:nBin-1
     iop = avgiotraj(iBin,iHyp);
     [~,coli] = min(abs(iop - pgrid));
 	plot(cartcoord(iBin,1), cartcoord(iBin,2), 'o', 'MarkerSize', 7, 'LineWidth', ...
-        1/2, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', cmap(coli,:));
+        1/2, 'MarkerEdgeColor', 'none', 'MarkerFaceColor', cmap(coli,:));
 end
 
 % Customize the colormap and add a colorbar
@@ -118,14 +118,6 @@ figure('Position', [202 905 200 200]);
 % Display the identity line
 plot([0,1], [0,1], '-', 'Color', g); hold('on');
 text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
-
-% Display the regression line between beliefs from subjects and IO
-beta = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'TLS', {'beta0', 'beta1'});
-confint  = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'TLS', 'confint');
-confintx = Emergence_Regress(avgsubtraj(:,iHyp), avgiotraj(:,iHyp), 'TLS', 'confintx');
-fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
-    'k', 'EdgeColor', 'none', 'FaceColor', tricol(iHyp,:), 'FaceAlpha', 0.15); hold('on');
-plot(avgiotraj(:,iHyp), beta(1)+avgiotraj(:,iHyp)*beta(2), '-', 'Color', tricol(iHyp,:), 'LineWidth', 3);
 
 % Display averaged beliefs in each probability bin with its error bars
 plot(repmat(avgiotraj(:,iHyp)', [2,1]), avgsubtraj(:,iHyp)'+semsubtraj(:,iHyp)'.*[-1;1], 'k-');
