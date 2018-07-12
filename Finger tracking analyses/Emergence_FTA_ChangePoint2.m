@@ -78,9 +78,8 @@ end
 % Display group-level correlation between real and estimated change point's position
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Prepare the figure
-figure('Position', [463 906 340 200]);
-subplot(1,3,1:2);
+% Prepare a new figure
+figure('Position', [463 906 220 200]);
 
 % Display the generative process underlying the position of the change points
 bot = 60;
@@ -130,7 +129,7 @@ axis(repmat([bot, N-bot], 1, 2));
 set(gca, 'XTick', get(gca, 'YTick'), 'Box', 'Off');
 
 % Add some labels
-xlabel(sprintf('Objective %s point''s position', ptname{xp}));
+xlabel(sprintf('True %s point''s position', ptname{xp}));
 ylabel(sprintf('Inferred %s point''s position', ptname{xp}));
 
 % Display the real distribution of change points
@@ -141,12 +140,17 @@ bar((x(1:end-1) + x(2:end)) / 2, n, 'EdgeColor', 'None', 'FaceColor', 'k', 'Face
 set(gca, 'YColor', 'None');
 axis([x([1,end]), 0, 1]);
 
+% Save the figure
+if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_Corr1S.pdf');
+else, save2pdf('figs/F_CP_Corr1IO.pdf');
+end
+
 % Display individual correlation coefficient from the correlation between
 % real and estimated change point's position
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Display the scenario in which no correlation is observed
-subplot(1,3,3); hold('on');
+% Prepare a new figure
+figure('Position', [684 905 120 200]);
 
 % Display difference in correlation coefficients between the two types of regularity
 Emergence_PlotSubGp(coef, tricol(1:2,:));
@@ -166,9 +170,12 @@ set(gca, 'XColor', 'None', 'Box', 'Off');
 % Display whether the difference is significant or not
 Emergence_DispStatTest(coef);
 
+% Add text labels
+ylabel('Correlation coefficient');
+
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_CorrS.pdf');
-else, save2pdf('figs/F_CP_CorrIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_Corr2S.pdf');
+else, save2pdf('figs/F_CP_Corr2IO.pdf');
 end
 
 %% CONFIDENCE IN THE ESTIMATE
