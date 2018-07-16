@@ -19,8 +19,17 @@ idxtrimap = cell(1,3);
 
 % For sequences entailing regularities
 for iHyp = 1:2
+    
+    % Get indices of post-change-point observations
     idxtrimap{iHyp} = cellfun(@(x) (x.Jump-1/2):N, G, 'UniformOutput', 0);
-    idxtrimap{iHyp}(setdiff(1:size(D,1), cidx{iHyp}),:) = {[]};
+    
+    % Keep only indices for sequences with the current type of regularity
+    idxtrimap{iHyp}(setdiff(1:size(G,1), cidx{iHyp}),:) = {[]};
+    
+    % Keep only sequences that have been correctly identified
+    detecmask = zeros(size(G));
+    detecmask(cidx{iHyp},:) = cellfun(@(xval) xval.Questions(2) == iHyp, G(cidx{iHyp},:));
+    idxtrimap{iHyp}(~detecmask) = {[]};
 end
 
 % For stochastic parts (both the fully-stochastic sequences and the
@@ -77,12 +86,9 @@ for iMap = 1:nMap
     end
     
     % Interpolate the trajectories
-    idx = find(sum(~cellfun(@isempty, points), 2) > 0);
-    lists  = idxtrimap{iMap}(idx,:);
-    points = points(idx,:);
-    interppoints = cellfun(@(x,v) interp1(x', v, x(1):dtint:x(end)), ...
-        lists, points, 'UniformOutput', 0);
-    gppoints{iMap} = cell2mat(interppoints(:));
+    interppoints = cellfun(@(x) interp1(1:size(x,1), x, 1:dtint:size(x,1)), ...
+        points(~cellfun(@isempty, points)), 'UniformOutput', 0);
+    gppoints{iMap} = cell2mat(interppoints);
     
     % Compute the density map
     cc = gppoints{iMap}*tcn;
