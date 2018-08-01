@@ -1,4 +1,4 @@
-function [ pYgMp, pAgYMp, pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
+function [ pYgMp, pAgYMp, pTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_MARKOV implements an observer learning parameters (i.e.
 % frequency of transitions) of a first-order binary Markov chain from a
 % sequence of binary observations.
@@ -139,7 +139,9 @@ end
 % The likelihood of the first event is simply 1 over the number of
 % different possible stimuli in the sequence
 % p(y_1) = 1/2 <=> log(p(y_1)) = -log(2)
-pY1 = 1/2;
+if     strcmpi(scaleme, 'lin'), pY1 = 1/2;
+elseif strcmpi(scaleme, 'log'), pY1 = -log(2);
+end
 
 % Get the identity of the previous observations of each observation in the
 % sequence. This eases the frequency counts of transitions
@@ -189,14 +191,14 @@ if ~usegrid
     % likelihood of the first event:
     % p(y|t(A|B),t(B|A)) = p(y_1) * p(y_2:K|t(X|A)) * p(y_2:K|t(X|B))
     % <=> log(p(y|t(A|B),t(B|A))) = log(p(y_1)) + log(p(y_2:K|t(X|A))) + log(p(y_2:K|t(X|B)))
-    if     strcmpi(scaleme, 'lin'), pYgMp =     pY1  * pYgTgA * pYgTgB;
-    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY1) + pYgTgA + pYgTgB;
+    if     strcmpi(scaleme, 'lin'), pYgMp = pY1 * pYgTgA * pYgTgB;
+    elseif strcmpi(scaleme, 'log'), pYgMp = pY1 + pYgTgA + pYgTgB;
     end
     
     % If asked, return the posterior distribution
     if returnpost
-        pTgA = Emergence_IO_BetaPDF(theta, nXgA(1,2), nXgA(1,1), nt); % p(X|A), x-axis
-        pTgB = Emergence_IO_BetaPDF(theta, nXgB(1,1), nXgB(1,2), nt); % p(X|B), y-axis
+        pTgA = Emergence_IO_BetaPDF(theta, nXgA(2), nXgA(1), nt); % p(X|A), x-axis
+        pTgB = Emergence_IO_BetaPDF(theta, nXgB(1), nXgB(2), nt); % p(X|B), y-axis
         pTgY = pTgA' * pTgB; % create the 2D probability distribution
         pTgY = pTgY ./ sum(pTgY(:)); % normalize the posterior
     end
@@ -262,7 +264,32 @@ end
 % analytical formula can be used, which is simply a ratio).
 % N.B. This depends on the identity of the previously received observation.
 pAgX  = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
-X     = y(end);  % get the identity of the last observation
+X     = y(end); % get the identity of the last observation
 pAgYMp = pAgX(X); % returns p(A) conditionaly on the last observation
+
+%% Entropy of the posterior distribution
+%  =====================================
+
+% If analytical solutions have been used
+if ~usegrid
+    
+    % Use analytical formulation of the entropy of a beta distribution
+    % => differential entropy
+    anent = @(a,b) betaln(a,b) - (a-1) * psi(a) - (b-1) * psi(b) + (a+b-2) * psi(a+b);
+    H_ptBgA = anent(nXgA(2), nXgA(1));
+    H_ptAgB = anent(nXgB(1), nXgB(2));
+
+% If grid-based numerical solutions have been used
+elseif usegrid
+    
+    % Comput the entropy of the distribution
+    % => discrete entropy
+    H_ptBgA = sum(-pYgtBgA .* log2(pYgtBgA), 'OmitNaN');
+    H_ptAgB = sum(-pYgtAgB .* log2(pYgtAgB), 'OmitNaN');
+end
+
+% When marginal distributions are independant, we have:
+% H(X,Y) = H(X)+H(Y)
+H_pTgY = H_ptBgA + H_ptAgB;
 
 end
