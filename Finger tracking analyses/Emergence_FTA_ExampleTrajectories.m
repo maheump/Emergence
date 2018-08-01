@@ -6,36 +6,86 @@
 % N.B. To be run without subject exclusion. To do so, turn the boolean
 % variable "rmbadsub" in "Emergence_FTA_LoadData" to false.
 
+%% 3 EXAMPLE SEQUENCES
+%  ===================
+
+% Select example sequences to look at
+sublist  = [22 25 28];
+condlist = [10 16 22];
+nSeq  = numel(sublist);
+
+% Prepare the window
+figure('Position', [1 805 800 300]);
+
+% Display example sequences
+% ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% For each sequence
+for iSeq = 1:nSeq
+    cond = condlist(iSeq);
+    sub = sublist(iSeq);
+    subplot(3,1,iSeq); hold('on');
+    
+    % Display the generative process(es) of the sequence
+    for iProc = unique(G{cond,sub}.Gen)
+        if     iProc == 2 && strcmpi(G{cond,sub}.Cond(1), 'P')
+            col = tricol(1,:);
+            rule = sprintf('p(A|B) = %1.2f & p(B|A) = %1.2f', G{cond,sub}.Rule);
+        elseif iProc == 2 && strcmpi(G{cond,sub}.Cond(1), 'D')
+            col = tricol(2,:);
+            rule = sprintf('[%s]^{n}', pat2str(G{cond,sub}.Rule));
+        elseif iProc == 1
+            col = tricol(3,:);
+            rule = '';
+        end
+        obsidx = find(G{cond,sub}.Gen == iProc);
+        fill(obsidx([1,end,end,1])+ones(1,4)/2.*[-1,1,1,-1], ...
+            [0,0,1,1]+ones(1,4)/4.*[-1,-1,1,1], ...
+            'k', 'FaceColor', col, 'EdgeColor', 'none');
+    end
+    text(mean([1, min([G{cond,sub}.Jump, N])]), -1, ...
+        'Stochastic part', 'Color', tricol(3,:));
+    text(mean([N, G{cond,sub}.Jump]), -1, ...
+        {sprintf('%s part', G{cond,sub}.Cond), rule}, 'Color', col);
+    
+    % Display the position of the change point
+    plot(repmat(G{cond,sub}.Jump,1,2), [-0.5,1.5], 'k-', 'LineWidth', 1);
+    
+    % Display the sequence
+    plot(1:N, G{cond,sub}.Seq-1, 'w.-', 'LineWidth', 1/2);
+    
+    % Customize the axes
+    axis([1,N,-1,2]); axis('off');
+end
+
+% Save the figure
+save2pdf('figs/F_ET_ExpSeqs.pdf');
+
 %% SUBJECT AND IDEAL OBSERVER BELIEFS IN 3 EXAMPLE TRAJECTORIES
 %  ============================================================
 
-% Compare with the ideal observer
-subs  = [22 25 28];
-conds = [10 16 22];
-nseq  = numel(subs);
-
 % Prepare a new window
-figure('Position', [1 805 800 300]);
+figure('Position', [1 431 800 300]);
 
 % For each sequence
-for iSeq = 1:nseq
+for iSeq = 1:nSeq
     
     % For both the subject and the ideal observer
     for iObs = 1:2        
-        if     iObs == 1, X = G{conds(iSeq),subs(iSeq)};
-        elseif iObs == 2, X = IO{conds(iSeq),subs(iSeq)};
+        if     iObs == 1, X = G{condlist(iSeq),sublist(iSeq)};
+        elseif iObs == 2, X = IO{condlist(iSeq),sublist(iSeq)};
         end
         
         % Plot the trajectory within the triangle
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ipos = iSeq + 3*(iObs-1) + 5*(iSeq-1);
-        subplot(nseq, 2*(1+2), ipos);
+        subplot(nSeq, 2*(1+2), ipos);
         Emergence_PlotTrajOnTri(X.BarycCoord, X.Jump+1/2, tricol, 6);
         Emergence_PlotGridOnTri(3);
         
         % Plot the Barycentric coordinates
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        subplot(nseq, 2*(1+2), (1:2) + ipos);
+        subplot(nSeq, 2*(1+2), (1:2) + ipos);
         Emergence_PlotBarycTraj(X.BarycCoord, tricol);
         
         % Append help lines
@@ -48,7 +98,7 @@ for iSeq = 1:nseq
         set(gca, 'YTick', 0:1/3:1, 'YTickLabel', {'0','1/3','2/3','1'});
         
         % Add some text labels
-        title(sprintf('Subject %1.0f, Sequence %1.0f', subs(iSeq), conds(iSeq)));
+        title(sprintf('Subject %1.0f, Sequence %1.0f', sublist(iSeq), condlist(iSeq)));
     end
 end
 
@@ -59,8 +109,8 @@ save2pdf('figs/F_ET_SubVsIO.pdf');
 %  =========================
 
 % Define which trajectories to display
-subs  = [08 02 15 02 20 20 06 06];
-conds = [18 02 15 22 22 18 12 18];
+sublist  = [08 02 15 02 20 20 06 06];
+condlist = [18 02 15 22 22 18 12 18];
 trajnames = {'Jolting', 'Sweeping' ...
              'Hesitation', 'Changes of mind', ...
              'Ballistic', 'Gradual', ...
@@ -71,7 +121,7 @@ trajgp = {{'Discrete vs', 'continuous'}, ...
           {'Levels of', 'confidence'}};
 
 % Prepare a new window
-figure('Position', [1 284 800 447]);
+figure('Position', [802 658 800 447]);
 
 % For each sequence
 for iSeq = 1:numel(trajnames)
@@ -82,7 +132,7 @@ for iSeq = 1:numel(trajnames)
     % Plot the trajectory and the triangle
     ipos = (iSeq+1:iSeq+1)+2*(iSeq-1)-1;
     subplot(4, 2*(1+2), ipos);
-    X = D{conds(iSeq),subs(iSeq)};
+    X = D{condlist(iSeq),sublist(iSeq)};
     Emergence_PlotTrajOnTri(X.BarycCoord, X.Jump+1/2, tricol);
     if mod(iSeq,2) == 1
         text(0, 1/2, trajgp{(iSeq+1)/2}, 'FontWeight', 'Bold', 'FontSize', ...
@@ -107,9 +157,9 @@ for iSeq = 1:numel(trajnames)
     
     % Add some text labels
     title(trajnames{iSeq});
-    text(7, 0.9, sprintf('Subject %i', subs(iSeq)), ...
+    text(7, 0.9, sprintf('Subject %i', sublist(iSeq)), ...
         'HorizontalAlignment', 'Left', 'FontSize', 8);
-    text(7, 0.75, sprintf('%s', c{conds(iSeq)}), ...
+    text(7, 0.75, sprintf('%s', c{condlist(iSeq)}), ...
             'HorizontalAlignment', 'Left', 'FontSize', 8);
 end
 
