@@ -15,11 +15,8 @@
 % Create the parameter grid, i.e. the value of shift between the subjects
 % and the ideal observer to be considered in the following parameter
 % estimation loop
-param = -50:50;
-nParam = numel(param);
-
-% Length of the sequence
-N = numel(G{1}.Seq);
+paramlist = -50:50;
+nParam = numel(paramlist);
 
 % Prepare output variable
 coef = NaN(nParam, nCond, nSub); % R2 of interest
@@ -32,7 +29,7 @@ for iSub = 1:nSub
     % For each considered value of the shift (in # of observations)
     % between subject and ideal observer beliefs
     for iParam = 1:nParam
-        i = param(iParam);
+        p = paramlist(iParam);
         
         % For each sequence
         for iCond = 1:nCond
@@ -43,12 +40,12 @@ for iSub = 1:nSub
             
             % Shift the subject's trajectory with respect to the ideal
             % observer's trajectory
-            if i >= 0 % if the subject is slower than the ideal observer
-                subtraj = subbel(i+1:N,:); % to be explained: subject's trajectory
-                iotraj  = iobel(1:N-i,:);  % explaining variable: IO's belief
-            elseif i < 0 % if the subject is faster than the ideal observer
-                subtraj = subbel(1:N+i,:); % to be explained: subject's trajectory
-                iotraj  = iobel(-i+1:N,:); % explaining variable: IO's belief
+            if p >= 0 % if the subject is slower than the ideal observer
+                subtraj = subbel(p+1:N,:); % to be explained: subject's trajectory
+                iotraj  = iobel(1:N-p,:);  % explaining variable: IO's belief
+            elseif p < 0 % if the subject is faster than the ideal observer
+                subtraj = subbel(1:N+p,:); % to be explained: subject's trajectory
+                iotraj  = iobel(-p+1:N,:); % explaining variable: IO's belief
             end
             
             % Measure the correlation between subject's and ideal
@@ -62,12 +59,12 @@ for iSub = 1:nSub
             % This provides us a symmetric R2 behaviour that help quantify
             % the effect of the shift on two perfectly correlated
             % variables.
-            if i >= 0 % if the subject is slower than the ideal observer
-                iotraj1 = iobel(i+1:N,:);
-                iotraj2 = iobel(1:N-i,:);
-            elseif i < 0 % if the subject is faster than the ideal observer
-                iotraj1 = iobel(1:N+i,:);
-                iotraj2 = iobel(-i+1:N,:);
+            if p >= 0 % if the subject is slower than the ideal observer
+                iotraj1 = iobel(p+1:N,:);
+                iotraj2 = iobel(1:N-p,:);
+            elseif p < 0 % if the subject is faster than the ideal observer
+                iotraj1 = iobel(1:N+p,:);
+                iotraj2 = iobel(-p+1:N,:);
             end
             bchm(iParam,iCond,iSub) = Emergence_Regress(iotraj1(:), iotraj2(:), 'CC', 'r');
         end
@@ -80,7 +77,7 @@ avgR2 = squeeze(mean(coef, 2));
 
 % Display averaged R2 and corresponding best shift parameter for each subject
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%%
+
 % Create a new window
 figure('Position', [1 906 200 200]);
 
@@ -91,22 +88,22 @@ text(0, 1/2, ' Identity', 'Color', g, 'VerticalAlignment', 'Bottom', ...
 
 % Display the benchmark scenario (fitting the IO against itself)
 avgBM = squeeze(mean(bchm, 3));
-plot(param, mean(avgBM, 2), 'k-', 'LineWidth', 1/2);
+plot(paramlist, mean(avgBM, 2), 'k-', 'LineWidth', 1/2);
 
 % Display group-level R2 curves according to shift parameter
 gpavgR2 = mean(avgR2, 2);
 gpsemR2 = sem(avgR2, 2);
-f = plotMSEM(param, gpavgR2, gpsemR2, 0.15, 'k', 'k', 3, 1, '-', 'none');
+f = plotMSEM(paramlist, gpavgR2, gpsemR2, 0.15, 'k', 'k', 3, 1, '-', 'none');
 
 % Display group-level best shift parameter
 [gpmaxavgR2, gpmaxidxavgR2] = max(gpavgR2, [], 1);
-plot(param(gpmaxidxavgR2), gpmaxavgR2, 'o', 'LineWidth', 1, 'MarkerSize', 8, ...
+plot(paramlist(gpmaxidxavgR2), gpmaxavgR2, 'o', 'LineWidth', 1, 'MarkerSize', 8, ...
     'MarkerEdgeColor', get(f, 'Color'), 'MarkerFaceColor', g);
-text(param(gpmaxidxavgR2), gpmaxavgR2, sprintf('   delay = %1.0f', ...
-    param(gpmaxidxavgR2)), 'VerticalAlignment', 'Bottom', 'HorizontalAlignment', 'Left');
+text(paramlist(gpmaxidxavgR2), gpmaxavgR2, sprintf('   delay = %1.0f', ...
+    paramlist(gpmaxidxavgR2)), 'VerticalAlignment', 'Bottom', 'HorizontalAlignment', 'Left');
 
 % Customize the axes
-axis([param(1), param(end), 1/2, 1]);
+axis([paramlist(1), paramlist(end), 1/2, 1]);
 set(gca, 'Box', 'Off');
 
 % Add some text labels
@@ -129,14 +126,14 @@ text(0, 0, ' Identity', 'Color', g, 'VerticalAlignment', 'Top', ...
 
 % Display subject-level best shift parameters
 [submaxavgR2, submaxidxavgR2] = max(avgR2, [], 1);
-Emergence_PlotSubGp(param(submaxidxavgR2), 'k');
+Emergence_PlotSubGp(paramlist(submaxidxavgR2), 'k');
 
 % Customize the axes
 axis([0, 2, -5, 20]);
 set(gca, 'Box', 'Off', 'XColor', 'None');
 
 % Display whether the difference is significant or not
-Emergence_DispStatTest(param(submaxidxavgR2));
+Emergence_DispStatTest(paramlist(submaxidxavgR2));
 
 % Add some text labels
 ylabel('Estimated delay (# obs.)');
@@ -151,7 +148,7 @@ save2pdf('figs/F_QD_Delay.pdf');
 figure('Position',  [323 906 220 200]);
 
 % Display confidence intervals
-x = param(submaxidxavgR2);
+x = paramlist(submaxidxavgR2);
 y = submaxavgR2;
 confint  = Emergence_Regress(y, x, 'OLS', 'confint');
 confintx = Emergence_Regress(y, x, 'OLS', 'confintx');
