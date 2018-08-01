@@ -1,4 +1,4 @@
-function [ seqLH, post, predA, surp, entr, update ] = ...
+function [ seqlh, post, predA, surp, predent, update, pe, postent ] = ...
     Emergence_IO_RunMi( IOfun, seq, inputs )
 % EMERGENCE_IO_RUNMI runs iteratively a given ideal observer algorithm on a
 % sequential input. This allows to get updated beliefs of the ideal
@@ -12,16 +12,26 @@ function [ seqLH, post, predA, surp, entr, update ] = ...
 %
 % Copyright (c) 2018 Maxime Maheu
 
+% Avoid error when no inputs are provided
+if nargin < 3, inputs = {}; end
+
 % Number of observation in the sequence
 N = numel(seq);
 
 % Prepare the output variables
-seqLH  = NaN(1,N);
-post   = cell(1,N);
-predA  = NaN(1,N);
-surp   = NaN(1,N);
-entr   = NaN(1,N);
-update = NaN(1,N);
+seqlh   = NaN(1,N);   % p(y|M)
+post    = cell(1,N);  % p(theta|y,M)
+predA   = NaN(1,N+1); % p(y_k+1=A|y,M)
+surp    = NaN(1,N);   % -log p(y_k+1|y,M)
+predent	= NaN(1,N);   % H(p(y_k+1=A|y,M))
+update  = NaN(1,N);   % D(p(theta|y_1:K-1,M)||p(theta|y_1:K,M))
+pe      = NaN(1,N);   % |y_k+1 - p(y_k+1|y,M)|
+postent = NaN(1,N);   % H(p(theta|y,M))
+
+% The initial prediction is simply the probability of observing one
+% observation or the other by chance, which is 1/2 because sequences are
+% binary
+predA(1) = 1/2;
 
 % Loop over observations of the sequence
 for k = 1:N
@@ -34,25 +44,26 @@ for k = 1:N
     obs = seq(k);
 
     % Estimated probability of receiving this observation
-    if k == 1, pObs = 1/2; % chance
-    elseif k > 1 % prediction derived from the most recent inference
-        if     obs == 1, pObs =     predA(k-1); % p(y_k = A)
-        elseif obs == 2, pObs = 1 - predA(k-1); % p(y_k = B) = 1 - p(y_k = A)
-        end
+    if     obs == 1, pObs =     predA(k); % p(y_k = A)
+    elseif obs == 2, pObs = 1 - predA(k); % p(y_k = B) = 1 - p(y_k = A)
     end
-
-    % Theoretical Shannon surprise
-    surp(k) = -log2(pObs);
+    
+    % Prediction error
+    pe(k) = 1 - pObs;
+    
+    % Theoretical Shannon surprise (simply log pe)
+    surp(k) = -log(pObs);
 
     % Entropy of the prediction
-    entr(k)  = -(pObs .* log2(pObs) + (1-pObs) .* log2(1-pObs));
+    predent(k)  = -(pObs .* log2(pObs) + (1-pObs) .* log2(1-pObs));
 
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
     % Update the beliefs of the ideal observer %
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-    [seqLH(k), ...  % likelihood of the sequence up to the k-th observation
-     predA(k), ...  % probability that the k+1-th observation will be a A
-     post{k}] = ... % posterior probability distribution over model's parameters
+    [seqlh(k), ...      % likelihood of the sequence up to the k-th observation
+     predA(k+1), ...    % probability that the k+1-th observation will be a A
+     post{k}, ...       % posterior probability distribution over model's parameters
+     postent(k)] = ...  % entropy of the posterior distribution over model's parameters
      IOfun(seq(1:k), inputs{:});
 
     % ~~~~~~~~~~~~~~~~~~~~ %
@@ -67,8 +78,8 @@ for k = 1:N
     % Make sure there is no zeros or NaNs in the posterior distributions
     pB(isnan(pB)) = 1/numel(pB); % uniform prior
     cB(isnan(cB)) = 1/numel(cB); % uniform prior
-    pB(pB == 0) = eps; % smallest non-zero positive double
-    cB(cB == 0) = eps; % smallest non-zero positive double
+    pB(pB == 0) = realmin; % smallest non-zero positive double
+    cB(cB == 0) = realmin; % smallest non-zero positive double
 
     % Normalize the distributions
     pB = pB ./ sum(pB);
@@ -81,6 +92,10 @@ for k = 1:N
               + (1/2) .* sum(cB .* log2(cB ./ ((pB+cB)/2)));
     end
 end
+
+% Discard the last prediction because we do not have any observation to
+% compare with (the sequence is over)
+predA = predA(1:end-1);
 
 % Transform the posterior distribution into a matrix
 post = cell2mat(reshape(post, [ones(1,ndims(post{end})), N]));
