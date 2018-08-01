@@ -10,14 +10,12 @@
 %% INITIALIZATION
 %  ==============
 
-% Clear the place
-clear; close('all');
-
 % Define the location of the data
 homedir = '/Users/Maxime/Documents/My projects/Emergence';
+datadir = fullfile(homedir, 'Stimulation', 'bhv', 'data');
 
 % Get subjects' list
-subjects = dir(fullfile(homedir, 'Stimulation', 'bhv', 'data', 'Subject*'));
+subjects = dir(fullfile(datadir, 'Subject*'));
 subjects = {subjects.name};
 nSub = numel(subjects);
 
@@ -54,7 +52,7 @@ prob = {[1/3 1/3], ... % p(A|B) = 1/3 & p(B|A) = 1/3 => Rep. freq. (low)
 %  =======================================================
 
 % Get data from the first subject
-subloc  = fullfile(homedir, subjects{1});
+subloc  = fullfile(datadir, subjects{1});
 datfile = dir(fullfile(subloc, '*_Experiment_All.mat'));
 subfile = load(fullfile(subloc, datfile.name));
 
@@ -92,13 +90,13 @@ tripxl = [J,I];
 
 % For each subject
 for iSub = 1:nSub
-    fprintf('Preprocessing data from subject #%2.0f/%2.0f.\n', iSub, nSub);
+    fprintf('- Preprocessing data from subject #%2.0f/%2.0f.\n', iSub, nSub);
     
     % Get data
     % ~~~~~~~~
     
     % Get subject's data
-    subloc  = fullfile(homedir, subjects{iSub});
+    subloc  = fullfile(datadir, subjects{iSub});
     datfile = dir(fullfile(subloc, '*_Experiment_All.mat'));
     subfile = load(fullfile(subloc, datfile.name));
     
@@ -210,28 +208,29 @@ end
 IO = cell(size(G)); % conditions x subjects cell matrix with IO's inference
 
 % Define options for the observer
-stat  = 'Transitions'; % statistic to be learned by the probabilistic model
-treed = 10; % depth of the rules' tree to explore
-pEp   = 0; % probability of making a memory error at each observation
 pEd   = 0; % probability of making a memory error at each observation
-pJ    = 'Uniform'; % prior over change point's position
+pEp   = 0; % probability of making a memory error at each observation
+treed = 10; % depth of the rules' tree to explore
+stat  = 'Transitions'; % statistic to be learned by the probabilistic model
 pR    = 'Size-principle'; % the prior probability of each rule depends on its length
+pT    = 'Bayes-Laplace'; % the prior over statistics to be learnt
+pJ    = 'Uniform'; % prior over change point's position
 comp  = 'all'; % compute after each observation
 scale = 'log'; % scale of the model evidence
-verb  = 0; % do not output messages in the command window
-pgrid = []; % do not ask for the posterior distributions
+verb  = 1; % do not output messages in the command window
+pgrid = []; % precision of the posterior over theta
 
 % For each subject
 for iSub = 1:nSub
     
     % For each condition
     for iCond = 1:nCond
-        fprintf('Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f.\n', ...
+        fprintf('- Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f... ', ...
             iCond, nCond, iSub, nSub);
         
         % Run the observer with these options
         IO{iCond,iSub} = Emergence_IO_IdealObserver(G{iCond,iSub}.Seq, ... % sequence
-            pEp, pEd, treed, stat, pJ, pR, comp, scale, verb, pgrid);      % options
+            pEd, pEp, treed, stat, pR, pT, pJ, comp, scale, verb, pgrid);  % options
         
         % Remove unnecessary fields to light up the output MATLAB file
         IOf = fields(IO{iCond,iSub});
@@ -265,7 +264,8 @@ for iSub = 1:nSub
         % 2) Which type?
         else
             IO{iCond,iSub}.Questions(1) = 1; % a regularity was found
-            IO{iCond,iSub}.Questions(2) = IO{iCond,iSub}.Mhat(end) - 1; % 1 for probabilistic, 2 for deterministic
+            IO{iCond,iSub}.Questions(2) = IO{iCond,iSub}.Mhat(end) - 1;
+            % 1 for probabilistic, 2 for deterministic
             
             % 3) p(Jump)?
             if IO{iCond,iSub}.Questions(2) == 1
@@ -306,17 +306,14 @@ cidx = {11:21, 22:31, 1:10};
 
 % Add useful variables to the MATLAB file in which preprocessed data will
 % be saved
-leftcol  = [066 146 198]; % 1: probabilistic component (blue)
-rightcol = [239 059 033]; % 2: deterministic component (red)
-downcol  = [065 171 093]; % 3: stochastic component (green)
-tricol   = [leftcol; rightcol; downcol] ./ 255;
-tricc    = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-letters  = {'A','B'};
+tricol  = [cbrewer2('Blues', 1); cbrewer2('Reds', 1); cbrewer2('Greens', 1)];
+tricc   = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
+letters = {'A','B'};
 g = repmat(0.7,1,3); % grey
 
 % Save the group data file
-filename = fullfile(homedir, 'Finger tracking analyses', 'ppdata', 'Emergence_Behaviour_GroupData.mat');
+filename = fullfile(homedir, 'Finger tracking analyses', 'ppdata', ...
+    'Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'homedir', ...
     'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...
-    'tricol', 'tricc', 'letters', 'downcol', 'leftcol', 'rightcol', ...
-    'prob', 'det', 'g');
+    'tricol', 'tricc', 'letters', 'prob', 'det', 'g');
