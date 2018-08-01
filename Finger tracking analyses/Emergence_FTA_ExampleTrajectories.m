@@ -134,6 +134,7 @@ for iSeq = 1:numel(trajnames)
     subplot(4, 2*(1+2), ipos);
     X = D{condlist(iSeq),sublist(iSeq)};
     Emergence_PlotTrajOnTri(X.BarycCoord, X.Jump+1/2, tricol);
+    Emergence_PlotGridOnTri(3);
     if mod(iSeq,2) == 1
         text(0, 1/2, trajgp{(iSeq+1)/2}, 'FontWeight', 'Bold', 'FontSize', ...
             12, 'HorizontalAlignment', 'Right', 'Rotation', 0);

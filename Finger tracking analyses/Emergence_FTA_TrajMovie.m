@@ -79,7 +79,7 @@ obslab = {'Subject', {'Ideal','observer'}};
 
 % Prepare the video file
 if strcmpi(tosave, 'gif')
-    filename = 'Emergence_FTA_ExampleSequence.gif';
+    filename = 'figs/F_M.gif';
     delete(filename);
 elseif strcmpi(tosave, 'avi')
     vidObj = VideoWriter('vid.avi');
@@ -89,7 +89,7 @@ end
 
 % After each observation
 for iObs = 1:N
-    
+
     % For subject's and IO's inference
     for ind = 1:2
         shift = (2*3)*(ind-1);
@@ -105,11 +105,12 @@ for iObs = 1:N
         % Plot the trajectory (up to sample "i") on the triangle
         Emergence_PlotTrajOnTri(X{ind}.BarycCoord(1:iObs,:), J, ...
             tricol, eps, markers, false, fs);
-        
+        Emergence_PlotGridOnTri(3);
+
         % Display the type of observer
         text(min(xlim), min(ylim), obslab{ind}, 'FontWeight', 'Bold', ...
             'HorizontalAlignment', 'Left', 'FontSize', fs);
-        
+
         % Customize the axes
         set(gca, 'FontSize', fs);
 
@@ -134,7 +135,7 @@ for iObs = 1:N
             plot(repmat(X{ind}.Jump,1,2), [0,3], 'k-');
             plot(X{ind}.Jump, 3, markers{2}, 'MarkerSize', ms, ...
                 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
-        end    
+        end
 
         % Customize the axes
         axis([1,N,0,3]);
@@ -174,23 +175,23 @@ for iObs = 1:N
             ylabel({'Barycentric','coordinates'});
         end
     end
-    
+
     % Draw iteratively and get the frame
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     % Update the figure
     drawnow;
-    
+
     % Get the image
     frame = getframe(ff);
-    
+
     % Append to the file
     if strcmpi(tosave, 'gif')
         im = frame2im(frame);
         [imind, cm] = rgb2ind(im, 256);
-        if     iObs == 1, imwrite(imind, cm, filename, 'gif', 'Loopcount', inf); 
-        elseif iObs  > 1, imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append'); 
-        end 
+        if     iObs == 1, imwrite(imind, cm, filename, 'gif', 'Loopcount', inf);
+        elseif iObs  > 1, imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append');
+        end
     elseif strcmpi(tosave, 'avi')
     	writeVideo(vidObj, frame);
     end
