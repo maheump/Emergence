@@ -18,7 +18,7 @@ badsubs = [1, 7, 13, 14, 19];
 goodsubs = setdiff(1:nSub, badsubs);
 
 % Remove data from bad subjects
-if rmbadsub || ~exist('rmbadsub', 'var')
+if ~exist('rmbadsub', 'var') || rmbadsub
     G = G(:,goodsubs);
     S = S(goodsubs);
     IO = IO(:,goodsubs);
