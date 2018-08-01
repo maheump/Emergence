@@ -65,7 +65,7 @@ end
 % Uniform and non-informative Bayes-Laplace prior
 if isa(prior, 'char') && strcmpi(prior, 'Bayes-Laplace')
     p_nXgX = ones(2,ncond);
-
+    
 % Non-informative Jeffreys prior
 elseif isa(prior, 'char') && strcmpi(prior, 'Jeffreys')
     p_nXgX = ones(2,ncond)./i;
@@ -151,7 +151,7 @@ end
 end
 
 % % This is is a snipset of code that can be used to derive the joint
-% % distributions from the marginal ones. It is commented becomes it
+% % distributions from the marginal ones. It is commented because it
 % % quickly becomes highly computationaly demanding
 % joint = mat2cell(pTgY, ones(ncond, 1), nt);
 % reshmat = mat2cell(eye(ncond)*(nt-1)+1, ones(ncond,1), ncond);
