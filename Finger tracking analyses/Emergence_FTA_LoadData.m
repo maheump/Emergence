@@ -30,6 +30,9 @@ end
 % By default, look at subjects' data
 D = G;
 
+% Get the length of each sequence
+N = numel(G{1}.Seq);
+
 %% DEFINE DEFAULT FIGURE OPTIONS
 %  =============================
 
