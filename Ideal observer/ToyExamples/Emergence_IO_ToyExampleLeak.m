@@ -20,7 +20,7 @@ leakval = cellfun(@(x) sprintf('%1.3f', x), ...
     num2cell(pMemError), 'UniformOutput', 0);
 
 % Length of sequences to consider
-nObs = 50;
+nObs = 48;
 
 %% Run ideal observers using a leaky integration
 %  =============================================
@@ -34,19 +34,18 @@ for iParam = 1:nParam, leak(iParam,:) = Emergence_IO_Leak(pMemError(iParam), nOb
 % Example sequences
 nSeq = 2;
 y = cell(1,nSeq);
-y{1} = GenRandSeq(nObs, [1/3, 2/3]); % probabilistic regularity
-y{2} = repmat([1 1 2 2 1], [1, 10]); % deterministic regularity
+y{1} = GenRandSeq(nObs, [1/4, 1/4]); % probabilistic regularity
+y{2} = repmat(str2pat('AAAABBBB'), [1, 6]); % deterministic regularity
 
 % Prepare outputs
-seqLH  = NaN(nParam,nObs,2);
-predA  = NaN(nParam,nObs,2);
-surp   = NaN(nParam,nObs,2);
-entr   = NaN(nParam,nObs,2);
-update = NaN(nParam,nObs,2);
-post   = cell(1,2);
+pYgM  = NaN(nParam,nObs,2);
+pAgYM = NaN(nParam,nObs,2);
+IgYM  = NaN(nParam,nObs,2);
+JSdiv = NaN(nParam,nObs,2);
+pTgY  = cell(1,2);
 
 % Define properties of the ideal observers' inference
-nu = nObs; % depth of the tree
+nu = 10; % depth of the tree
 dt = 0.01; % precision of the grid
 
 % For each value of the leak
@@ -66,18 +65,18 @@ for iParam = 1:nParam
         
         % Run the observer iteratively after each observation of the
         % sequence
-        [seqLH(iParam,:,iObs), post{iObs}(:,:,:,iParam), predA(iParam,:,iObs), ...
-            surp(iParam,:,iObs), ~, update(iParam,:,iObs)] = ...
+        [pYgM(iParam,:,iObs), pTgY{iObs}(:,:,:,iParam), pAgYM(iParam,:,iObs), ...
+            IgYM(iParam,:,iObs), ~, JSdiv(iParam,:,iObs)] = ...
             Emergence_IO_RunMi(IOfun, y{iObs}, inputs);
     end
 end
 
 % Get rid of non-relevant dimensions
-post = cellfun(@(x) squeeze(x), post, 'UniformOutput', 0);
+pTgY = cellfun(@(x) squeeze(x), pTgY, 'UniformOutput', 0);
 
 % Compare inference to a dumb observer hypothesizing that the sequence is
 % purely random
-batch = log((1/2).^(1:nObs));
+pYgMr = (1:nObs) * log(1/2);
 
 %% Display the different weighting functions
 %  =========================================
@@ -108,6 +107,97 @@ ylabel({'Weights $w_{k}$', '$p\left(\hat{y}_{k} = {y}_{k}\right)$'}, ...
 legend(lgd, leakval, 'Interpreter', 'LaTeX', 'Orientation', ...
     'Horizontal', 'Location', 'SouthOutside');
 
+%%
+
+for iObs = 1:2
+
+% Define the different variables from the IO to display
+Var = {pYgM(:,:,iObs), pAgYMd, IgYMd, HpRgY, sqrt(JSdiv)};
+nVar = numel(Var);
+VarLab = {{'Bayes factor', '$\frac{p(y|\mathcal{M_{\mathrm{D}}})}{p(y|\mathcal{M}_{\rm{S}})}$'}, ...
+          {'Prediction', '$p(y_{k+1}=\mathrm{A}|y_{1:k},\mathcal{M_{\mathrm{D}}})$'}, ...
+          {'Surprise', '$-\log_{2} p(y_{k+1},\mathcal{M_{\mathrm{D}}})$'}, ...
+          {'Entropy of the posterior', '$H(p(R|y,\mathcal{M_{\mathrm{D}}}))$'}, ...
+          {'Model update', '$\sqrt{\mathrm{JS}(p(R|y_{1:k},\mathcal{M_{\mathrm{D}}})||p(R|y_{1:k-1},\mathcal{M_{\mathrm{D}}}))}$'}};
+
+% Create a new window
+figure('Units', 'Normalized', 'Position', [0 1/2-0.2 1 0.4]);
+
+% Choose different colors for each sequence (i.e. each pattern)
+col = lines(nSeq);
+
+% For each sequence (i.e. each pattern)
+for iSeq = 1:nSeq
+    
+    % For each variable from the ideal observer
+    for iVar = 1:nVar
+        subplot(nVar+2, nSeq, iSeq+nSeq*(iVar-1));
+        
+        % Define vertical limits of the plot
+        limy1 = [min(Var{iVar}(:)), max(Var{iVar}(:))];
+        margin = diff(limy1).*(1/4);
+        limy2 = limy1 + [-1,1].*margin;
+        
+        % Display each time a pattern is repeated
+        rep = (L(iSeq):L(iSeq):nObs) + 1/2;
+        plot(repmat(rep', [1,2])', repmat(limy2, [numel(rep),1])', ...
+            '-', 'Color', ones(1,3)./2, 'LineWidth', 1/2); hold('on');
+        
+        % Display the sequence
+        pos = (limy2 - limy1) / 2 + limy1;
+        plot(find(y{iSeq} == 2), pos(1), 'k.', 'MarkerSize', 6);
+        plot(find(y{iSeq} == 1), pos(2), 'k.', 'MarkerSize', 6);
+        
+        % Display the beliefs of the ideal observer
+        plot(1:nObs, Var{iVar}(iSeq,:), '.-', 'Color', col(iSeq,:), ...
+            'LineWidth', 1, 'MarkerSize', 8); hold('on');
+        
+        % Customize the axes
+        axis([1/2, nObs+1/2, limy2]);
+        set(gca, 'XTick', [1, 5:5:nObs]);
+        set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
+            'TickLabelInterpreter', 'LaTeX');
+
+        % Add some text labels
+        if iVar == 1
+            title(sprintf('[%s]$^n$', patterns{iSeq}), ...
+                'Interpreter', 'LaTeX', 'Color', col(iSeq,:));
+        end
+        if iSeq == 1
+            ylabel(VarLab{iVar}, 'Interpreter', ...
+                'LaTeX', 'Rotation', 0, 'HorizontalAlignment', 'Right', ...
+                'VerticalAlignment', 'Middle');
+        end
+    end
+    
+    % Display the posterior beliefs over patterns
+    sp = subplot(nVar+2, nSeq, iSeq + nSeq*nVar + [0,nSeq]);
+%     imagesc(1:nObs, 1:nu, pRgY(:,:,iSeq)); hold('on');
+%     
+%     % Dis
+%     plot(repmat(rep', [1,2])', repmat([1/2, nObs+1/2], [numel(rep),1])', ...
+%         '-', 'Color', ones(1,3)./2, 'LineWidth', 1/2);
+%     
+%     % Customize the colormap
+%     colormap(viridis); caxis([0,1]);
+%     
+%     % Customize the axes
+%     set(gca, 'XTick', [1, 5:5:nObs]);
+%     set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
+%         'TickLabelInterpreter', 'LaTeX');
+%     
+%     % Add some text labels
+%     if iSeq == 1
+%         ylabel({'Posterior', 'distribution', '$p(R_i|y,\mathcal{M_{\mathrm{D}}})$'}, ...
+%             'Interpreter', 'LaTeX', 'Rotation', 0, ...
+%             'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Middle');
+%     end
+%     xlabel('Observation ($k$)', 'Interpreter', 'LaTeX');
+end
+end
+
+
+
 %% Display the effect of the leaky integration of the dynamics of the inference
 %  ============================================================================
 
@@ -126,8 +216,8 @@ for iObs = 1:2
         % ~~~~~~~~~~~~~~~~
         
         subplot(6,nParam,iParam); hold('on');
-        LLR = seqLH(iParam,:,iObs) - batch;
-        mLLR = max(max(abs(seqLH(:,:,iObs))));
+        LLR = pYgM(iParam,:,iObs) - pYgMr;
+        mLLR = max(max(abs(pYgM(:,:,iObs))));
         plot(repmat(1:nObs,2,1)', [-mLLR,mLLR], '-', 'Color', g);
         plot([1,nObs], zeros(1,2), 'k--');
         plot(1:nObs, LLR, '-', 'Color', col, 'LineWidth', 2);
@@ -146,11 +236,11 @@ for iObs = 1:2
         subplot(6,nParam,nParam+iParam); hold('on');
         plot(repmat(1:nObs,2,1)', [0,1], '-', 'Color', g);
         plot([1,nObs], ones(1,2)/2, 'k--');
-        plot(1:nObs, predA(iParam,:,iObs), '-', 'Color', col, 'LineWidth', 2);
+        plot(1:nObs, pAgYM(iParam,:,iObs), '-', 'Color', col, 'LineWidth', 2);
         set(gca, 'XLim', [1,nObs], 'YLim', [0,1]);
         set(gca, 'FontSize', fs, 'LineWidth', 1, 'TickLabelInterpreter', 'LaTeX');
         if iParam == 1
-            ylabel({'Prediction', '$p(y_{k+1}=\rm{A}\it{|}y_{1:k})$'}, ...
+            ylabel({'Prediction', '$p(y_{k+1}=\mathrm{A}|y_{1:k})$'}, ...
                 'Interpreter', 'LaTeX', 'Rotation', 0, ...
                 'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Middle');
         end
@@ -161,7 +251,7 @@ for iObs = 1:2
         subplot(6,nParam,(nParam*2)+iParam); hold('on');
         plot(repmat(1:nObs,2,1)', [0,6], '-', 'Color', g);
         plot([1,nObs], ones(1,2), 'k--');
-        plot(1:nObs, surp(iParam,:,iObs), '-', 'Color', col, 'LineWidth', 2);
+        plot(1:nObs, IgYM(iParam,:,iObs), '-', 'Color', col, 'LineWidth', 2);
         set(gca, 'XLim', [1,nObs], 'YLim', [0,6]);
         set(gca, 'FontSize', fs, 'LineWidth', 1, 'TickLabelInterpreter', 'LaTeX');
         if iParam == 1
@@ -175,11 +265,11 @@ for iObs = 1:2
         
         subplot(6,nParam,(nParam*3)+iParam); hold('on');
         plot(repmat(1:nObs,2,1)', [0,1], '-', 'Color', g);
-        plot(1:nObs, sqrt(update(iParam,:,iObs)), '-', 'Color', col, 'LineWidth', 2);
+        plot(1:nObs, sqrt(JSdiv(iParam,:,iObs)), '-', 'Color', col, 'LineWidth', 2);
         set(gca, 'XLim', [1,nObs], 'YLim', [0,1]);
         set(gca, 'FontSize', fs, 'LineWidth', 1, 'TickLabelInterpreter', 'LaTeX');
         if iParam == 1
-            ylabel({'Model', 'update', '$\sqrt{\rm{JS}(\it{p}(\theta|y_{1:k})}$', ...
+            ylabel({'Model', 'update', '$\sqrt{\mathrm{JS}(p(\theta|y_{1:k})}$', ...
                 '$\overline{||p(\theta|y_{1:k-1}))}$'}, 'Interpreter', 'LaTeX', 'Rotation', 0, ...
                 'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Middle');
         end
@@ -193,8 +283,8 @@ for iObs = 1:2
         
         % Model learning probabilistic regularities
         if iObs == 1
-            if ndims(post{1}) == 4
-                imagesc(0:dt:1, 0:dt:1, post{iObs}(:,:,end,iParam));
+            if ndims(pTgY{1}) == 4
+                imagesc(0:dt:1, 0:dt:1, pTgY{iObs}(:,:,end,iParam));
                 plot([0,1], [0,1], 'k-');
                 plot([0,1], [1,0], 'k-');
                 plot([0,1], ones(1,2)/2, 'k--');
@@ -205,8 +295,8 @@ for iObs = 1:2
                     xlabel('$\theta_{A|B}$', 'Interpreter', 'latex');
                     ylabel('$\theta_{B|B}$', 'Interpreter', 'latex');
                 end
-            elseif ndims(post{1}) == 3
-                imagesc(1:nObs, 0:dt:1, post{iObs}(:,:,iParam));
+            elseif ndims(pTgY{1}) == 3
+                imagesc(1:nObs, 0:dt:1, pTgY{iObs}(:,:,iParam));
                 plot([1,nObs], ones(1,2)./2, 'k--');
                 axis([1,nObs,0,1]);
                 if iParam == 1
@@ -220,7 +310,7 @@ for iObs = 1:2
         % Model learning deterministic regularities
         elseif iObs == 2
             plot([0,nu+1], repmat(1/nu,1,2), 'k--');
-            bar(1:nu, post{iObs}(:,end,iParam), 1, 'FaceColor', col);
+            bar(1:nu, pTgY{iObs}(:,end,iParam), 1, 'FaceColor', col);
             set(gca, 'XLim', [1/2,nu+1/2], 'YLim', [0,1]);
             xlabel('$R_{i}$', 'Interpreter', 'LaTeX');
             if iParam == 1
