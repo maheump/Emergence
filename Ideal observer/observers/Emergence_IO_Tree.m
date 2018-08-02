@@ -175,7 +175,9 @@ for i = ilRo
         % Compute how much the repetition of that current rule matches the
         % observed sequence
         % p(Ri|y) = (1/2) * prod_(y_k == yhat_k) w_k * prod_(y_k ~= yhat_k) (1-w_k)
-        pYgRio(i) = (1/2) * prod(pYkgRi);
+        if     strcmpi(scaleme, 'lin'), pYgRio(i) =  (1/2) * prod(pYkgRi);
+        elseif strcmpi(scaleme, 'log'), pYgRio(i) = -log(2) + sum(pYkgRi);
+        end
    end
     
     % Derive the expected identity of the next observation based on that
@@ -194,7 +196,9 @@ if strcmpi(prior, 'Bayes-Laplace')
     % The prior probability is simply 1 over the total number of rules
     % (i.e. both fully and partially observed ones)
     % p(Ri) = 1/{R}
-    p_pRi = ones(1, nlRo) ./ nR;
+    if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), p_pRi = ones(1, nlRo) ./ nR;
+    elseif               ~idealinteg && strcmpi(scaleme, 'log'), p_pRi = repmat(-log(nR), 1, nlRo);
+    end
     
 % For prior based on the size-principle
 elseif strcmpi(prior, 'Size-principle')
@@ -202,7 +206,9 @@ elseif strcmpi(prior, 'Size-principle')
     % The size principle states that, since these are binary rules,
     % their prior simply depends on their lengths:
     % p(pRi) = (1/3) .^ |Ri|;
-    p_pRi = (1/3) .^ ilRo;
+    if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), p_pRi = (1/3) .^ ilRo;
+    elseif               ~idealinteg && strcmpi(scaleme, 'log'), p_pRi = -ilRo .* log(3);
+    end
 end
 
 %% Sequence's marginal likelihood
@@ -213,11 +219,13 @@ end
 
 % Sequence's likelihood for each rule
 % p(y|Rio) propto p(Rio|y) * p(Ri)
-pRiogY = pYgRio .* p_pRi;
+if      idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), pRiogY =     pYgRio .* p_pRi;
+elseif                ~idealinteg && strcmpi(scaleme, 'log'), pRiogY = exp(pYgRio  + p_pRi);
+end
 
 % Sequence's likelihood for entirely observed rules
 % p(Ro|y) = sum(i=1:{Ro}) p(Ri|y)
-pRogY = sum(pRiogY);
+pRogY = sum(pRiogY); 
 
 % Partially observed rules
 % ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -235,12 +243,12 @@ end
 % deterministic model
 % p(y|Md) = p(y|Ro) * p(Ro) + p(y|Ru) * p(Ru)
 pYgMd = pRogY + pRugY;
-if strcmpi(scaleme, 'log'), pYgMd = log(pYgMd); end
+if idealinteg && strcmpi(scaleme, 'log'), pYgMd = log(pYgMd); end
 
 % If none of the observed rules can explain the sequence and the sequence
 % is longer than the depth of the tree (i.e. the longest possible rule that
 % is considered), the likelihood of the sequence is null. When exported in
-% log scale, we return the log of the smallest postitive floatin point
+% log scale, we return the log of the smallest postitive floating point
 % number.
 if corout && strcmpi(scaleme, 'log') && isinf(pYgMd), pYgMd = log(realmin); end
 
