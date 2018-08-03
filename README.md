@@ -25,6 +25,7 @@ Here is an example sequence with the beliefs from an example subject and from th
 * [VBA toolbox](http://mbb-team.github.io/VBA-toolbox/)
 * [cbrewer2](https://github.com/scottclowe/cbrewer2)
 * [avconv](https://libav.org/avconv.html)
+* [Perceptually uniform colormaps](https://fr.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps)
 
 ## Related toolboxes
 
