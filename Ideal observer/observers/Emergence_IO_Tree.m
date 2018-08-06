@@ -12,6 +12,8 @@ function [ pYgMd, pAgYMd, pRigY, H_pRigY, R ] = Emergence_IO_Tree( y, nu, scalem
 %       'Uniform' or based on the 'Size-principle'.
 %   - "decw": a Nx1 or 1xN array of (decaying) weights that will weight
 %       past observations of the sequence.
+%   - "corout": a boolean specofying whether to correct the output
+%       variables when the result of the inference is singular.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
