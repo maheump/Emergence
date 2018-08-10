@@ -12,7 +12,7 @@ clear;
 close('all');
 
 % Define colors
-tricol = [cbrewer2('Blues', 1); cbrewer2('Reds', 1); cbrewer2('Greens', 1)];
+tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 
 % Define the Shannon's entropy function
 H = @(p) -(p .* log2(p) + (1-p) .* log2(1-p));

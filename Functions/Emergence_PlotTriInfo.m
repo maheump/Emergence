@@ -17,11 +17,11 @@ end
 
 % Default colors to use
 if nargin < 2 || isempty(tricol)
-    tricol = [cbrewer2('Blues', 1); cbrewer2('Reds', 1); cbrewer2('Greens', 1)];
+    tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 end
 
 % Default font-size
-if nargin < 3 || isempty(fs), fs = 12; end
+if nargin < 3 || isempty(fs), fs = 15; end
 
 % Draw triangle's limits
 tr = fill(tricc(:,1), tricc(:,2), 'k', 'FaceColor', 'None', 'LineWidth', 2);
@@ -32,9 +32,9 @@ proclab = {'P','D','S'};
 hal = {'Right','Left','Center'};
 val = {'Bottom','Bottom','Top'};
 for k = 1:3
-    text(tricc(k,1), tricc(k,2), proclab{k}(1), 'FontSize', fs, ...
-        'Color', tricol(k,:), 'FontWeight', 'Bold', ...
-        'HorizontalAlignment', hal{k}, 'VerticalAlignment', val{k});
+    text(tricc(k,1), tricc(k,2), ['$\mathcal{M}_{\mathrm{' proclab{k} '}}$'], ...
+        'Interpreter', 'LaTeX', 'FontSize', fs, 'Color', tricol(k,:), ...
+        'FontWeight', 'Bold', 'HorizontalAlignment', hal{k}, 'VerticalAlignment', val{k});
 end
 
 end

@@ -306,7 +306,7 @@ cidx = {11:21, 22:31, 1:10};
 
 % Add useful variables to the MATLAB file in which preprocessed data will
 % be saved
-tricol  = [cbrewer2('Blues', 1); cbrewer2('Reds', 1); cbrewer2('Greens', 1)];
+tricol  = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 tricc   = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
 letters = {'A','B'};
 g = repmat(0.7,1,3); % grey

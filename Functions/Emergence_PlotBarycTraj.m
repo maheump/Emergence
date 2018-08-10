@@ -14,7 +14,7 @@ if nargin < 3, x = 1:nObs; end
 
 % Colors to use 
 if nargin < 2 || isempty(tricol)
-    tricol = [cbrewer2('Blues', 1); cbrewer2('Reds', 1); cbrewer2('Greens', 1)];
+    tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 end
 
 % Compute cumulative probabilities

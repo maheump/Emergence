@@ -38,7 +38,7 @@ tricc = [0,   sqrt(3)/2; ... % top left (P)
 
 % Default colors to use
 if nargin < 3
-    tricol = [cbrewer2('Blues', 1); cbrewer2('Reds', 1); cbrewer2('Greens', 1)];
+    tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 end
 
 % Get barycentric coordinates of the trajectory
