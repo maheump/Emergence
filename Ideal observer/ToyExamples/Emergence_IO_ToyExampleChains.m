@@ -24,7 +24,7 @@ N = 3; % order of the chain
 options = {'log', 'Bayes-Laplace', N, 0.01};
 
 % Run the chain iteratively each time an observation is received
-[pYgM, post, pred, surp, entr] = Emergence_IO_RunMi(@Emergence_IO_Chains, seq, options);
+[pYgM, post, pred, surp, entr] = Emergence_IO_RunIO(@Emergence_IO_Chains, seq, options);
 
 % Likelihood of the null model
 pYgM0 = -(1:nObs)*log(2);

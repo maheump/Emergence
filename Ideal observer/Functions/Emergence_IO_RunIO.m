@@ -1,6 +1,6 @@
 function [ seqlh, post, predA, surp, predent, update, pe, postent ] = ...
-    Emergence_IO_RunMi( IOfun, seq, inputs )
-% EMERGENCE_IO_RUNMI runs iteratively a given ideal observer algorithm on a
+    Emergence_IO_RunIO( IOfun, seq, inputs )
+% EMERGENCE_IO_RUNIO runs iteratively a given ideal observer algorithm on a
 % sequential input. This allows to get updated beliefs of the ideal
 % observer after each observation of the sequence, and not considering the
 % entire sequence.
@@ -56,7 +56,7 @@ for k = 1:N
 
     % Entropy of the prediction
     predent(k)  = -(pObs .* log2(pObs) + (1-pObs) .* log2(1-pObs));
-
+    
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
     % Update the beliefs of the ideal observer %
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
