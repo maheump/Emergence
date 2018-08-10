@@ -9,7 +9,7 @@
 
 % Clear the place
 clear;
-close('all')
+close('all');
 
 % Define patterns to test
 patterns = {'AABB', ...
@@ -25,9 +25,14 @@ nObs = nRep*maxL; % number of observations
 
 % Create sequences based on these patterns
 patternsrecod = cellfun(@str2pat, patterns, 'UniformOutput', 0);
-y = cellfun(@(x) repmat(x, 1, nObs), patternsrecod, 'UniformOutput', 0);
-y = cellfun(@(x) x(1:nObs), y, 'UniformOutput', 0);
-nSeq = numel(y);
+Seq = cellfun(@(x) repmat(x, 1, nObs), patternsrecod, 'UniformOutput', 0);
+Seq = cellfun(@(x) x(1:nObs), Seq, 'UniformOutput', 0);
+
+% Add a fully-stochastic sequence
+L(end+1) = NaN;
+patterns{end+1} = 'Stochastic';
+Seq{end+1} = GenRandSeq(nObs, 1/2); 
+nSeq = numel(Seq);
 
 %% Run the Bayesian ideal observer
 %  ===============================
@@ -41,7 +46,7 @@ pErr = 0;
 leak = Emergence_IO_Leak(pErr, nObs);
 
 % Define the depth of the tree to explore
-nu = nObs;
+nu = round(nObs/2);
 
 % Prepare output variables
 pRgY       = NaN(nu,nObs,nSeq);
@@ -60,8 +65,8 @@ for iSeq = 1:nSeq
     % Run the Bayesian ideal observer
     [log_pYgMd(iSeq,:), pRgY(:,:,iSeq), pAgYMd(iSeq,:), ...
      IgYMd(iSeq,:), ~, JSdiv(iSeq,:), ~, HpRgY(iSeq,:)] = ...
-        Emergence_IO_RunMi(@Emergence_IO_Tree, ... % IO learning repeating patterns
-        y{iSeq}, ... % current binary sequence
+        Emergence_IO_RunIO(@Emergence_IO_Tree, ... % IO learning repeating patterns
+        Seq{iSeq}, ... % current binary sequence
         {nu, 'log', false, 'Size-principle', leak, true}); % properties of the IO
 end
 
@@ -103,7 +108,8 @@ for iSeq = 1:nSeq
         subplot(nVar+2, nSeq, iSeq+nSeq*(iVar-1));
         
         % Define vertical limits of the plot
-        limy1 = [min(Var{iVar}(:)), max(Var{iVar}(:))];
+        y = Var{iVar}(~isinf(Var{iVar}));
+        limy1 = [min(y), max(y)];
         margin = diff(limy1).*(1/4);
         limy2 = limy1 + [-1,1].*margin;
         
@@ -114,8 +120,8 @@ for iSeq = 1:nSeq
         
         % Display the sequence
         pos = (limy2 - limy1) / 2 + limy1;
-        plot(find(y{iSeq} == 2), pos(1), 'k.', 'MarkerSize', 6);
-        plot(find(y{iSeq} == 1), pos(2), 'k.', 'MarkerSize', 6);
+        plot(find(Seq{iSeq} == 2), pos(1), 'k.', 'MarkerSize', 6);
+        plot(find(Seq{iSeq} == 1), pos(2), 'k.', 'MarkerSize', 6);
         
         % Display the beliefs of the ideal observer
         plot(1:nObs, Var{iVar}(iSeq,:), '.-', 'Color', col(iSeq,:), ...
@@ -148,7 +154,7 @@ for iSeq = 1:nSeq
         '-', 'Color', ones(1,3)./2, 'LineWidth', 1/2);
     
     % Customize the colormap
-    colormap(viridis); caxis([0,1]);
+    colormap(viridis); caxis([min(pRgY(:)), max(pRgY(:))]);
     
     % Customize the axes
     set(gca, 'XTick', [1, 5:5:nObs]);
@@ -156,10 +162,10 @@ for iSeq = 1:nSeq
         'TickLabelInterpreter', 'LaTeX');
     
     % Add some text labels
+    xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
     if iSeq == 1
         ylabel({'Posterior', 'distribution', '$p(R_i|y,\mathcal{M_{\mathrm{D}}})$'}, ...
             'Interpreter', 'LaTeX', 'Rotation', 0, ...
             'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Middle');
     end
-    xlabel('Observation ($k$)', 'Interpreter', 'LaTeX');
 end
