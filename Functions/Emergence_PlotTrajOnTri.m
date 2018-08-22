@@ -45,9 +45,9 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Convert barycentric coordinates to cartesian coordinates
-if nargin < 1, pMgY = NaN(1,3); end
+if nargin < 1 || isempty(pMgY), pMgY = NaN(1,3); end
 cartcoor = pMgY*tricc;
-cartcoor = cartcoor(any(~isnan(cartcoor), 2),:);
+%cartcoor = cartcoor(any(~isnan(cartcoor), 2),:);
 
 % Plot the triangle
 % ~~~~~~~~~~~~~~~~~
@@ -67,7 +67,7 @@ Emergence_PlotTriInfo(tricc, tricol, fs);
 lout = NaN(1,4);
 lnames = {'Trajectory', 'Starting point', 'Ending point', 'Change point'};
 if nargin < 5 || isempty(markers), markers = {'v', 'p', '^'}; end
-if nargin < 4, ms = eps; end
+if nargin < 4, ms = realmin; end
 
 % Plot the trajectory
 if nargin >= 1 && ~isempty(cartcoor)
@@ -81,7 +81,7 @@ end
 
 % Plot the position of the change point
 if nargin < 2, J = NaN; end
-if ~isnan(J)
+if ~isnan(J) && size(cartcoor, 1) > J
     lout(4) = plot(cartcoor(J,1), cartcoor(J,2), markers{2}, 'MarkerSize', 15, ...
         'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1);
 else, lout = lout(1:3); lnames = lnames(1:3);
