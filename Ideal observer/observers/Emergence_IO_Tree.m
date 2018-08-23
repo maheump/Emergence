@@ -268,38 +268,42 @@ if corout && strcmpi(scaleme, 'log') && isinf(pYgMd), pYgMd = log(realmin); end
 %% Predictions
 %  ===========
 
-% Conditionaly on entirely observed patterns
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Get predictions given each observed patterns
-% p(A|y,Rio) E {0,1}
-pAgYRio = double(pXgYRio == 1);
-
-% Marginalize predictions over all observed patterns
-% p(A|y,Ro) = sum_(i=1:{Ro}) p(A|y,Rio) * p(Rio|y)
-pAgYRo = sum(pAgYRio .* pRiogY) / pRogY;
-
-% Conditionaly on partialy observed patterns
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% The likelihood that the next observation would be an A conditioned on the
-% yet unonbserved patterns is simply chance level
-% p(A|Riu) = 1/2
-pAgYRu = 1/2;
-
-% Combine both expectancies
-% ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Compute the likelihood that the next observation will be a A by means of
-% Bayesian Model Averaging
-% p(A|y) = (p(A|y,Ro)*p(Ro|y) + p(A|y,Ru)*p(Ru|y)) / (p(Ro|y) + p(Ru|y))
-pAgYMd = (pAgYRo*pRogY + pAgYRu*pRugY) / (pRogY + pRugY);
-
-% If none of the observed patterns can explain the sequence and the
-% sequence is longer than the depth of the tree (i.e. the longest possible
-% pattern that is considered), we return chance level for the expectancy of
-% the next observation.
-if corout && (pRogY + pRugY) == 0, pAgYMd = 1/2; end
+% If the expectation has to be returned 
+if nargout > 1
+    
+    % Conditionaly on entirely observed patterns
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    % Get predictions given each observed patterns
+    % p(A|y,Rio) E {0,1}
+    pAgYRio = double(pXgYRio == 1);
+    
+    % Marginalize predictions over all observed patterns
+    % p(A|y,Ro) = sum_(i=1:{Ro}) p(A|y,Rio) * p(Rio|y)
+    pAgYRo = sum(pAgYRio .* pRiogY) / pRogY;
+    
+    % Conditionaly on partialy observed patterns
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    % The likelihood that the next observation would be an A conditioned on the
+    % yet unonbserved patterns is simply chance level
+    % p(A|Riu) = 1/2
+    pAgYRu = 1/2;
+    
+    % Combine both expectancies
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    % Compute the likelihood that the next observation will be a A by means of
+    % Bayesian Model Averaging
+    % p(A|y) = (p(A|y,Ro)*p(Ro|y) + p(A|y,Ru)*p(Ru|y)) / (p(Ro|y) + p(Ru|y))
+    pAgYMd = (pAgYRo*pRogY + pAgYRu*pRugY) / (pRogY + pRugY);
+    
+    % If none of the observed patterns can explain the sequence and the
+    % sequence is longer than the depth of the tree (i.e. the longest possible
+    % pattern that is considered), we return chance level for the expectancy of
+    % the next observation.
+    if corout && (pRogY + pRugY) == 0, pAgYMd = 1/2; end
+end
 
 %% Wrap things up
 %  ==============
@@ -323,7 +327,7 @@ if nargout > 2
     if all(isnan(pRigY)), pRigY = zeros(1, nlRo); end
 end
 
-% Measure the entropy of that posterior distribution
+% If the entropy of the posterior distribution has to be returned
 if nargout > 3
     HpRigY = Emergence_IO_Entropy(pRigY);
 end
