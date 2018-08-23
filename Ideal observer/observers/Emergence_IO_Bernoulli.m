@@ -1,4 +1,4 @@
-function [ pYgMp, pAgYMp, pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegrid, prior, decw, dt )
+function [ pYgT, pAgYT, pTgY, H_pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_BERNOULLI implements an observer learning the frequency of
 % items from a binary sequence.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
@@ -143,8 +143,8 @@ if ~usegrid
     
     % Since we use a conjugate prior, the model evidence is a beta
     % distribution, and its integral can be analytically computed.
-    if     strcmpi(scaleme, 'lin'), pYgMp =   beta(nX(1), nX(2));
-    elseif strcmpi(scaleme, 'log'), pYgMp = betaln(nX(1), nX(2));
+    if     strcmpi(scaleme, 'lin'), pYgT =   beta(nX(1), nX(2));
+    elseif strcmpi(scaleme, 'log'), pYgT = betaln(nX(1), nX(2));
     end
     
     % If asked, return the posterior distribution
@@ -167,7 +167,7 @@ elseif usegrid
     dB = decw(B) * (1-theta) + (1 - decw(B)) *    theta ;
     
     % Compute the sequence's likelihood
-    pYgT = prod(dA, 1) .* prod(dB, 1);
+    pYgT = prod(dA) .* prod(dB);
 
     % Compute the posterior distribution over theta
     BayesNum = pYgT .* pT; % likelihood times prior (numerator in Bayes' rule)
@@ -175,23 +175,48 @@ elseif usegrid
     pTgY = BayesNum ./ pY; % posterior distribution over theta using Bayes' rule
 
     % Derive (log-) model evidence
-    if     strcmpi(scaleme, 'lin'), pYgMp = pY / nt;
-    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY) - log(nt);
+    if     strcmpi(scaleme, 'lin'), pYgT = pY / nt;
+    elseif strcmpi(scaleme, 'log'), pYgT = log(pY) - log(nt);
     end
     % N.B. We use sum(X) / N(X) instead of the MATLAB "mean" function
     % because it is much faster (it avoids checks that are useless in the
     % context of this function).
 
     % Compute the likelihood that the next observation will be a A
-    pAgYMp = pTgY * theta';
+    pAgYT = pTgY * theta';
 end
 
 %% Predictions
 %  ===========
 
 % Compute the likelihood that the next observation will be a A
-if    ~usegrid, pAgYMp = nX(1) / sum(nX); % analytical formula (a ratio)
-elseif usegrid, pAgYMp = pTgY * theta';   % based on the grid
+if nargout > 1
+    if    ~usegrid, pAgYT = nX(1) / sum(nX); % analytical formula (a ratio)
+    elseif usegrid, pAgYT = pTgY * theta';   % based on the grid
+    end
+end
+
+%% Entropy of the posterior distribution
+%  =====================================
+
+% If the entropy of the posterior distribution has to be returned
+if nargout > 3
+    
+    % If analytical solutions have been used
+    if ~usegrid
+        
+        % Use analytical formulation of the entropy of a beta distribution
+        % => differential entropy
+        anent = @(a,b) betaln(a,b) - (a-1) * psi(a) - (b-1) * psi(b) + (a+b-2) * psi(a+b);
+        H_pTgY = anent(nX(1), nX(2));
+        
+    % If grid-based numerical solutions have been used
+    elseif usegrid
+        
+        % Compute the entropy of the (histogram-like) distribution
+        % => discrete entropy
+        H_pTgY = Emergence_IO_Entropy(pYgT);
+    end
 end
 
 end
