@@ -3,6 +3,8 @@ function  y = Emergence_IO_BetaPDF(x,a,b,n)
 %   - it does not check the inputs, but directly "repmat" the coefficients
 %   - it does not have to check whether the inputs are smaller than 0
 %   - it does not have to check the size of x
+% 
+% Copyright (c) 2018 Maxime Maheu
 
 y = zeros(1, n);
 
