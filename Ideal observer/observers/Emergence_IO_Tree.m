@@ -325,7 +325,7 @@ end
 
 % Measure the entropy of that posterior distribution
 if nargout > 3
-    HpRigY = sum(-pRigY .* log2(pRigY), 'OmitNaN');
+    HpRigY = Emergence_IO_Entropy(pRigY);
 end
 
 % Fill the output variable (for the partially observed patterns) such that
