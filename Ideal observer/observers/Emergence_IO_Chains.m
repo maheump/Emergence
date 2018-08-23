@@ -1,4 +1,4 @@
-function [ pYgMp, pAgYMp, pTgY, pXgX ] = Emergence_IO_Chains( y, scaleme, prior, i, dt )
+function [ pYgMp, pAgYMp, mpTgY, H_pTgY, pXgX ] = Emergence_IO_Chains( y, scaleme, prior, i, dt )
 % EMERGENCE_IO_CHAINS implements a N-order Markov chain that is estimated
 % from a binary sequence.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
@@ -34,6 +34,7 @@ end
 if returnpost
     theta = 0:dt:1; % grid for theta based on grid precision
     nt = (1/dt)+1;  % number of values for theta
+elseif ~returnpost, mpTgY = []; % return empty vector
 end
 
 %% Construct the chain
@@ -103,7 +104,7 @@ end
 
 % Combine both likelihoods together
 % p(y|chain) = p(y_1:i) * prod_k_2^i (p(y_i+1:K|theta_k))
-% <=> log(p(y|chain)) = log(p(y_1:i)) + sum__k_2^i (p(y_i+1:K|theta_k))
+% <=> log(p(y|chain)) = log(p(y_1:i)) + sum_k_2^i (p(y_i+1:K|theta_k))
 if     strcmpi(scaleme, 'lin'), pYgMp = L1 * prod(L2);
 elseif strcmpi(scaleme, 'log'), pYgMp = L1 + sum(L2);
 end
@@ -113,39 +114,59 @@ if returnpost
     
     % Estimate marginal distributions
     % p(t_j|y) ~ Beta(N(A|xj), N(B|xj));
-    pTgY = NaN(ncond,nt);
+    mpTgY = NaN(nt,ncond);
     for j = 1:ncond
-        pTgY(j,:) = Emergence_IO_BetaPDF(theta, nXgX(1,j), nXgX(2,j), nt);
+        mpTgY(:,j) = Emergence_IO_BetaPDF(theta, nXgX(1,j), nXgX(2,j), nt);
     end
     
     % Normalize the distribution
-    pTgY = pTgY ./ sum(pTgY, 2);
+    mpTgY = mpTgY ./ sum(mpTgY);
 
 % To speed-up the computations, avoid returning the distributions
-else, pTgY = [];
+else, mpTgY = [];
 end
 
 %% Predictions
 %  ===========
 
-% Compute the observed probabilities
-pXgX = nXgX ./ sum(nXgX,1);
+% If the expectation has to be returned 
+if nargout > 1
+    
+    % Compute the observed probabilities
+    pXgX = nXgX ./ sum(nXgX,1);
+    
+    % Conditioned on what has been observed in the past
+    if K > i
+        
+        % Get which history of observations (among those possible from the
+        % chain) we are in
+        prevobs = y(end-i+1:end);
+        currtrans = (sum(cond == prevobs, 2) == i);
+        
+        % Get the corresponding probability of observing a A after this
+        % history of observation, the trasition X => A
+        pAgYMp = pXgX(1, currtrans);
+    else
+        
+        % For the first observations, predictions are simply at chance level
+        pAgYMp = 1/2;
+    end
+end
 
-% Conditioned on what has been observed in the past
-if K > i
+%% Entropy of the posterior distribution
+%  =====================================
     
-    % Get which history of observations (among those possible from the
-    % chain) we are in
-    prevobs = y(end-i+1:end);
-    currtrans = (sum(cond == prevobs, 2) == i);
+% If the entropy of the posterior distribution has to be returned
+if nargout > 3
+
+    % Use analytical formulation of the entropy of a beta distribution
+    % => differential entropy
+    anent = @(a,b) betaln(a,b) - (a-1) * psi(a) - (b-1) * psi(b) + (a+b-2) * psi(a+b);
+    H_pTXgY = cellfun(@(x) anent(x(1),x(2)), mat2cell(nXgX, 2, ones(1,ncond)));
     
-    % Get the corresponding probability of observing a A after this
-    % history of observation, the trasition X => A
-    pAgYMp = pXgX(1, currtrans);
-else
-    
-	% For the first observations, predictions are simply at chance level
-	pAgYMp = 1/2;
+    % When marginal distributions are independant, we have:
+    % H(X,Y) = H(X)+H(Y)
+    H_pTgY = sum(H_pTXgY);
 end
 
 end
