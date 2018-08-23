@@ -1,4 +1,4 @@
-function [ pYgMp, pAgYMp, pTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
+function [ pYgMp, pAgYMp, mpTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_MARKOV implements an observer learning parameters (i.e.
 % frequency of transitions) of a first-order binary Markov chain from a
 % sequence of binary observations.
@@ -55,7 +55,7 @@ if nargin < 6, dt = 0.1; end
 
 % This requires to create a grid for theta
 if ~isempty(dt) && nargout > 2, returnpost = true;
-else, returnpost = false; pTgY = []; % return empty vector
+else, returnpost = false; mpTgY = []; % return empty vector
 end
 
 % Create a vector for theta values, if:
@@ -112,15 +112,15 @@ elseif usegrid
         
     % Non-informative Jeffreys prior
     elseif isa(prior, 'char') && strcmpi(prior, 'Jeffreys')
-        pTgA = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt); % p(X|A), x-axis
-        pTgB = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt); % p(X|B), y-axis
-        pT = pTgA'*pTgB;
+        pTgAgY = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt); % p(X|A), x-axis
+        pTgBgY = Emergence_IO_BetaPDF(theta, 1/2, 1/2, nt); % p(X|B), y-axis
+        pT = pTgAgY'*pTgBgY;
         
     % Custom prior
     elseif isa(prior, 'double') && numel(prior) == 4
-        pTgA = Emergence_IO_BetaPDF(theta, prior(1,2), prior(1,1), nt); % p(X|A), x-axis
-        pTgB = Emergence_IO_BetaPDF(theta, prior(2,1), prior(2,2), nt); % p(X|B), y-axis
-        pT = pTgA'*pTgB;
+        pTgAgY = Emergence_IO_BetaPDF(theta, prior(1,2), prior(1,1), nt); % p(X|A), x-axis
+        pTgBgY = Emergence_IO_BetaPDF(theta, prior(2,1), prior(2,2), nt); % p(X|B), y-axis
+        pT = pTgAgY'*pTgBgY;
         
     % Catch possible mistakes
     else, error('The prior input has the wrong form.');
@@ -197,10 +197,11 @@ if ~usegrid
     
     % If asked, return the posterior distribution
     if returnpost
-        pTgA = Emergence_IO_BetaPDF(theta, nXgA(2), nXgA(1), nt); % p(X|A), x-axis
-        pTgB = Emergence_IO_BetaPDF(theta, nXgB(1), nXgB(2), nt); % p(X|B), y-axis
-        pTgY = pTgA' * pTgB; % create the 2D probability distribution
-        pTgY = pTgY ./ sum(pTgY(:)); % normalize the posterior
+        pTgAgY = Emergence_IO_BetaPDF(theta, nXgA(2), nXgA(1), nt); % p(X|A), x-axis
+        pTgBgY = Emergence_IO_BetaPDF(theta, nXgB(1), nXgB(2), nt); % p(X|B), y-axis
+        pTgAgY = pTgAgY ./ sum(pTgAgY); % normalize the marginal distribution
+        pTgBgY = pTgBgY ./ sum(pTgBgY); % normalize the marginal distribution
+        mpTgY = [pTgAgY', pTgBgY']; % concatenate marginal distributions
     end
     
     % Compute the expected value of each transition
@@ -248,11 +249,14 @@ elseif usegrid
     % because it is much faster (it avoids checks that are useless in the
     % context of this function).
     
+    % Return (independent) marginal distributions
+    pTgAgY = sum(pTgY, 2)'; % marginal distribution (vector over theta values)
+    pTgBgY = sum(pTgY, 1); % marginal distribution (vector over theta values)
+    if returnpost, mpTgY = [pTgAgY; pTgBgY]'; end % concatenate marginal distributions
+    
 	% Compute the expected value of each transition
-    pTgA = sum(pTgY, 2)'; % marginal distribution (vector over theta values)
-    pTgB = sum(pTgY, 1) ; % marginal distribution (vector over theta values)
-    pBgA = (pTgA / sum(pTgA)) * theta'; % expected value of theta(X|A)
-    pAgB = (pTgB / sum(pTgB)) * theta'; % expected value of theta(X|B)
+    pAgB = (pTgBgY / sum(pTgBgY)) * theta'; % expected value of theta(X|B)
+    pBgA = (pTgAgY / sum(pTgAgY)) * theta'; % expected value of theta(X|A)
     pXgA = [1 - pBgA, pBgA]; % p(A|A) & p(B|A)
     pXgB = [pAgB, 1 - pAgB]; % p(A|B) & p(B|B)
 end
@@ -263,33 +267,39 @@ end
 % Compute the likelihood that the next observation will be a A (an
 % analytical formula can be used, which is simply a ratio).
 % N.B. This depends on the identity of the previously received observation.
-pAgX  = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
-X     = y(end); % get the identity of the last observation
-pAgYMp = pAgX(X); % returns p(A) conditionaly on the last observation
+if nargout > 1
+    pAgX   = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
+    X      = y(end); % get the identity of the last observation
+    pAgYMp = pAgX(X); % returns p(A) conditionaly on the last observation
+end
 
 %% Entropy of the posterior distribution
 %  =====================================
 
-% If analytical solutions have been used
-if ~usegrid
-    
-    % Use analytical formulation of the entropy of a beta distribution
-    % => differential entropy
-    anent = @(a,b) betaln(a,b) - (a-1) * psi(a) - (b-1) * psi(b) + (a+b-2) * psi(a+b);
-    H_ptBgA = anent(nXgA(2), nXgA(1));
-    H_ptAgB = anent(nXgB(1), nXgB(2));
+% If the entropy of the posterior distribution has to be returned
+if nargout > 3
 
-% If grid-based numerical solutions have been used
-elseif usegrid
+    % If analytical solutions have been used
+    if ~usegrid
+        
+        % Use analytical formulation of the entropy of a beta distribution
+        % => differential entropy
+        anent = @(a,b) betaln(a,b) - (a-1) * psi(a) - (b-1) * psi(b) + (a+b-2) * psi(a+b);
+        H_pTBgA = anent(nXgA(2), nXgA(1));
+        H_pTAgB = anent(nXgB(1), nXgB(2));
+        
+    % If grid-based numerical solutions have been used
+    elseif usegrid
+        
+        % Compute the entropy of the (histogram-like) distribution
+        % => discrete entropy
+        H_pTBgA = Emergence_IO_Entropy(pTgAgY);
+        H_pTAgB = Emergence_IO_Entropy(pTgBgY);
+    end
     
-    % Comput the entropy of the distribution
-    % => discrete entropy
-    H_ptBgA = sum(-pYgtBgA .* log2(pYgtBgA), 'OmitNaN');
-    H_ptAgB = sum(-pYgtAgB .* log2(pYgtAgB), 'OmitNaN');
+    % When marginal distributions are independant, we have:
+    % H(X,Y) = H(X)+H(Y)
+    H_pTgY = H_pTBgA + H_pTAgB;
 end
-
-% When marginal distributions are independant, we have:
-% H(X,Y) = H(X)+H(Y)
-H_pTgY = H_ptBgA + H_ptAgB;
-
+    
 end
