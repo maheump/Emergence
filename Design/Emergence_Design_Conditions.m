@@ -8,22 +8,22 @@
 %  ==========================
 
 % Compute an entropy map
-t = 0:0.001:1;
-H = @(p) -(p .* log2(p) + (1-p) .* log2(1-p));
-entmap = H(t)' + H(t);
+p = 0:0.001:1;
+entarr = arrayfun(@Emergence_IO_Entropy, p);
+entmap = entarr' + entarr;
 
 % Prepare the window
 figure('Position', [1 765 255 340]);
 
 % Display entropy map
-imagesc(t, t, entmap); hold('on');
+imagesc(p, p, entmap); hold('on');
 colormap(plasma(2000)); caxis([0,2]);
 cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
 cbr.Label.String = 'Entropy';
 
 % Display the different entropy levels of the rules
-entlev = unique(sum(H(cell2mat(prob')), 2)); 
-contour(t, t, entmap, entlev, 'k-');
+entlev = cellfun(@Emergence_IO_Entropy, prob);
+contour(p, p, entmap, entlev, 'k-');
 
 % Display diagonals
 plot([0,1], [0,1], 'k-', 'LineWidth', 1);
