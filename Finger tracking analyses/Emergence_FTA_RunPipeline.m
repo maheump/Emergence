@@ -13,6 +13,9 @@ close('all');
 % that were presented to the subjects
 Emergence_FTA_PreprocData;
 
+% Set default properties for the figures
+Emergence_DefaultFigureProperties;
+
 %% DESCRIBE THE EXEPERIMENTAL DESIGN
 %  =================================
 
