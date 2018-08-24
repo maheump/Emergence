@@ -36,7 +36,7 @@ else, decw = decw(:); % make sure it is a column vector (for linear algebra belo
 end
 if numel(decw) > K, decw = decw(end-K+1:end); % take only the most recent weights
 elseif numel(decw) == K % nothing to do in that case
-else, error('Not enough weights for the length of the sequence');
+elseif numel(decw)  < K, error('Not enough weights for the length of the sequence');
 end
 
 % By default, use analytical solutions to speed up the computations
