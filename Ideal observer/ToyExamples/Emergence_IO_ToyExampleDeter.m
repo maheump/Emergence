@@ -11,6 +11,14 @@
 clear;
 close('all');
 
+% Add ideal observer functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
+% Set default figure properties
+Emergence_DefaultFigureProperties;
+
 % Define patterns to test
 patterns = {'AABB', ...
             'AAABBB', 'AABABB', 'AAABAB'...
@@ -90,9 +98,9 @@ Var = {PP, pAgYMd, IgYMd, HpRgY, sqrt(JSdiv)};
 nVar = numel(Var);
 VarLab = {{'Bayes factor', '$\frac{p(y|\mathcal{M_{\mathrm{D}}})}{p(y|\mathcal{M}_{\rm{S}})}$'}, ...
           {'Prediction', '$p(y_{k+1}=\mathrm{A}|y_{1:k},\mathcal{M_{\mathrm{D}}})$'}, ...
-          {'Surprise', '$-\log_{2} p(y_{k+1},\mathcal{M_{\mathrm{D}}})$'}, ...
+          {'Surprise', '$-\log_{2} p(y_{k+1}|\mathcal{M_{\mathrm{D}}})$'}, ...
           {'Entropy of the posterior', '$H(p(R|y,\mathcal{M_{\mathrm{D}}}))$'}, ...
-          {'Model update', '$\sqrt{\mathrm{JS}(p(R|y_{1:k},\mathcal{M_{\mathrm{D}}})||p(R|y_{1:k-1},\mathcal{M_{\mathrm{D}}}))}$'}};
+          {'Model update', '$\sqrt{D_\mathrm{JS}(p(R|y_{1:k},\mathcal{M_{\mathrm{D}}})||p(R|y_{1:k-1},\mathcal{M_{\mathrm{D}}}))}$'}};
 
 % Create a new window
 figure('Units', 'Normalized', 'Position', [0 1/2-0.2 1 0.4]);
