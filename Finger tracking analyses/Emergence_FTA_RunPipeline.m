@@ -13,6 +13,16 @@ close('all');
 % that were presented to the subjects
 Emergence_FTA_PreprocData;
 
+%% DESCRIBE THE EXEPERIMENTAL DESIGN
+%  =================================
+
+% Show the different conditions and the hypotheses
+Emergence_Design_Conditions;
+Emergence_Design_Hypotheses;
+
+% Show how to use the triangular arena
+Emergence_Design_Triangle
+
 %% PERFORM SUBJECT-LEVEL ANALYSES
 %  ==============================
 
