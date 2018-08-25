@@ -28,9 +28,6 @@ if numel(varargin) == 2 && ...
     % Get (joint) distributions to be column vectors
     dist1 = varargin{1}(:);
     dist2 = varargin{2}(:);
-    
-    % Do not fill the outputs with NaNs in that case
-    flag = false;
 
 % If a single distribution is provided, compute iterative update
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,14 +36,9 @@ else
     % Get the single input distribution
     dist = varargin{1};
     
-    % Get the size of the input distribution
-    sz = [size(dist), 1];
-    
     % Make 2 distributions out of it
-    dist1 = dist(:,1:end-1,:); % previous beliefs
-    dist2 = dist(:,2:end,:);   %  current beliefs
-    
-    % In that case, fill the outputs with NaNs such that
+    dist1 = dist(1:end-1,:); % previous beliefs
+    dist2 = dist(2:end,:);   %  current beliefs
     flag = true;
 end
 
@@ -60,7 +52,7 @@ if any(dist2 == 0), dist2(dist2 == 0) = NaN; end
 % Define Kullback-Leibler divergence
 % !!! It is NOT symmetrical: D_KL(p,q) =/ D_KL(q,p))
 % see https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
-KL = @(p,q) sum(p .* log2(p./q), 'OmitNaN');
+KL = @(p,q) sum(p .* log2(p./q), 2, 'OmitNaN')';
 
 % Define Jensen-Shannon divergence
 % !!! It is symmetrical: D_JS(p,q) = D_JS(q,p))
@@ -73,21 +65,11 @@ D_JS = JS(dist1, dist2);
 % Compute the Kullback-Leibler divergence
 if nargout > 1, D_KL = KL(dist1, dist2); end
 
-%% Wrap things up
-%  ==============
-
+% Add a first NaN such that the output variables have the same dimension as
+% the input
 if flag
-    
-    % Return outputs that match the size of the inputs regarding
-    % non-relevant dimensions
-    outdim = [1, sz(2)-1, sz(3:end)];
-    D_JS = reshape(D_JS, outdim);
-    if nargout > 1, D_KL = reshape(D_KL, outdim); end
-    
-    % Fill with NaNs
-    NaNfill = NaN([1, 1, sz(3:end)]);
-    D_JS = cat(2, NaNfill, D_JS);
-    if nargout > 1, D_KL = cat(2, NaNfill, D_KL); end
+    D_JS = cat(2, NaN, D_JS);
+    if nargout > 1, D_KL = cat(2, NaN, D_KL); end
 end
 
 end

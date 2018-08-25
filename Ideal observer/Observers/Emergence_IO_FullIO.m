@@ -845,7 +845,7 @@ HpMgY = cellfun(@Emergence_IO_Entropy, mat2cell(pMsigY, 3, ones(1,N)));
 % D_JS = (1/2) * (D_KL(p(Mi|y_1:K-1)||((p(Mi|y_1:K-1)+p(Mi|y_1:K))/2) +
 %                 D_KL(p(Mi|y_1:K)  ||((p(Mi|y_1:K-1)+p(Mi|y_1:K))/2))
 % Where D_KL(p(Mi|y_1:K-1)||p(Mi|y_1:K) = sum_{i} p(Mi|y_1:K-1) * log2(p(Mi|y_1:K-1) / p(Mi|y_1:K))
-JSpMgY = Emergence_IO_DistDist(pMsigY);
+JSpMgY = Emergence_IO_DistDist(pMsigY');
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Compute the iterative covariance between current and previous beliefs %
@@ -892,9 +892,9 @@ HpJkgY    = cellfun(@Emergence_IO_Entropy, mat2cell(pJkgY,    N, ones(1,N)));
 
 % Compute the iterative updates of the posterior distributions over change
 % point's positions (see previous chunks for the mathematical definition)
-JSpJkgYMsp = Emergence_IO_DistDist(pJkgYMsp);
-JSpJkgYMsd = Emergence_IO_DistDist(pJkgYMsd);
-JSpJkgY    = Emergence_IO_DistDist(pJkgY);
+JSpJkgYMsp = Emergence_IO_DistDist(pJkgYMsp');
+JSpJkgYMsd = Emergence_IO_DistDist(pJkgYMsd');
+JSpJkgY    = Emergence_IO_DistDist(pJkgY');
 
 %% Compute expectancy-related quantities
 %  =====================================
@@ -988,9 +988,9 @@ HpAgY    = cellfun(@Emergence_IO_Entropy, num2cell(pAgY));
 
 % Compute the entropy of the posterior distributions over the identity of
 % the next observation (see previous chunks for the mathematical definition)
-JSpAgYMsp = Emergence_IO_DistDist([pAgYMsp; 1-pAgYMsp]);
-JSpAgYMsd = Emergence_IO_DistDist([pAgYMsd; 1-pAgYMsd]);
-JSpAgY    = Emergence_IO_DistDist([pAgY;    1-pAgY   ]);
+JSpAgYMsp = Emergence_IO_DistDist([pAgYMsp; 1-pAgYMsp]');
+JSpAgYMsd = Emergence_IO_DistDist([pAgYMsd; 1-pAgYMsd]');
+JSpAgY    = Emergence_IO_DistDist([pAgY;    1-pAgY   ]');
 
 %% Wrap things up
 %  ==============
