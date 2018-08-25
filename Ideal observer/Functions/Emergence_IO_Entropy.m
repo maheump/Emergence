@@ -35,7 +35,7 @@ if nDim <= 2 && any(Sz == 1)
     % ~~~~~~~~~~~~~~~~~~~~~~~~~
     if all(Sz == 1) % scalar
         p = dist;
-        if p < 0 || p > 1 || isnan(p), error('Check the input scalar'); end
+        if p < 0 || p > 1, error('Check the input scalar'); end
         if     corr && p == 0, p = eps;
         elseif corr && p == 1, p = 1-eps;
         end
