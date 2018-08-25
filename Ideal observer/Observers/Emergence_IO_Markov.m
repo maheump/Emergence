@@ -138,10 +138,8 @@ end
 
 % The likelihood of the first event is simply 1 over the number of
 % different possible stimuli in the sequence
-% p(y_1) = 1/2 <=> log(p(y_1)) = -log(2)
-if     strcmpi(scaleme, 'lin'), pY1 = 1/2;
-elseif strcmpi(scaleme, 'log'), pY1 = -log(2);
-end
+% p(y_1) = 1/2
+pY1 = 1/2;
 
 % Get the identity of the previous observations of each observation in the
 % sequence. This eases the frequency counts of transitions
@@ -191,8 +189,8 @@ if ~usegrid
     % likelihood of the first event:
     % p(y|t(A|B),t(B|A)) = p(y_1) * p(y_2:K|t(X|A)) * p(y_2:K|t(X|B))
     % <=> log(p(y|t(A|B),t(B|A))) = log(p(y_1)) + log(p(y_2:K|t(X|A))) + log(p(y_2:K|t(X|B)))
-    if     strcmpi(scaleme, 'lin'), pYgMp = pY1 * pYgTgA * pYgTgB;
-    elseif strcmpi(scaleme, 'log'), pYgMp = pY1 + pYgTgA + pYgTgB;
+    if     strcmpi(scaleme, 'lin'), pYgMp =     pY1  * pYgTgA * pYgTgB;
+    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY1) + pYgTgA + pYgTgB;
     end
     
     % If asked, return the posterior distribution
@@ -234,7 +232,7 @@ elseif usegrid
     % of transitions together
     pYgtBgA = prod(dAgA, 1) .* prod(dBgA, 1); % marginal distribution
     pYgtAgB = prod(dAgB, 1) .* prod(dBgB, 1); % marginal distribution
-    pYgT = pY1 .* pYgtBgA' .* pYgtAgB;        % joint distribution
+    pYgT = pY1 .* pYgtBgA' * pYgtAgB;         % joint distribution
     
     % Compute the posterior distribution over theta
     BayesNum = pYgT .* pT; % likelihood times prior (numerator in Bayes' rule)
