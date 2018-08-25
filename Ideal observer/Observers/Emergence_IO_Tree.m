@@ -318,13 +318,13 @@ if nargout > 2
     end
     
     % Normalize the posterior distribution
-    pRigY = pRigY ./ sum(pRigY);
+    pRigY = pRigY(:) ./ sum(pRigY);
     
     % If the sequence is longer than the longest allowed pattern (i.e. the
     % depth of the tree) and that no patterns can reproduce the sequence,
     % (i.e. we cannot normalize the posterior because it would mean divide
     % it by zero), return an array of zero 
-    if all(isnan(pRigY)), pRigY = zeros(1, nlRo); end
+    if all(isnan(pRigY)), pRigY = zeros(nlRo,1); end
 end
 
 % If the entropy of the posterior distribution has to be returned
