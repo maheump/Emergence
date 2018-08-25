@@ -71,10 +71,10 @@ HpRgY      = NaN(nSeq,nObs);
 for iSeq = 1:nSeq
     
     % Run the Bayesian ideal observer
-    [log_pYgMd(iSeq,:), pRgY(:,:,iSeq), pAgYMd(iSeq,:), ...
-     IgYMd(iSeq,:), ~, JSdiv(iSeq,:), ~, HpRgY(iSeq,:)] = ...
-        Emergence_IO_RunIO(@Emergence_IO_Tree, ... % IO learning repeating patterns
-        Seq{iSeq}, ... % current binary sequence
+    [log_pYgMd(iSeq,:), pAgYMd(iSeq,:), ~, IgYMd(iSeq,:), ~, ...
+	 pRgY(:,:,iSeq), ~, HpRgY(iSeq,:), JSdiv(iSeq,:)] = ...
+        Emergence_IO_RunIO(@Emergence_IO_Tree, ...         % IO learning repeating patterns
+        Seq{iSeq}, ...                                     % current binary sequence
         {nu, 'log', false, 'Size-principle', leak, true}); % properties of the IO
 end
 
@@ -96,11 +96,12 @@ PP = exp(log_pYgMd) ./ (exp(log_pYgMd) + exp(log_pYgMs));
 % Define the different variables from the IO to display
 Var = {PP, pAgYMd, IgYMd, HpRgY, sqrt(JSdiv)};
 nVar = numel(Var);
-VarLab = {{'Bayes factor', '$\frac{p(y|\mathcal{M_{\mathrm{D}}})}{p(y|\mathcal{M}_{\rm{S}})}$'}, ...
+VarLab = {{'Posterior probability', '$\frac{p(\mathcal{M_{\mathrm{D}}}|y)}{p(\mathcal{M}_{\rm{S}}|y)}$'}, ...
           {'Prediction', '$p(y_{k+1}=\mathrm{A}|y_{1:k},\mathcal{M_{\mathrm{D}}})$'}, ...
           {'Surprise', '$-\log_{2} p(y_{k+1}|\mathcal{M_{\mathrm{D}}})$'}, ...
           {'Entropy of the posterior', '$H(p(R|y,\mathcal{M_{\mathrm{D}}}))$'}, ...
-          {'Model update', '$\sqrt{D_\mathrm{JS}(p(R|y_{1:k},\mathcal{M_{\mathrm{D}}})||p(R|y_{1:k-1},\mathcal{M_{\mathrm{D}}}))}$'}};
+          {'Model update', ['$\sqrt{D_\mathrm{JS}(p(R|y_{1:k},\mathcal{M_', ...
+          '{\mathrm{D}}})||p(R|y_{1:k-1},\mathcal{M_{\mathrm{D}}}))}$']}};
 
 % Create a new window
 figure('Units', 'Normalized', 'Position', [0 1/2-0.2 1 0.4]);
@@ -162,7 +163,7 @@ for iSeq = 1:nSeq
         '-', 'Color', ones(1,3)./2, 'LineWidth', 1/2);
     
     % Customize the colormap
-    colormap(viridis); caxis([min(pRgY(:)), max(pRgY(:))]);
+    colormap(parula); caxis([min(pRgY(:)), max(pRgY(:))]);
     
     % Customize the axes
     set(gca, 'XTick', [1, 5:5:nObs]);
