@@ -215,7 +215,7 @@ if nargout > 3
         
         % Compute the entropy of the (histogram-like) distribution
         % => discrete entropy
-        H_pTgY = Emergence_IO_Entropy(pYgT);
+        H_pTgY = Emergence_IO_Entropy(pTgY);
     end
 end
 
