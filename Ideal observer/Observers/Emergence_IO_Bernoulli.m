@@ -199,6 +199,9 @@ end
 %% Entropy of the posterior distribution
 %  =====================================
 
+% Return posterior distribution as a column vector
+if nargout > 2, pTgY = pTgY(:); end
+
 % If the entropy of the posterior distribution has to be returned
 if nargout > 3
     
