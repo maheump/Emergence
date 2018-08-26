@@ -67,8 +67,8 @@ for iDim = dims
         cc = bc*tricc;
         
         % Display the boundaries the same way MATLAB does for the grid
-        lines(iGrid,iDim) = patchline(cc(:,1), cc(:,2), 'LineStyle', '-', ...
-            'EdgeColor', col, 'LineWidth', 1/2, 'EdgeAlpha', 0.15); 
+        lines(iGrid,iDim) = plot(cc(:,1), cc(:,2), 'LineStyle', '-', ...
+            'Color', [col, 0.15], 'LineWidth', 1/2); 
     end
 end
 
