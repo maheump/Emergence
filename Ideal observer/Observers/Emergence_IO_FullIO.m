@@ -49,20 +49,17 @@ function out = Emergence_IO_FullIO( ...
 % 
 % The inputs of the function are the following ones:
 %   - "s" (mandatory): a binary sequence.
+%   - "pEd" (default: 0): the probability that the deterministic observer
+%       will make a memory mistake at each received observation (this
 %   - "pEp" (default: 0): the probability that the probabilistic observer
 %       will make a memory mistake at each received observation (this
 %       results in a leaky integration).
-%   - "pEd" (default: 0): the probability that the deterministic observer
-%       will make a memory mistake at each received observation (this
 %       results in a leaky integration).
-%   - "nu" (default: length(s)): the depth of the patterns' tree to explore
-%       (i.e. the longest pattern length considered).
+%   - "patlen" (default: length(s)): the depth of the patterns' tree to 
+%       explore (i.e. the longest pattern length considered).
 %   - "stat" (default: 'Transitions'): the type of statistics to be learnt
 %       by the probabilistic observer. It can be either 'Items',
 %       'Alternation', 'Transitions', 'Chain3', 'Chain10', ...
-%   - "p_pJk" (default: 'Uniform'): the prior over change point's position.
-%       It can be either 'Uniform' or Gaussian by specifying the
-%       [mu, sigma] parameters.
 %   - "p_pRi" (default: 'Size-principle'): prior distribution over pattern
 %       in the deterministic observer. It can be either 'Uniform' or based
 %       a 'Size-principle' (i.e. smallest pattern are favoured).
@@ -72,23 +69,23 @@ function out = Emergence_IO_FullIO( ...
 %       latter case, it must match the "stat" field: e.g. if stat = "Item",
 %       then p_pTi should be a 1x2 array (e.g. [1 1] is a 'Bayes-Laplace'
 %       prior).
-%   - "p_pJ" (default: 'Uniform'): prior distribution over change point's
-%       position. It can be either 'Uniform',�[mu, sigma] for a Gaussian
+%   - "p_pJk" (default: 'Uniform'): prior distribution over change point's
+%       position. It can be either 'Uniform', [mu, sigma] for a Gaussian
 %       prior or any custom prior distribution (a 1xN array where N is the
 %       length of the sequence "s").
 %   - "computfor" (default: 'all'): whether to return the iteratively
 %       updated inference ('all') or simply its final status ('last').
 %   - "scaleme" (default: 'log'): scale for the model evidences, either a
 %       linear ('lin') or logarithmic ('log') scale.
+%   - "postprec" (default: []): precision of the posterior distribution for
+%       the probabilistic observer. Because it is computationaly demanding,
+%       when it is empty, posterior distributions for the probabilistic
+%       observer are not returned. Note also that posterior distributions
+%       cannot be returned for Markov chain of order higher than 1.
 %   - "verbose" (default: true): whether to print status of the inference
 %       in the command window. It can be either false (only prints the
 %       running time of the function), true (it prints chosen options) or
 %       2 (it prints status of the inference after each observation).
-%   - "dt" (default: []): precision of the posterior distribution for the
-%       probabilistic observer. Because it is computationaly demanding,
-%       when it is empty, posterior distributions for the probabilistic
-%       observer are not returned. Note also that posterior distributions
-%       cannot be returned for Markov chain of order higher than 1.
 % 
 % The function returns many different quantities related to the inference
 % of the input sequence, including (1) the posterior probability of each
@@ -346,7 +343,7 @@ end
 if nargin < 11, postprec = []; end
 if ~isempty(postprec), fprintf(['  * Precision of the posterior over ', ...
         'models'' parameters = %1.0f%%\n'], ceil(postprec*100)); end
-if ~isempty(postprec), nTprec = (1/postprec)+1; end
+if ~isempty(postprec), nTprec = 1/postprec; end
 
 %% Prepare output variables
 %  ========================
