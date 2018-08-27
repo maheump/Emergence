@@ -1,4 +1,4 @@
-function [ pYgMd, pAgYMd, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, usegrid, prior, decw, corout )
+function [ pY, pAgY, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, usegrid, prior, decw, corout )
 % EMERGENCE_IO_TREE implements an observer learning repeating patterns from
 % a sequence of binary observations.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
@@ -46,10 +46,22 @@ y = y(:);
 K = numel(y);
 % N.B. K = K-k if the sequence is a part after a change point.
 
-% By default, make sure that the output is corrected when the result of
-% the inference is singular. This happens only in some rare specific cases
-% (e.g. when the tree has been fully explored and no patterns have been found)
-if nargin < 7 || isempty(corout), corout = true; end
+% By default, the depth of the tree (i.e. the maximum pattern length allowed)
+% is the length of the sequence
+if nargin < 2, nu = K; end
+% N.B. Deep trees induce longer computation time
+
+% By default, export the model evidence in log-scale
+if nargin < 3, scaleme = 'log'; end
+if     strcmpi(scaleme, 'lin'), islin = true;  islog = false;
+elseif strcmpi(scaleme, 'log'), islin = false; islog = true;
+end
+
+% By default, use analytical solutions to speed up the computations
+if nargin < 4, usegrid = false; end
+
+% By default, use a prior distribution based on the size principle
+if nargin < 5 || isempty(prior), prior = 'Size-principle'; end
 
 % By default, use a perfect integration
 if nargin < 6 || isempty(decw), decw = ones(1,K); % no decay
@@ -63,19 +75,10 @@ if     any(decw ~= 1), idealinteg = false;
 elseif all(decw == 1), idealinteg = true;
 end
 
-% By default, use a prior distribution based on the size principle
-if nargin < 5 || isempty(prior), prior = 'Size-principle'; end
-
-% By default, use analytical solutions to speed up the computations
-if nargin < 4, usegrid = false; end
-
-% By default, export the model evidence in log-scale
-if nargin < 3, scaleme = 'log'; end
-
-% By default, the depth of the tree (i.e. the maximum pattern length allowed)
-% is the length of the sequence
-if nargin < 2, nu = K; end
-% N.B. Deep trees induce longer computation time
+% By default, make sure that the output is corrected when the result of
+% the inference is singular. This happens only in some rare specific cases
+% (e.g. when the tree has been fully explored and no patterns have been found)
+if nargin < 7 || isempty(corout), corout = true; end
 
 %% Get the dimensionality of the problem
 %  =====================================
@@ -177,8 +180,8 @@ for i = ilRo
         % Compute how much the repetition of that current pattern matches
         % the observed sequence
         % p(Ri|y) = (1/2) * prod_(y_k == yhat_k) w_k * prod_(y_k ~= yhat_k) (1-w_k)
-        if     strcmpi(scaleme, 'lin'), pYgRio(i) =  (1/2) * prod(pYkgRi);
-        elseif strcmpi(scaleme, 'log'), pYgRio(i) = -log(2) + sum(pYkgRi);
+        if     islin, pYgRio(i) = (1/2) * prod(pYkgRi);
+        elseif islog, pYgRio(i) = -log(2) + sum(log(pYkgRi));
         end
    end
     
@@ -198,8 +201,8 @@ if strcmpi(prior, 'Bayes-Laplace')
     % The prior probability is simply 1 over the total number of patterns
     % (i.e. both fully and partially observed ones)
     % p(Ri) = 1/{R}
-    if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), p_pRi = ones(1, nu) ./ nR;
-    elseif               ~idealinteg && strcmpi(scaleme, 'log'), p_pRi = repmat(-log(nR), 1, nu);
+    if     idealinteg || ~idealinteg && islin, p_pRi = ones(1, nu) ./ nR;
+    elseif               ~idealinteg && islog, p_pRi = repmat(-log(nR), 1, nu);
     end
     
 % In the case of a prior distribution based on the size-principle
@@ -207,9 +210,9 @@ elseif strcmpi(prior, 'Size-principle')
     
     % The size principle states that, since these are binary patterns,
     % their prior simply depends on their lengths:
-    % p(pRi) = (1/3) .^ |Ri|;
-    if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), p_pRi = (1/3) .^ (1:nu);
-    elseif               ~idealinteg && strcmpi(scaleme, 'log'), p_pRi = -(1:nu) .* log(3);
+    % p(pRi) = (1/3) .^ |Ri|
+    if     idealinteg || ~idealinteg && islin, p_pRi = (1/3) .^ (1:nu);
+    elseif               ~idealinteg && islog, p_pRi = -(1:nu) .* log(3);
     end
 end
 
@@ -226,8 +229,8 @@ p_pRiu = p_pRi((nlRo+1):nu);
 
 % Posterior probability of each observed pattern
 % p(Rio|y) propto p(y|Rio) * p(Ri)
-if      idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), pRiogY =     pYgRio .* p_pRio;
-elseif                ~idealinteg && strcmpi(scaleme, 'log'), pRiogY = exp(pYgRio  + p_pRio);
+if      idealinteg || ~idealinteg && islin, pRiogY =     pYgRio .* p_pRio;
+elseif                ~idealinteg && islog, pRiogY = exp(pYgRio  + p_pRio);
 end
 
 % Sum of posterior probabilities
@@ -239,14 +242,14 @@ pRogY = sum(pRiogY);
 
 % Posterior probability of each partially observed pattern
 % p(Rio|y) propto (1/2) * p(Ri)
-if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), pRiugY =    (1/2) .* p_pRiu;
-elseif               ~idealinteg && strcmpi(scaleme, 'log'), pRiugY = - log(2)  + p_pRiu;
+if     idealinteg || ~idealinteg && islin, pRiugY =   (1/2) .* p_pRiu;
+elseif               ~idealinteg && islog, pRiugY = -log(2)  + p_pRiu;
 end
 
 % Sum of posterior probabilities
 % p(Ru|y) = sum(i=1:{Ru}) (1/2) * p(Ri) = sum(i=1:(nu-K)}) 2^i * (1/2) * p(Ri)
-if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), pRugY = sum(2.^(1:nlRu) .* pRiugY);
-elseif               ~idealinteg && strcmpi(scaleme, 'log'), pRugY = sum(exp((1:nlRu).* log(2) + pRiugY));
+if     idealinteg || ~idealinteg && islin, pRugY = sum(2.^(1:nlRu) .* pRiugY);
+elseif               ~idealinteg && islog, pRugY = sum(exp((1:nlRu).*log(2) + pRiugY));
 end
 
 % All patterns together
@@ -255,15 +258,15 @@ end
 % Compute the probability of observing the sequence under a deterministic
 % model
 % p(y|Md) = p(y|Ro) * p(Ro) + p(y|Ru) * p(Ru)
-pYgMd = pRogY + pRugY;
-if idealinteg && strcmpi(scaleme, 'log'), pYgMd = log(pYgMd); end
+pY = pRogY + pRugY;
+if islog, pY = log(pY); end
 
 % If none of the observed patterns can explain the sequence and the
 % sequence is longer than the depth of the tree (i.e. the longest possible
 % pattern that is considered), the likelihood of the sequence is null. When
 % exported in log scale, we return the log of the smallest postitive
 % floating point number.
-if corout && strcmpi(scaleme, 'log') && isinf(pYgMd), pYgMd = log(realmin); end
+if corout && islog && isinf(pY), pY = log(realmin); end
 
 %% Predictions
 %  ===========
@@ -296,13 +299,13 @@ if nargout > 1
     % Compute the likelihood that the next observation will be a A by means of
     % Bayesian Model Averaging
     % p(A|y) = (p(A|y,Ro)*p(Ro|y) + p(A|y,Ru)*p(Ru|y)) / (p(Ro|y) + p(Ru|y))
-    pAgYMd = (pAgYRo*pRogY + pAgYRu*pRugY) / (pRogY + pRugY);
+    pAgY = (pAgYRo*pRogY + pAgYRu*pRugY) / (pRogY + pRugY);
     
     % If none of the observed patterns can explain the sequence and the
     % sequence is longer than the depth of the tree (i.e. the longest possible
     % pattern that is considered), we return chance level for the expectancy of
     % the next observation.
-    if corout && (pRogY + pRugY) == 0, pAgYMd = 1/2; end
+    if corout && (pRogY + pRugY) == 0, pAgY = 1/2; end
 end
 
 %% Wrap things up
@@ -313,8 +316,8 @@ if nargout > 2
     
     % Combine both the posterior distributions over entirely and partially
     % observed patterns
-    if     idealinteg || ~idealinteg && strcmpi(scaleme, 'lin'), pRigY = [pRiogY,     pRiugY ];
-    elseif               ~idealinteg && strcmpi(scaleme, 'log'), pRigY = [pRiogY, exp(pRiugY)];
+    if     idealinteg || ~idealinteg && islin, pRigY = [pRiogY,     pRiugY ];
+    elseif               ~idealinteg && islog, pRigY = [pRiogY, exp(pRiugY)];
     end
     
     % Normalize the posterior distribution
