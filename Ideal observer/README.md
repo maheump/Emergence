@@ -10,12 +10,14 @@ The different observers available are:
 
 The full Bayesian ideal observer of the task is implemented in  ```Emergence_IO_FullIO``` and considers there might be a change point in the sequence separating a fully-stochastic part from a regular part that can be described using one of the previous observers.
 
+Toy examples scripts are available for each of there observers.
+
 ## Full Bayesian ideal observer of the task
 
 ## Example inference
 
-Here is the result of the inference by the full Bayesian ideal observer of the task (the function Emergence_IO_FullIO).
-These figures can be reproduces using the script Emergence_IO_ToyExampleFullIO.
+Here is the result of the inference by the full Bayesian ideal observer of the task (the function ```Emergence_IO_FullIO```).
+These figures can be reproduced using the script ```Emergence_IO_ToyExampleFullIO```.
 
 ![Example inference](https://github.com/maheump/Emergence/blob/master/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO.jpeg)
 
