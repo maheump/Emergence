@@ -13,7 +13,8 @@ The environment is highly structured in time thus allowing the brain to generate
 ## Example inference
 
 Here is an example sequence with the beliefs from an example subject and from the ideal observer when presented with the very same sequence.
-![Example inference](https://user-images.githubusercontent.com/5986212/38567248-fbe65660-3ce5-11e8-957e-0116b8eafc00.gif)
+#![Example inference](https://user-images.githubusercontent.com/5986212/38567248-fbe65660-3ce5-11e8-957e-0116b8eafc00.gif)
+![Example inference](https://github.com/maheump/Emergence/blob/master/Finger%20tracking%20analyses/figs/F_M.gif)
 
 ## Organization of the repository
 
