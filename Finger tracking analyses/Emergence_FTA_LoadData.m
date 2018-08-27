@@ -8,6 +8,9 @@ scriptpath = mfilename('fullpath');
 folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
 addpath(genpath(folderpath));
 
+% Set default figure properties
+Emergence_DefaultFigureProperties;
+
 % Load the data
 load('Emergence_Behaviour_GroupData.mat');
 
