@@ -10,7 +10,7 @@
 % addition, the full IO also returns posterior beliefs over change point's
 % positions, models' parameters, and identity of the future observation.
 % 
-% Maxime Maheu, November 2016
+% Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============
@@ -524,12 +524,17 @@ end
 %% WRAP THINGS UP
 %  ==============
 
-% Save all the figures as a single png file
+% Define the folder where to save the figures
+figpath = fullfile(scriptpath(1:max(strfind(scriptpath,'/'))), 'figs/');
+
+% Save the figures as separate files
 figimg = arrayfun(@(x) frame2im(getframe(figure(x))), 1:4, 'UniformOutput', 0);
+cellfun(@(x,y) imwrite(x, [figpath, sprintf('Emergence_IO_ToyExampleFullIO_fig%i.jpeg', ...
+    y)]), figimg, num2cell(1:4), 'UniformOutput', 0);
+
+% Save all the figures as a single files
 figimg = cat(1, cat(2, figimg{1}, figimg{2}), cat(2, figimg{3}, figimg{4}));
-figpath = fullfile(scriptpath(1:max(strfind(scriptpath,'/'))), ...
-    'Emergence_IO_ToyExampleFullIO.jpeg');
-imwrite(figimg, figpath);
+imwrite(figimg, [figpath, 'Emergence_IO_ToyExampleFullIO.jpeg']);
 
 % Reoder figures on the screen
 arrayfun(@figure, 4:-1:1);
