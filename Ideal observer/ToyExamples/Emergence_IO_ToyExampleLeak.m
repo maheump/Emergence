@@ -152,12 +152,12 @@ for iObs = 1:2
         subplot(nVar+3, nParam, iParam);
         lgd = plot(1:nObs, leak(iParam,:), '.-', 'Color', ...
             col(iParam,:), 'MarkerSize', 8); hold('on');
-
+        
         % Customize the axes
         axis([1,nObs,1/2,1]);
         set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
             'TickLabelInterpreter', 'LaTeX');
-
+        
         % Add some text labels
         if iParam == 1
             ylabel({'Weights $w_{k}$', '$p(\hat{y}_{k} = {y}_{k})$'}, ...
@@ -173,29 +173,29 @@ for iObs = 1:2
         % For each variable from the ideal observer
         for iVar = 1:nVar
             subplot(nVar+3, nParam, iParam+nParam*iVar);
-
+            
             % Define vertical limits of the plot
             tp = eval([vars{iVar}, '(iParam,:,iObs)']);
             tp = tp(~isinf(tp));
             limy1 = [min([0,min(tp)]), max([1,max(tp)])];
             margin = diff(limy1).*(1/4);
             limy2 = limy1 + [-1,1].*margin;
-
+            
             % Display the sequence
             pos = (limy2 - limy1) / 2 + limy1;
             plot(find(y{iObs} == 2), pos(1), 'k.', 'MarkerSize', 6);
             plot(find(y{iObs} == 1), pos(2), 'k.', 'MarkerSize', 6);
-
+            
             % Display the beliefs of the ideal observer
             plot(1:nObs, tp, '.-', 'Color', col(iParam,:), ...
                 'LineWidth', 1, 'MarkerSize', 8); hold('on');
-
+            
             % Customize the axes
             axis([1/2, nObs+1/2, limy2]);
             set(gca, 'XTick', [1, 10:10:nObs]);
             set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
                 'TickLabelInterpreter', 'LaTeX');
-
+            
             % Add some text labels
             if iParam == 1
                 ylabel(VarLab{iVar}, 'Interpreter', ...
@@ -203,7 +203,7 @@ for iObs = 1:2
                     'VerticalAlignment', 'Middle');
             end
         end
-
+        
         % Posterior distribution over observer's parameters
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
@@ -212,15 +212,15 @@ for iObs = 1:2
         tp = pTgY{iParam,iObs}; nTdim = size(tp,3);
         tp = reshape(permute(tp, [2,1,3]), [nObs, size(tp,1)*nTdim])';
         imagesc(1:nObs, [], tp); hold('on');
-
+        
         % Customize the colormap
         colormap(parula); caxis([min(tp(:)), max(tp(:))]);
-
+        
         % Customize the axes
         set(gca, 'XTick', [1, 10:10:nObs]); axis('xy');
         set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
             'TickLabelInterpreter', 'LaTeX');
-
+        
         % Add some text labels
         xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
         if iParam == 1
