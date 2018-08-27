@@ -1,4 +1,7 @@
-% Default figures' properties
+% This script defines default options for the figures
+% 
+% Copyright (c) 2018 Maxime Maheu
+
 set(groot, 'DefaultAxesLineWidth',              1);                     % axes
 set(groot, 'DefaultBarLineWidth',               1);                     % bars
 set(groot, 'DefaultColorbarLineWidth',          1);                     % colorbar
