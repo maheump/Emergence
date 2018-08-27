@@ -1,5 +1,5 @@
-function [ pYgMp, pAgYMp, mpTgY, H_pTgY, pXgX ] = Emergence_IO_Chains( y, scaleme, prior, i, dt )
-% EMERGENCE_IO_CHAINS implements a N-order Markov chain that is estimated
+function [ pYgMp, pAgYMp, mpTgY, H_pTgY, pXgX ] = Emergence_IO_Chain( y, scaleme, prior, i, dt )
+% EMERGENCE_IO_CHAIN implements a N-order Markov chain that is estimated
 % from a binary sequence.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
 %       and 2s).
