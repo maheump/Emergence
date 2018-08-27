@@ -1,5 +1,15 @@
 # Ideal observer
 
+## Scripts and functions
+
+The different observers available are:
+* ```Emergence_IO_Bernoulli``` estimates the frequency of A and B.
+* ```Emergence_IO_Markov``` estimates the frequency of first-order transitions (A|A, A|B, B|A, and B|B).
+* ```Emergence_IO_Chain``` estimates the frequency of transitions of any order.
+* ```Emergence_IO_Tree``` detects repetition of pattern of any length up to a given limit.
+
+The full Bayesian ideal observer of the task is implemented in  ```Emergence_IO_FullIO``` and considers there might be a change point in the sequence separating a fully-stochastic part from a regular part that can be described using one of the previous observers.
+
 ## Full Bayesian ideal observer of the task
 
 ## Example inference

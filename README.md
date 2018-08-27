@@ -17,10 +17,11 @@ Here is an example sequence with the beliefs from an example subject and from th
 
 ## Organization of the repository
 
-* **Ideal observer**: Functions implementing the full ideal observer of the task as well as partial observers learning one type of regularity (e.g. Bernoulli, ...). "Toy examples" simulation scripts are also provided to easily run the different models and inspect their behavior based on visual displays.
+* **Design**: A set of scripts used to explain the experimental design.
 * **Finger tracking analyses**: Series of scripts, that can be run as a pipeline, that reproduce the analyses and figures of the paper.
 * **Functions**: A set of functions used by many different scripts in the repository. It contains mostly
-* **Design**: A set of scripts used to explain the experimental design.
+* **Ideal observer**: Functions implementing the full ideal observer of the task as well as partial observers learning one type of regularity (e.g. Bernoulli, ...). "Toy examples" simulation scripts are also provided to easily run the different models and inspect their behavior based on visual displays.
+$ **Stimulation**: Scripts and functions used to run the behavioural experiment.
 
 ## Dependencies
 
