@@ -24,6 +24,10 @@ Emergence_DefaultFigureProperties;
 %% DESCRIBE THE EXEPERIMENTAL DESIGN
 %  =================================
 
+% Load data from all the subjects
+rmbadsub = false;
+Emergence_FTA_LoadData;
+
 % Show the different conditions and the hypotheses
 Emergence_Design_Conditions;
 Emergence_Design_Hypotheses;
@@ -33,10 +37,6 @@ Emergence_Design_Triangle
 
 %% PERFORM SUBJECT-LEVEL ANALYSES
 %  ==============================
-
-% Load data from all the subjects
-rmbadsub = false;
-Emergence_FTA_LoadData;
 
 % Get trajectories of all the subjects in all the conditions
 Emergence_FTA_SubjectAnalysis;
