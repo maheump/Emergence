@@ -58,7 +58,7 @@ sequence = sequence(1:N);
 %% RUN THE BAYESIAN IDEAL OBSERVER
 %  ===============================
 
-% Define options for the observer
+% Define options for the ideal observer
 pEd   = 0; % probability of making a memory error at each observation
 pEp   = 0; % probability of making a memory error at each observation
 treed = 20; % depth of the rules' tree to explore
@@ -195,7 +195,7 @@ plot([0,N+1], zeros(1,2), 'k-', 'LineWidth', wid2);
 
 % Customize the axes
 defaxprop(gca);
-set(gca, 'XTickLabel', {});%, 'YLim', [-limy,limy]);
+set(gca, 'XTickLabel', {});
 
 % Add some text labels
 if     strcmpi(scale, 'lin'), txt = '';
@@ -247,30 +247,11 @@ subplot(9,3,10+[0,1,3,4]);
 Emergence_PlotBarycTraj(pMgY, tricol);
 
 % Customize the axes
-defaxprop(gca);
+defaxprop(gca); pos = get(gca, 'Position');
 set(gca, 'XTickLabel', {}, 'YLim', [0,1], 'YTick', 0:1/5:1);
 
 % Add some text labels
 ylabel({'Model', 'posterior', 'probability', '$p(\mathcal{M}|y_{1:K})$'}, txtopt{:});
-
-% Display the posterior model's probabilities at the end of the sequence
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Create an inset plot
-pos = get(gca, 'Position');
-insetw = 0.15; % width of the plot (in percent)
-axes('Position', [pos(1)+pos(3)-insetw/6, pos(2)+pos(4)/2-insetw/2, insetw, insetw]);
-
-% Display the pie chart
-h = pie(pMgY(end,:));
-
-% Customize the pie chart
-for imod = 1:3
-    set(h(imod+(imod-1)), 'FaceColor', tricol(imod,:), 'LineWidth', wid2);
-    str = get(h(imod*2), 'String');
-    str = ['$' str(1:end-1) '\' str(end) '$'];
-    set(h(imod*2), 'String', str, cbrlabopt{:});
-end
 
 % Plot the amount of beliefs update
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -285,8 +266,8 @@ set(gca, 'XTickLabel', {});
 
 % Add some text labels
 ylabel({'Update of', 'the posterior', 'distribution', ...
-    '$\sqrt{D_\mathrm{JS}(p(\mathcal{M}|y_{1:K-1})}$', ...
-    '$\overline{||p(\mathcal{M}|y_{1:K}))}$'}, txtopt{:});
+    '$\sqrt{D_\mathrm{JS}(p(\mathcal{M}|y_{1:K})}$', ...
+    '$\overline{||p(\mathcal{M}|y_{1:K-1}))}$'}, txtopt{:});
 
 % Plot the entropy of the posterior distribution over models
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -310,6 +291,25 @@ plot(repmat(J,1,2), ylim, 'k-', 'LineWidth', wid1);
 for sp = 4:6:22
     subplot(9,3,sp+[0,1,3,4]);
     plot(repmat(J,1,2), ylim, 'k-', 'LineWidth', wid1);
+end
+
+% Display the posterior model's probabilities at the end of the sequence
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Create an inset plot
+insetw = 0.12; % width of the plot (in percent)
+axes('Position', [pos(1)+pos(3)-insetw/6, pos(2)+pos(4)/2-insetw/2, insetw, insetw]);
+
+% Display the pie chart
+h = pie(pMgY(end,:));
+x = find(pMgY(end,:) ~= 0);
+
+% Customize the pie chart
+for imod = 1:numel(x)
+    set(h(imod+(imod-1)), 'FaceColor', tricol(x(imod),:), 'LineWidth', wid2);
+    str = get(h(imod*2), 'String');
+    str = ['$' str(1:end-1) '\' str(end) '$'];
+    set(h(imod*2), 'String', str, cbrlabopt{:});
 end
 
 %% POSTERIOR DISTRIBUTIONS OVER MODELS' PARAMETERS
@@ -393,8 +393,8 @@ varlab = {{'Posterior', 'distribution', 'over already', 'observed change', ...
           {'Entropy of', 'the posterior', 'distribution', ...
             '$H(p(j_{k}|y_{1:K},\mathcal{M})$'}
           {'Update of', 'the posterior', 'distribution', ...
-            '$\sqrt{D_\mathrm{JS}(p(j_{k}|y_{1:K-1})}$', ...
-            '$\overline{||p(j_{k}|y_{1:K},\mathcal{M}))}$'}};
+            '$\sqrt{D_\mathrm{JS}(p(j_{k}|y_{1:K})}$', ...
+            '$\overline{||p(j_{k}|y_{1:K-1},\mathcal{M}))}$'}};
 
 % Prepare a new figure
 ffun(2);
@@ -474,17 +474,17 @@ end
 %  ===================
 
 % Choose which variables to display
-var = {'I', '', 'H', 'JS'};
-varlab = {{'Surprise', 'evoked by the', 'current observation', ...
+var = {'', 'I', 'H', 'JS'};
+varlab = {{'Expectation', 'regarding the', 'current observation', ...
+            '$p(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M})$'}, ...
+          {'Surprise', 'evoked by the', 'current observation', ...
             '$-\log_{2}(p(y_{K}|y_{1:K-1},\mathcal{M}))$'}, ...
-          {'Expectation', 'regarding the', 'next observation', ...
-            '$p(y_{K+1}=\mathrm{A}|y_{1:K},\mathcal{M})$'}, ...
           {'Entropy of', 'the posterior', 'distribution', ...
-            '$H(p(y_{K+1}|y_{1:K},\mathcal{M}))$'}, ...
+            '$H(p(y_{K}|y_{1:K-1},\mathcal{M}))$'}, ...
           {'Update of', 'the posterior', 'distribution', ...
-            '$\sqrt{D_\mathrm{JS}(p(\mathrm{A}|y_{1:K-1},\mathcal{M})}$', ...
-            '$\overline{||p(\mathrm{A}|y_{1:K},\mathcal{M}))}$'}};
-slev = [1, 1/2, 1, 0]; % level of those variables for the fully-stochastic model
+            '$\sqrt{D_\mathrm{JS}(p(\mathrm{A}|y_{1:K},\mathcal{M})}$', ...
+            '$\overline{||p(\mathrm{A}|y_{1:K-1},\mathcal{M}))}$'}};
+slev = [1/2, 1, 1, 0]; % level of those variables for the fully-stochastic model
 
 % Prepare a new figure
 ffun(4);
@@ -507,7 +507,7 @@ for imod = 1:3
 
         % Customize the axes
         defaxprop(gca);
-        if ivar == 1, set(gca, 'YLim', [0,4]);
+        if ivar == 2, set(gca, 'YLim', [0,4]);
         else, set(gca, 'YLim', [0,1]);
         end
         
