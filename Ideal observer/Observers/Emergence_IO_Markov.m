@@ -1,4 +1,4 @@
-function [ pYgMp, pAgYMp, mpTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
+function [ pY, pAgY, mpTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_MARKOV implements an observer learning parameters (i.e.
 % frequency of transitions) of a first-order binary Markov chain from a
 % sequence of binary observations.
@@ -26,6 +26,9 @@ K = numel(y);
 
 % By default, export the model evidence in log-scale
 if nargin < 2 || isempty(scaleme), scaleme = 'log'; end
+if     strcmpi(scaleme, 'lin'), islin = true;  islog = false;
+elseif strcmpi(scaleme, 'log'), islin = false; islog = true;
+end
 
 % By default, use a uniform, non-informative, prior distribution
 if nargin < 4 || isempty(prior), prior = 'Bayes-Laplace'; end
@@ -38,17 +41,16 @@ if numel(decw) > K, decw = decw(end-K+1:end); % take only the most recent weight
 elseif numel(decw) == K % nothing to do in that case
 elseif numel(decw)  < K, error('Not enough weights for the length of the sequence');
 end
+decw = cat(1,decw,NaN);
+% N.B adding a NaN at the end allow the use of linear algebra when the
+% sequence is composed of only one single observation
 
 % By default, use analytical solutions to speed up the computations
 if nargin < 3, usegrid = false; end
 
-% If the weights are uniform over the entire sequence, it means that there
-% are no memory decay, therefore analytical solutions can be used.
-% Otherwise, it means that there is a memory decay which requires to used
-% non-analytical grid-based solutions.
-if     any(decw ~= 1), usegrid = true;
-elseif all(decw == 1), usegrid = false;
-end
+% Analytical solutions are not available for analytical solutions, use
+% grid-based approximations instead
+if any(decw(1:end-1) ~= 1), usegrid = true; end
 
 % By default, use a small grid precision to speed-up the computation
 if nargin < 6, dt = 0.1; end
@@ -65,8 +67,8 @@ end
 %   thus have to create it afterwards, based on analytical solutions, using
 %   probability distribution functions.
 if usegrid || ~usegrid && returnpost
-    theta = 0:dt:1; % grid for theta based on grid precision
-    nt = (1/dt)+1;  % number of values for theta
+    theta = (0+dt/2):dt:(1-dt/2); % grid for theta based on grid precision
+    nt = 1/dt; % number of values for one dimension of theta
 end
 
 %% Prior probabilities
@@ -126,8 +128,9 @@ elseif usegrid
     else, error('The prior input has the wrong form.');
     end
     
-    % Make sure the prior distribution is normalized
-    pT = pT ./ sum(pT(:));
+    % Return log prior distribution when the model evidence must be
+    % returned in log-scale
+    if islog, pT = log(pT); end
 end
 
 %% Sequence's marginal likelihood
@@ -139,7 +142,9 @@ end
 % The likelihood of the first event is simply 1 over the number of
 % different possible stimuli in the sequence
 % p(y_1) = 1/2
-pY1 = 1/2;
+if     islin, pY1 = 1/2;
+elseif islog, pY1 = -log(2);
+end
 
 % Get the identity of the previous observations of each observation in the
 % sequence. This eases the frequency counts of transitions
@@ -152,7 +157,9 @@ gA = cond(A); % observations that follow an A
 gB = cond(B); % observations that follow a B
 
 % Get positions of each transition in the sequence
-AgA = false(1, K); AgB = AgA; BgA = AgA; BgB = AgA;
+% N.B we add a false at the end to allow linear algebra below
+% (it has no effect on the counts)
+AgA = false(1, K+1); AgB = AgA; BgA = AgA; BgB = AgA;
 AgA(A) = (gA == 1); % A => A cases
 BgA(B) = (gB == 1); % A => B cases
 AgB(A) = (gA == 2); % A => B cases
@@ -177,10 +184,10 @@ if ~usegrid
     % counts. This can be solved analytically by the means of gamma
     % distributions:
     % p(y|Msp) = p(y_1) int[p(y_2:K|t(A|B),t(B|A))] dt
-    if strcmpi(scaleme, 'lin')
+    if islin
         pYgTgA = prod(gamma(nXgA)) ./ gamma(sum(nXgA));
         pYgTgB = prod(gamma(nXgB)) ./ gamma(sum(nXgB));
-    elseif strcmpi(scaleme, 'log')
+    elseif islog
         pYgTgA = sum(gammaln(nXgA)) - gammaln(sum(nXgA));
         pYgTgB = sum(gammaln(nXgB)) - gammaln(sum(nXgB));
     end
@@ -189,8 +196,8 @@ if ~usegrid
     % likelihood of the first event:
     % p(y|t(A|B),t(B|A)) = p(y_1) * p(y_2:K|t(X|A)) * p(y_2:K|t(X|B))
     % <=> log(p(y|t(A|B),t(B|A))) = log(p(y_1)) + log(p(y_2:K|t(X|A))) + log(p(y_2:K|t(X|B)))
-    if     strcmpi(scaleme, 'lin'), pYgMp =     pY1  * pYgTgA * pYgTgB;
-    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY1) + pYgTgA + pYgTgB;
+    if     islin, pY = pY1 * pYgTgA * pYgTgB;
+    elseif islog, pY = pY1 + pYgTgA + pYgTgB;
     end
     
     % If asked, return the posterior distribution
@@ -211,45 +218,47 @@ if ~usegrid
 % N.B. We need to rely on grid-based approximation solutions
 elseif usegrid
     
-    % Get the weights corresponding to the positions at which each
-    % transition was observed
-    wAgA = decw(AgA); if isempty(wAgA), wAgA = 1/2; end
-    wBgA = decw(BgA); if isempty(wBgA), wBgA = 1/2; end
-    wAgB = decw(AgB); if isempty(wAgB), wAgB = 1/2; end
-    wBgB = decw(BgB); if isempty(wBgB), wBgB = 1/2; end
-    
     % For each transition, compute the likelihood of each observation,
     % given the weight of its corresponding position in the sequence, and
     % for each value of theta that is considered (depending on the grid)
     % e.g. p(observing A|A at position #10 with the corresponding weight
     % of position #10 if estimated p(A|A) = 1/10)
-    dAgA = wAgA * (1-theta) + (1 - wAgA) *    theta ;
-    dBgA = wBgA *    theta  + (1 - wBgA) * (1-theta);
-    dAgB = wAgB *    theta  + (1 - wAgB) * (1-theta);
-    dBgB = wBgB * (1-theta) + (1 - wBgB) *    theta ;
+    dAgA = decw(AgA) * (1-theta) + (1 - decw(AgA)) *    theta;
+    dBgA = decw(BgA) *    theta  + (1 - decw(BgA)) * (1-theta);
+    dAgB = decw(AgB) *    theta  + (1 - decw(AgB)) * (1-theta);
+    dBgB = decw(BgB) * (1-theta) + (1 - decw(BgB)) *    theta ;
 	
-    % Compute the sequence's likelihood by combining different observations
-    % of transitions together
-    pYgtBgA = prod(dAgA, 1) .* prod(dBgA, 1); % marginal distribution
-    pYgtAgB = prod(dAgB, 1) .* prod(dBgB, 1); % marginal distribution
-    pYgT = pY1 .* pYgtBgA' * pYgtAgB;         % joint distribution
+    % Compute a distribution that is proportional to the joint posterior
+    % distribution over theta 
+    if islin
+        pYgtBgA = prod(dAgA, 1) .* prod(dBgA, 1); % marginal distribution
+        pYgtAgB = prod(dAgB, 1) .* prod(dBgB, 1); % marginal distribution
+        pYgT = pY1 .* pYgtBgA' * pYgtAgB;         % joint distribution
+        ppTgY = pYgT .* pT;                       % numerator in Bayes' rule
+    elseif islog
+        pYgtBgA = sum(log(dAgA), 1) + sum(log(dBgA), 1); % marginal distribution
+        pYgtAgB = sum(log(dAgB), 1) + sum(log(dBgB), 1); % marginal distribution
+        pYgT = pY1 + pYgtBgA' + pYgtAgB;                 % joint distribution
+        ppTgY = pYgT + pT;                               % numerator in Bayes' rule
+    end
     
-    % Compute the posterior distribution over theta
-    BayesNum = pYgT .* pT; % likelihood times prior (numerator in Bayes' rule)
-    pY = sum(BayesNum(:)); % marginal likelihood (denominator in Bayes' rule)
-    pTgY = BayesNum ./ pY; % posterior distribution over theta using Bayes' rule
-    
-    % Derive (log-) model evidence
-    if     strcmpi(scaleme, 'lin'), pYgMp = pY / (nt^2);
-    elseif strcmpi(scaleme, 'log'), pYgMp = log(pY) - 2*log(nt);
+    % Compute the sequence's marginal likelihood (denominator in Bayes'
+    % rule) by integrating over theta (the joint distribution)
+    if     islin, pY =     sum(    ppTgY(:))   * 1/nt^2;
+    elseif islog, pY = log(sum(exp(ppTgY(:)))) - 2*log(nt);
     end
     % N.B. We use sum(X) / N(X) instead of the MATLAB "mean" function
     % because it is much faster (it avoids checks that are useless in the
     % context of this function).
     
+    % Compute the posterior distribution over theta using Bayes' rule
+    if     islin, pTgY =    (ppTgY ./ pY .* 1/nt^2);
+    elseif islog, pTgY = exp(ppTgY  - pY  - 2*log(nt));
+    end
+    
     % Return (independent) marginal distributions
     pTgAgY = sum(pTgY, 2)'; % marginal distribution (vector over theta values)
-    pTgBgY = sum(pTgY, 1); % marginal distribution (vector over theta values)
+    pTgBgY = sum(pTgY, 1);  % marginal distribution (vector over theta values)
     if returnpost, mpTgY = [pTgAgY; pTgBgY]'; end % concatenate marginal distributions
     
 	% Compute the expected value of each transition
@@ -266,9 +275,9 @@ end
 % analytical formula can be used, which is simply a ratio).
 % N.B. This depends on the identity of the previously received observation.
 if nargout > 1
-    pAgX   = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
-    X      = y(end); % get the identity of the last observation
-    pAgYMp = pAgX(X); % returns p(A) conditionaly on the last observation
+    pAgXY = [pXgA(1), pXgB(1)]; % p(A|A) & p(A|B)
+    X     = y(end); % get the identity of the last observation
+    pAgY  = pAgXY(X); % returns p(A) conditionaly on the last observation
 end
 
 %% Entropy of the posterior distribution

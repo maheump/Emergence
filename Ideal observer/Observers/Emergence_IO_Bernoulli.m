@@ -1,4 +1,4 @@
-function [ pYgT, pAgYT, pTgY, H_pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegrid, prior, decw, dt )
+function [ pY, pAgY, pTgY, H_pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegrid, prior, decw, dt )
 % EMERGENCE_IO_BERNOULLI implements an observer learning the frequency of
 % items from a binary sequence.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
@@ -25,6 +25,9 @@ K = numel(y);
 
 % By default, export the model evidence in log-scale
 if nargin < 2 || isempty(scaleme), scaleme = 'log'; end
+if     strcmpi(scaleme, 'lin'), islin = true;  islog = false;
+elseif strcmpi(scaleme, 'log'), islin = false; islog = true;
+end
 
 % By default, use a uniform, non-informative, prior distribution
 if nargin < 4 || isempty(prior), prior = 'Bayes-Laplace'; end
@@ -37,17 +40,16 @@ if numel(decw) > K, decw = decw(end-K+1:end); % take only the most recent weight
 elseif numel(decw) == K % nothing to do in that case
 elseif numel(decw)  < K, error('Not enough weights for the length of the sequence');
 end
+decw = cat(1,decw,NaN);
+% N.B adding a NaN at the end allow the use of linear algebra when the
+% sequence is composed of only one single observation
 
 % By default, use analytical solutions to speed up the computations
 if nargin < 3, usegrid = false; end
 
-% If the weights are uniform over the entire sequence, it means that there
-% are no memory decay, therefore analytical solutions can be used.
-% Otherwise, it means that there is a memory decay which requires to used
-% non-analytical grid-based solutions.
-if     any(decw ~= 1), usegrid = true;
-elseif all(decw == 1), usegrid = false;
-end
+% Analytical solutions are not available for analytical solutions, use
+% grid-based approximations instead
+if any(decw(1:end-1) ~= 1), usegrid = true; end
 
 % By default, use a small grid precision to speed-up the computation
 if nargin < 6, dt = 0.1; end
@@ -64,8 +66,8 @@ end
 %   thus have to create it afterwards, based on analytical solutions, using
 %   probability distribution functions.
 if usegrid || ~usegrid && returnpost
-    theta = 0:dt:1; % grid for theta based on grid precision
-    nt = (1/dt)+1;  % number of values for theta
+    theta = (0+dt/2):dt:(1-dt/2); % grid for theta based on grid precision
+    nt = 1/dt; % number of values for theta
 end
 
 %% Prior probabilities
@@ -114,9 +116,10 @@ elseif usegrid
     % Catch possible mistakes
     else, error('The prior input has the wrong form.');
     end
-
-    % Make sure the prior distribution is normalized
-    pT = pT ./ sum(pT(:));
+    
+    % Return log prior distribution when the model evidence must be
+    % returned in log-scale
+    if islog, pT = log(pT); end
 end
 
 %% Sequence's marginal likelihood
@@ -126,8 +129,8 @@ end
 % ~~~~~~~~~~~~~~
 
 % Get events' positions
-A = (y == 1);
-B = (y == 2);
+A = [(y == 1), false]; % we add a false at the end to allow linear algebra when there
+B = [(y == 2), false]; % is only one observation (it has no effect on the counts)
 
 % Compute the model evidence in case of a perfect integration
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,8 +146,8 @@ if ~usegrid
     
     % Since we use a conjugate prior, the model evidence is a beta
     % distribution, and its integral can be analytically computed.
-    if     strcmpi(scaleme, 'lin'), pYgT =   beta(nX(1), nX(2));
-    elseif strcmpi(scaleme, 'log'), pYgT = betaln(nX(1), nX(2));
+    if     islin, pY =   beta(nX(1), nX(2));
+    elseif islog, pY = betaln(nX(1), nX(2));
     end
     
     % If asked, return the posterior distribution
@@ -157,7 +160,7 @@ if ~usegrid
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % N.B. We need to rely on grid-based approximation solutions
 elseif usegrid
-
+    
     % For each item, compute the likelihood of each observation, given the
     % weight of its corresponding position in the sequence, and for each
     % value of theta that is considered (depending on the grid)
@@ -167,23 +170,29 @@ elseif usegrid
     dB = decw(B) * (1-theta) + (1 - decw(B)) *    theta ;
     
     % Compute the sequence's likelihood
-    pYgT = prod(dA) .* prod(dB);
-
-    % Compute the posterior distribution over theta
-    BayesNum = pYgT .* pT; % likelihood times prior (numerator in Bayes' rule)
-    pY = sum(BayesNum);    % marginal likelihood (denominator in Bayes' rule)
-    pTgY = BayesNum ./ pY; % posterior distribution over theta using Bayes' rule
-
-    % Derive (log-) model evidence
-    if     strcmpi(scaleme, 'lin'), pYgT = pY / nt;
-    elseif strcmpi(scaleme, 'log'), pYgT = log(pY) - log(nt);
+    if     islin, pYgT = prod(   dA,  1) .* prod(    dB,  1);
+    elseif islog, pYgT = sum(log(dA), 1)  + sum( log(dB), 1);
+    end
+    
+    % Compute a distribution that is proportional to the posterior
+    % distribution over theta
+    if     islin, ppTgY = pYgT .* pT; % numerator in Bayes' rule
+    elseif islog, ppTgY = pYgT  + pT; % numerator in Bayes' rule
+    end
+    
+    % Compute the sequence's marginal likelihood (denominator in Bayes'
+    % rule) by integrating over theta
+    if     islin, pY =     sum(    ppTgY)   * 1/nt;
+    elseif islog, pY = log(sum(exp(ppTgY))) - log(nt);
     end
     % N.B. We use sum(X) / N(X) instead of the MATLAB "mean" function
     % because it is much faster (it avoids checks that are useless in the
     % context of this function).
-
-    % Compute the likelihood that the next observation will be a A
-    pAgYT = pTgY * theta';
+    
+    % Compute the posterior distribution over theta using Bayes' rule
+    if     islin, pTgY =    (ppTgY ./ pY .* 1/nt);
+    elseif islog, pTgY = exp(ppTgY  - pY - log(nt));
+    end
 end
 
 %% Predictions
@@ -191,8 +200,8 @@ end
 
 % Compute the likelihood that the next observation will be a A
 if nargout > 1
-    if    ~usegrid, pAgYT = nX(1) / sum(nX); % analytical formula (a ratio)
-    elseif usegrid, pAgYT = pTgY * theta';   % based on the grid
+    if    ~usegrid, pAgY = nX(1) / sum(nX); % analytical formula (a ratio)
+    elseif usegrid, pAgY = pTgY * theta';   % based on the grid
     end
 end
 
