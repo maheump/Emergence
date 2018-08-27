@@ -20,6 +20,9 @@ addpath(genpath(folderpath));
 % Set default figure properties
 Emergence_DefaultFigureProperties;
 
+%% CREATE A SEQUENCE
+%  =================
+
 % Create a sequence biased toward repetitions
 nObs = 200;
 pAgB = 1/3;
@@ -29,23 +32,30 @@ y = GenRandSeq(nObs, [pAgB, pBgA]);
 %% RUN THE BAYESIAN IDEAL OBSERVERS LEARNING DIFFERENT PROBABILISTIC REGULARITIES
 %  ==============================================================================
 
+% Define the models to use
+% N.B. order 0 is Bernoulli, 1 is Markov and greater than 1 are
+% higher-order Markov chains
+nOrder = [0, 1:4];
+nMod = numel(nOrder);
+
 % Prepare outputs
-nMod = 3;
 pYgMp  = NaN(nMod,nObs);
 pAgYMp = NaN(nMod,nObs);
 IgYMp  = NaN(nMod,nObs);
 pTgYMp = cell(1,nMod);
 
 % Define the observers to 
-iofun = {@Emergence_IO_Bernoulli, @Emergence_IO_Markov, @Emergence_IO_Chain};
+iofun = cat(2, {@Emergence_IO_Bernoulli}, {@Emergence_IO_Markov}, ...
+    repmat({@Emergence_IO_Chain}, 1, sum(nOrder > 1)));
 
 % Define the same properties for these observers
 dt      = 0.01; % precision of the posterior
 scaleme = 'log'; % scale of the model evidence
 prior   = 'Bayes-Laplace'; % prior over observers' parameter(s)
-options = {{scaleme, false, prior, [],    dt}, ...
-           {scaleme, false, prior, [],    dt}, ...
-           {scaleme,        prior,     2, dt}};
+options = cat(2, {{scaleme, false, prior, [], dt}}, ...
+                 {{scaleme, false, prior, [], dt}}, ...
+     cellfun(@(x) {scaleme,        prior,  x, dt}, ...
+     num2cell(nOrder(nOrder>1)), 'UniformOutput', 0));
 
 % Present the same input sequence to all the different observers
 for iMod = 1:nMod
@@ -108,9 +118,8 @@ for iMod = 1:nMod
         
         % Customize the axes
         axis([1/2, nObs+1/2, limy2]);
-        set(gca, 'XTick', [1, get(gca, 'XTick')]);
-        set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
-            'TickLabelInterpreter', 'LaTeX');
+        set(gca, 'XTick', [1, get(gca, 'XTick')], 'TickLabelInterpreter', 'LaTeX');
+            
         
         % Add some text labels
         if iMod == 1
@@ -120,7 +129,9 @@ for iMod = 1:nMod
         end
         if iVar == 1
             ttl = func2str(iofun{iMod});
-            title(ttl(max(strfind(ttl,'_'))+1:end), 'Interpreter', 'LaTeX');
+            title({ttl(max(strfind(ttl,'_'))+1:end), ...
+                sprintf('Order of the transition: %i', nOrder(iMod))}, ...
+                'Interpreter', 'LaTeX');
         end
     end
     
@@ -128,7 +139,7 @@ for iMod = 1:nMod
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     % Display the posterior beliefs over patterns
-    sp = subplot(nVar+2, nMod, iMod + nMod*(nVar) + [0,nMod]);
+    subplot(nVar+2, nMod, iMod + nMod*(nVar) + [0,nMod]);
     tp = pTgYMp{iMod}; nTdim = size(tp,3);
     tp = reshape(permute(tp, [2,1,3]), [nObs, size(tp,1)*nTdim])';
     imagesc(1:nObs, [], tp); hold('on');
@@ -140,9 +151,8 @@ for iMod = 1:nMod
     colormap(parula); caxis([min(tp(:)), max(tp(:))]);
     
     % Customize the axes
-    set(gca, 'XTick', [1, get(gca, 'XTick')]); axis('xy');
-    set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
-        'TickLabelInterpreter', 'LaTeX');
+    axis('xy');
+    set(gca, 'XTick', [1, get(gca, 'XTick')], 'TickLabelInterpreter', 'LaTeX');
     
     % Add some text labels
     xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
