@@ -2,7 +2,7 @@
 % a Bayesian observer using a n-order Markov chain at detecting a repeating
 % pattern from noise.
 % 
-% Maxime Maheu, November 2016
+% Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============
