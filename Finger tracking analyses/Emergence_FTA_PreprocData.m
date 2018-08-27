@@ -10,9 +10,13 @@
 %% INITIALIZATION
 %  ==============
 
+% Add functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
 % Define the location of the data
-homedir = '/Users/Maxime/Documents/My projects/Emergence';
-datadir = fullfile(homedir, 'Stimulation', 'bhv', 'data');
+datadir = fullfile(folderpath, 'Stimulation', 'bhv', 'data');
 
 % Get subjects' list
 subjects = dir(fullfile(datadir, 'Subject*'));
@@ -208,17 +212,17 @@ end
 IO = cell(size(G)); % conditions x subjects cell matrix with IO's inference
 
 % Define options for the observer
-pEd   = 0; % probability of making a memory error at each observation
-pEp   = 0; % probability of making a memory error at each observation
-treed = 10; % depth of the rules' tree to explore
-stat  = 'Transitions'; % statistic to be learned by the probabilistic model
-pR    = 'Size-principle'; % the prior probability of each rule depends on its length
-pT    = 'Bayes-Laplace'; % the prior over statistics to be learnt
-pJ    = 'Uniform'; % prior over change point's position
-comp  = 'all'; % compute after each observation
-scale = 'log'; % scale of the model evidence
-verb  = 1; % do not output messages in the command window
-pgrid = []; % precision of the posterior over theta
+pEd    = 0; % probability of making a memory error at each observation
+pEp    = 0; % probability of making a memory error at each observation
+patlen = 10; % depth of the rules' tree to explore
+stat   = 'Transitions'; % statistic to be learned by the probabilistic model
+pR     = 'Size-principle'; % the prior probability of each rule depends on its length
+pT     = 'Bayes-Laplace'; % the prior over statistics to be learnt
+pJ     = 'Uniform'; % prior over change point's position
+comp   = 'all'; % compute after each observation
+scale  = 'log'; % scale of the model evidence
+pgrid  = []; % precision of the posterior over theta
+verb   = 0; % do not output messages in the command window
 
 % For each subject
 for iSub = 1:nSub
@@ -229,8 +233,8 @@ for iSub = 1:nSub
             iCond, nCond, iSub, nSub);
         
         % Run the observer with these options
-        IO{iCond,iSub} = Emergence_IO_IdealObserver(G{iCond,iSub}.Seq, ... % sequence
-            pEd, pEp, treed, stat, pR, pT, pJ, comp, scale, verb, pgrid);  % options
+        IO{iCond,iSub} = Emergence_IO_FullIO(G{iCond,iSub}.Seq, ... % sequence
+            pEd, pEp, patlen, stat, pR, pT, pJ, comp, scale, pgrid, verb);  % options
         
         % Remove unnecessary fields to light up the output MATLAB file
         IOf = fields(IO{iCond,iSub});
@@ -246,7 +250,7 @@ for iSub = 1:nSub
         % Create a variable with all models' posterior probability
         IO{iCond,iSub}.BarycCoord = [IO{iCond,iSub}.pMspgY', ... % 1: probabilistic component
                                      IO{iCond,iSub}.pMsdgY', ... % 2: deterministic component
-                                     IO{iCond,iSub}.pMssgY'];    % 3: stochastic component
+                                     IO{iCond,iSub}.pMssgY'];    % 3: stochastic    component
         
         % Create a variable with (corrected) cartesian coordinates
         traj = round(IO{iCond,iSub}.BarycCoord * tricoord);
@@ -312,7 +316,7 @@ letters = {'A','B'};
 g = repmat(0.7,1,3); % grey
 
 % Save the group data file
-filename = fullfile(homedir, 'Finger tracking analyses', 'ppdata', ...
+filename = fullfile(folderpath, 'Finger tracking analyses', 'ppdata', ...
     'Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'homedir', ...
     'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...

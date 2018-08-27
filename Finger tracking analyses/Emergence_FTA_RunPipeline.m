@@ -9,6 +9,11 @@
 clear;
 close('all');
 
+% Add functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
 % Preprocess behavioural data and run the ideal observer on the sequences
 % that were presented to the subjects
 Emergence_FTA_PreprocData;
