@@ -70,7 +70,7 @@ if nTdim > 1
             jointpost = cellfun(@indepmarg2joint, margpost, 'UniformOutput', 0);
             jointpost = cell2mat(reshape(jointpost, [ones(1,nTdim), N]));
         end
-        margpost  = permute(cell2mat(reshape(margpost,  [ones(1,nTdim), N])), [1,3,2]);
+        margpost  = permute(squeeze(cell2mat(reshape(margpost,  [ones(1,nTdim), N]))), [1,3,2]);
     end
 elseif nTdim == 1
     if nargout > 5
