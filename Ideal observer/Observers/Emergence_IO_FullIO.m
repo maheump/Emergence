@@ -4,7 +4,7 @@ function out = Emergence_IO_FullIO( ...
     pEp, ...        % (3)  the probability of an error in the probabilistic observer
     patlen, ...     % (4)  the depth of the tree used by the deterministic observer
     stat, ...       % (5)  the type of statistics learnt by the probabilistic obserber
-    p_pRi, ...      % (6)  the prior for the rules in the deterministic observer
+    p_pRi, ...      % (6)  the prior for the patterns in the deterministic observer
     p_pTi, ...      % (7)  the prior for the statistics in the probabilistic observer
     p_pJk, ...      % (8)  the prior for the position of the change point
     computfor, ...  % (9)  whether to do iterative or final computations
@@ -178,7 +178,7 @@ if nargin < 4, patlen = N; end
 
 % If it is larger than the sequence, notify it
 if patlen > N 
-    warning(['The depth of rules'' tree to explore is larger than the ', ...
+    warning(['The depth of patterns'' tree to explore is larger than the ', ...
         'number of observations in the sequence.']);
 end
 if verbose, fprintf('  * Longest possible pattern: %i observations\n', patlen); end
@@ -219,13 +219,13 @@ end
 % Define the type of prior for the deterministic observer %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 
-% By default, use the size-principle for the prior over rules
+% By default, use the size-principle for the prior over patterns
 if nargin < 6 || isempty(p_pRi), p_pRi = 'Size-principle'; end
 
-% The two available analytical prior distributions over rules
+% The two available analytical prior distributions over patterns
 if verbose, fprintf('  * Type of prior over patterns: %s\n', lower(p_pRi)); end
 if ~any(strcmpi(p_pRi, {'Uniform', 'Size-principle'}))
-    error(['Please provide a prior over rules that is either "Uniform" ', ...
+    error(['Please provide a prior over patterns that is either "Uniform" ', ...
         'or based on the "Size-principle"']);
 end
 
@@ -281,10 +281,10 @@ if strcmpi(Jprior, 'Uniform')
 % informative prior that follows a Gaussian distribution:
 % p(J) ~ Normal(1:N, mu, sigma)
 elseif strcmpi(Jprior, 'Gaussian')
-    mu    = p_pJk(1);                 % mean
-    sigma = p_pJk(2);                 % dispersion
+    mu    = p_pJk(1);                % mean
+    sigma = p_pJk(2);                % variance
     gauss = normpdf(1:N, mu, sigma); % the gaussian distribution
-    p_pJk  = gauss ./ sum(gauss);     % normalized
+    p_pJk  = gauss ./ sum(gauss);    % normalized
 
 % If the prior distrubution over change point's position is a user-provided
 % custom one, make sure it is a row vector to ensure that linear algebra
@@ -423,8 +423,8 @@ for K = obs
     % is strictly equivalent to making coin tosses with an unbiased coin.
     % p(y|Mss) = (1/2)^K
     % <=> log(p(y|Mss)) = -K * log(2)
-    if     islin, pYgMss(K) = (1/2) ^ K;
-    elseif islog, pYgMss(K) = -K * log(2);
+    if     islin, pYgMss(K) = Emergence_IO_Null(K, 'lin');
+    elseif islog, pYgMss(K) = Emergence_IO_Null(K, 'log');
     end
     
     %% Loop over possible change point's positions
@@ -462,8 +462,8 @@ for K = obs
         % The marginal likelihood of a fully stochastic model:
         % p(y1|Ms) = (1/2)^k
         % <=> log(p(y1|Ms)) = -k * log(2)
-        if     islin, pYp1gMs = (1/2) ^ k;
-        elseif islog, pYp1gMs = -k * log(2);
+        if     islin, pYp1gMs = Emergence_IO_Null(k, 'lin');
+        elseif islog, pYp1gMs = Emergence_IO_Null(k, 'log');
         end
         
         %% Compute the marginal likelihood of the 2nd part under a probabilistic model
@@ -539,7 +539,7 @@ for K = obs
             % p(y2|Mp) ~ prod_i Beta(N(A|T_i), N(B|T_i))
             %          = p(y2(1)) * p(y2(2:end)|t(A|T_1),t(A|T_2),...,t(B|T_n))
             % p(y(K+1)=A|y2,Mp) = N(A|X) / (N(A|X) + N(B|X))
-            [pYp2gMp, pAgJkYp2Mp(k), pTgY(:,k,:)] = Emergence_IO_Chains(...
+            [pYp2gMp, pAgJkYp2Mp(k), pTgY(:,k,:)] = Emergence_IO_Chain(...
                 Yp2, ...        % second part of the sequence
                 scaleme, ...	% scale for p(y|Mp)
                 p_pTi, ...      % prior distribution over theta values
@@ -577,7 +577,7 @@ for K = obs
             patlen, ...  % depth of the tree to explore
             scaleme, ... % scale for p(y|Md)
             false, ...   % use analytical solutions instead of numerical ones
-            p_pRi, ...   % type of prior over rules
+            p_pRi, ...   % type of prior over patterns
             Wd, ...      % vector of decaying weights
             true);       % make sure that the output variables are not singular
         
@@ -664,8 +664,8 @@ for K = obs
     % striclty linear if the prior is uniform.
     % for all Jk E {K,K+1,...,N}: p(y|Jk) = (1/2)^K * p(Jk)
     % <=> log(p(y|Jk>K)) = -K * log(2) + p(Jk)
-    if     islin, ppunobsJkgYKMsp = (1/2) .^ K   .* p_punobsJk;
-    elseif islog, ppunobsJkgYKMsp = -K .* log(2)  + p_punobsJk;
+    if     islin, ppunobsJkgYKMsp = Emergence_IO_Null(K, 'lin') .* p_punobsJk;
+    elseif islog, ppunobsJkgYKMsp = Emergence_IO_Null(K, 'log')  + p_punobsJk;
     end
     
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
@@ -705,7 +705,7 @@ for K = obs
     %  are marginalized over change point's position. Importantly, we
     %  consider only change point's positions that are already observed.
     %  Another possibility would be to marginalize over all (including not
-    %  yet onserved change point's positions) but it is less interesting
+    %  yet observed change point's positions) but it is less interesting
     %  in that case because the maginalized posteriors would be strongly
     %  driven by the (uniform) prior distribution over change point's
     %  positions thus resulting in uniform distribution over models'
@@ -747,12 +747,12 @@ for K = obs
     %% Compute predictions regarding the identity of the forthcoming observation
     %  =========================================================================
     %  The prediction is computed after receiving the observation K:
-    %  for all i E {P,D}: p(A|y,Msi) = p(y(K+1)=A|y_1:K,Msi) = 1 - p(B|y,Msi)
+    %  for all i E {P,D}: p(A|y,Msi) = p(y_K+1=A|y_1:K,Msi) = 1 - p(B|y,Msi)
     %  
     %  It is obtained by deriving the expectation of a A given the
     %  observations following the change point times the posterior
     %  probability of the change point being at that point:
-    %  for all i E {P,D}: p(y(K+1)=A|y,Jk,Msi) = p(y(K+1)=A|y,Msi) * p(Jk|y)
+    %  for all i E {P,D}: p(y(K+1)=A|y,Jk,Msi) = p(y_K+1=A|y,Msi) * p(Jk|y)
     
     % for the stochastic-to-probabilistic observer
     pAgYMsp(K) = pAgJkYp2Mp * pJkgYMsp(:,K);
@@ -792,7 +792,7 @@ pY = sum(pYgMsi.*p_pMsi, 1);
 % Compute the models' posterior probability %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 
-% Bayes' rule states that the model's posterior probability is proportional
+% Bayes' pattern states that the model's posterior probability is proportional
 % to its model evidence times its prior probability. Dividing this product
 % by the normalization factor computed just above gives probabilities
 % that evolve from 0 to 1.
@@ -866,7 +866,7 @@ covpMsi = [NaN, cellfun(@(x) x(2,1), covpMsi, 'UniformOutput', 1)];
 
 % Since, in the fully-stochastic model, there is no assumption about
 % any change point, we just need to combine the beliefs of the
-% probabilistic-to-stochastic and deterministic-to-stochastic models
+% probabilistic-to-stochastic and stochastic-to-deterministic models
 % regarding the position of the change point:
 % p(Jk|y) propto p(Jk|y,Msp) * p(Msp) + p(Jk|y,Msd) * p(Msd)
 pJkgY = (pJkgYMsp .* pMspgY + ... % p(Jk|y,Msp) * p(Msp|y)
@@ -909,8 +909,8 @@ pAgYMss = ones(1,N) ./ 2; % p(A|y_0,Mss) = 1/2
 pAgYMsp(1) = 1/2; % p(A|y_0,Msp) = 1/2
 pAgYMsd(1) = 1/2; % p(A|y_0,Msd) = 1/2
 
-% Make sure expectations evolve between 0 and 1. Errors may happen because
-% of numeric overflows
+% Make sure expectations evolve between 0 and 1 (errors may happen because
+% of numeric overflows)
 pAgYMsd(pAgYMsd < 0) = 0;
 pAgYMsp(pAgYMsp < 0) = 0;
 pAgYMsd(pAgYMsd > 1) = 1;
