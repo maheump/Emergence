@@ -22,7 +22,7 @@ cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
 cbr.Label.String = 'Entropy';
 
 % Display the different entropy levels of the rules
-entlev = cellfun(@Emergence_IO_Entropy, prob);
+entlev = sum(arrayfun(@Emergence_IO_Entropy, cell2mat(prob')), 2);
 contour(p, p, entmap, entlev, 'k-');
 
 % Display diagonals

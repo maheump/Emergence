@@ -47,6 +47,6 @@ entarr = arrayfun(@Emergence_IO_Entropy, p);
 figure('Position', [282 1055 500 50]);
 
 % Display a colormap indexed on the entropy levels
-imagesc(p, 1, H(p));
+imagesc(p, 1, entarr);
 colormap(cbrewer2('Blues')); caxis([0,1]);
 axis('off');
