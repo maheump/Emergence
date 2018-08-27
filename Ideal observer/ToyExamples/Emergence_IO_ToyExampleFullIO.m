@@ -35,7 +35,6 @@ if ~exist('sequence', 'var')
 %   >> rule = [1/4 3/4]; % stochastic-to-probabilistic sequence
 %   >> rule = [1 2 2 1 1 2]; % stochastic-to-deterministic sequence
 rule = [3/4 3/4];
-rule = [1 2 2 1 1 2];
 
 % Define the length of the sequence
 N = 200;
