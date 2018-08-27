@@ -32,8 +32,8 @@ end
 
 % Create a vector for theta values
 if returnpost
-    theta = 0:dt:1; % grid for theta based on grid precision
-    nt = (1/dt)+1;  % number of values for theta
+    theta = (0+dt/2):dt:(1-dt/2); % grid for theta based on grid precision
+    nt = 1/dt;  % number of values for theta
 elseif ~returnpost, mpTgY = []; % return empty vector
 end
 
