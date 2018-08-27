@@ -41,8 +41,10 @@ Temporary Items
 # Ignore private folders
 private
 
-# Ignore LaTeX files
+# Ignore zip files
 *.zip
+
+# Ignore LaTeX files
 *.log
 *.gz
 *.toc
@@ -54,9 +56,6 @@ private
 *.wav
 
 # Ignore some folders that we do not want to push online
-Behaviour*
-fMRI*
-Pupil*
 Examples
 Notes
 instr
