@@ -19,6 +19,9 @@ addpath(genpath(folderpath));
 % Set default figure properties
 Emergence_DefaultFigureProperties;
 
+%% PREPARE SEQUENCES
+%  =================
+
 % Define patterns to test
 patterns = {'AABB', ...
             'AAABBB', 'AABABB', 'AAABAB'...
@@ -27,9 +30,9 @@ patterns = {'AABB', ...
 
 % Get size of sequences
 L = cellfun(@numel, patterns); % length of each pattern
-maxL = max(L); % maximum patterns' length
-nRep = 3; % number of repetition of the longest pattern
-nObs = nRep*maxL; % number of observations
+maxL = max(L);                 % maximum patterns' length
+nRep = 3;                      % number of repetition of the longest pattern
+nObs = nRep*maxL;              % number of observations
 
 % Create sequences based on these patterns
 patternsrecod = cellfun(@str2pat, patterns, 'UniformOutput', 0);
@@ -143,9 +146,7 @@ for iSeq = 1:nSeq
         
         % Customize the axes
         axis([1/2, nObs+1/2, limy2]);
-        set(gca, 'XTick', [1, 5:5:nObs]);
-        set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
-            'TickLabelInterpreter', 'LaTeX');
+        set(gca, 'XTick', [1, 5:5:nObs], 'TickLabelInterpreter', 'LaTeX');
 
         % Add some text labels
         if iVar == 1
@@ -160,7 +161,7 @@ for iSeq = 1:nSeq
     end
     
     % Display the posterior beliefs over patterns
-    sp = subplot(nVar+2, nSeq, iSeq + nSeq*nVar + [0,nSeq]);
+    subplot(nVar+2, nSeq, iSeq + nSeq*nVar + [0,nSeq]);
     imagesc(1:nObs, 1:nu, pRgY(:,:,iSeq)); hold('on');
     
     % Display each time a pattern is repeated
@@ -171,9 +172,8 @@ for iSeq = 1:nSeq
     colormap(parula); caxis([min(pRgY(:)), max(pRgY(:))]);
     
     % Customize the axes
-    set(gca, 'XTick', [1, 5:5:nObs]); axis('xy');
-    set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
-        'TickLabelInterpreter', 'LaTeX');
+    axis('xy');
+    set(gca, 'XTick', [1, 5:5:nObs], 'TickLabelInterpreter', 'LaTeX');
     
     % Add some text labels
     xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
