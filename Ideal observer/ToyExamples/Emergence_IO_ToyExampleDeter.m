@@ -4,7 +4,7 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % Clear the place
@@ -42,7 +42,7 @@ patterns{end+1} = 'Stochastic';
 Seq{end+1} = GenRandSeq(nObs, 1/2); 
 nSeq = numel(Seq);
 
-%% Run the Bayesian ideal observer
+%% RUN THE BAYESIAN IDEAL OBSERVER
 %  ===============================
 
 % Properties of the Bayesian ideal observer
@@ -90,8 +90,8 @@ LLR = log_pYgMd - log_pYgMs;
 % Posterior probability
 PP = exp(log_pYgMd) ./ (exp(log_pYgMd) + exp(log_pYgMs));
 
-%% Display the inference process
-%  =============================
+%% DISPLAY THE RESULT OF THE INFERENCE
+%  ===================================
 
 % Define the different variables from the IO to display
 Var = {PP, pAgYMd, IgYMd, HpRgY, sqrt(JSdiv)};
@@ -166,7 +166,7 @@ for iSeq = 1:nSeq
     colormap(parula); caxis([min(pRgY(:)), max(pRgY(:))]);
     
     % Customize the axes
-    set(gca, 'XTick', [1, 5:5:nObs]);
+    set(gca, 'XTick', [1, 5:5:nObs]); axis('xy');
     set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
         'TickLabelInterpreter', 'LaTeX');
     
