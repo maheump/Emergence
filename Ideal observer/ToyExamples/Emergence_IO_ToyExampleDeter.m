@@ -1,6 +1,6 @@
-% This script compares the learning dynamic of different patterns in a
-% binary sequence detection by a deterministic (supposing repetitions of
-% the same pattern) ideal (Bayesian) observer.
+% This script compares the learning dynamic of a deterministic (supposing
+% repetitions of the same pattern) ideal (Bayesian) observer presented with
+% sequences made of the repetition of different patterns.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
@@ -35,11 +35,6 @@ nObs = nRep*maxL; % number of observations
 patternsrecod = cellfun(@str2pat, patterns, 'UniformOutput', 0);
 Seq = cellfun(@(x) repmat(x, 1, nObs), patternsrecod, 'UniformOutput', 0);
 Seq = cellfun(@(x) x(1:nObs), Seq, 'UniformOutput', 0);
-
-% Add a fully-stochastic sequence
-L(end+1) = NaN;
-patterns{end+1} = 'Stochastic';
-Seq{end+1} = GenRandSeq(nObs, 1/2); 
 nSeq = numel(Seq);
 
 %% RUN THE BAYESIAN IDEAL OBSERVER
@@ -53,16 +48,18 @@ nSeq = numel(Seq);
 pErr = 0;
 leak = Emergence_IO_Leak(pErr, nObs);
 
-% Define the depth of the tree to explore
-nu = round(nObs/2);
+% Define properties of the observer
+nu      = nObs;             % the longest possible pattern considered
+scaleme = 'log';            % scale for the model evidence
+prior   = 'Size-principle'; % the prior distribution over patterns
 
 % Prepare output variables
-pRgY       = NaN(nu,nObs,nSeq);
-log_pYgMd  = NaN(nSeq,nObs);
-pAgYMd     = NaN(nSeq,nObs);
-IgYMd      = NaN(nSeq,nObs);
-JSdiv      = NaN(nSeq,nObs);
-HpRgY      = NaN(nSeq,nObs);
+pRgY   = NaN(nu,nObs,nSeq);
+pYgMd  = NaN(nSeq,nObs);
+pAgYMd = NaN(nSeq,nObs);
+IgYMd  = NaN(nSeq,nObs);
+JSdiv  = NaN(nSeq,nObs);
+HpRgY  = NaN(nSeq,nObs);
 
 % Run the Bayesian ideal observer
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,34 +68,42 @@ HpRgY      = NaN(nSeq,nObs);
 for iSeq = 1:nSeq
     
     % Run the Bayesian ideal observer
-    [log_pYgMd(iSeq,:), pAgYMd(iSeq,:), ~, IgYMd(iSeq,:), ~, ...
+    [pYgMd(iSeq,:), pAgYMd(iSeq,:), ~, IgYMd(iSeq,:), ~, ...
 	 pRgY(:,:,iSeq), ~, HpRgY(iSeq,:), JSdiv(iSeq,:)] = ...
-        Emergence_IO_RunIO(@Emergence_IO_Tree, ...         % IO learning repeating patterns
-        Seq{iSeq}, ...                                     % current binary sequence
-        {nu, 'log', false, 'Size-principle', leak, true}); % properties of the IO
+        Emergence_IO_RunIO(@Emergence_IO_Tree, ... % IO learning repeating patterns
+        Seq{iSeq}, ...                             % current binary sequence
+        {nu, scaleme, false, prior, leak, true});  % properties of the IO
 end
+
+% For the update, take the square root value of the Jensen-Shannon divergence
+JSdiv = sqrt(JSdiv);
 
 % Compare to a random toss scenario
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Sequence likelihood for a fully-stochastic observer
-log_pYgMs = -log(2) .* (1:nObs);
+% (log-)Likelihood of any sequence under a null model
+pYgMs = Emergence_IO_Null(1:nObs, scaleme);
 
-% Log-likelihood ratio
-LLR = log_pYgMd - log_pYgMs;
+% (log-)Likelihood ratio
+if     strcmpi(scaleme, 'lin'), LR = pYgMd ./ pYgMs;
+elseif strcmpi(scaleme, 'log'), LR = pYgMd  - pYgMs;
+end
 
-% Posterior probability
-PP = exp(log_pYgMd) ./ (exp(log_pYgMd) + exp(log_pYgMs));
+% Observers posterior probabilities
+if     strcmpi(scaleme, 'lin'), pMdgY =     pYgMd  ./ (    pYgMd  +     pYgMs );
+elseif strcmpi(scaleme, 'log'), pMdgY = exp(pYgMd) ./ (exp(pYgMd) + exp(pYgMs));
+end
 
 %% DISPLAY THE RESULT OF THE INFERENCE
 %  ===================================
 
 % Define the different variables from the IO to display
-Var = {PP, pAgYMd, IgYMd, HpRgY, sqrt(JSdiv)};
-nVar = numel(Var);
-VarLab = {{'Posterior probability', '$\frac{p(\mathcal{M_{\mathrm{D}}}|y)}{p(\mathcal{M}_{\rm{S}}|y)}$'}, ...
-          {'Prediction', '$p(y_{k+1}=\mathrm{A}|y_{1:k},\mathcal{M_{\mathrm{D}}})$'}, ...
-          {'Surprise', '$-\log_{2} p(y_{k+1}|\mathcal{M_{\mathrm{D}}})$'}, ...
+Vars = {'LR', 'pMdgY', 'pAgYMd', 'IgYMd', 'HpRgY'};
+nVar = numel(Vars);
+VarLab = {{'Likelihood ratio', '$\frac{p(y|\mathcal{M_{\mathrm{D}}})}{p(y|\mathcal{M}_{\rm{S}})}$'}, ...
+          {'Posterior probability', '$\frac{p(\mathcal{M_{\mathrm{D}}}|y)}{p(\mathcal{M}_{\rm{S}}|y)}$'}, ...
+          {'Prediction', '$p(y_{k}=\mathrm{A}|y_{1:k-1},\mathcal{M_{\mathrm{D}}})$'}, ...
+          {'Surprise', '$-\log_{2} p(y_{k}|y_{1:k-1}\mathcal{M_{\mathrm{D}}})$'}, ...
           {'Entropy of the posterior', '$H(p(R|y,\mathcal{M_{\mathrm{D}}}))$'}, ...
           {'Model update', ['$\sqrt{D_\mathrm{JS}(p(R|y_{1:k},\mathcal{M_', ...
           '{\mathrm{D}}})||p(R|y_{1:k-1},\mathcal{M_{\mathrm{D}}}))}$']}};
@@ -117,8 +122,8 @@ for iSeq = 1:nSeq
         subplot(nVar+2, nSeq, iSeq+nSeq*(iVar-1));
         
         % Define vertical limits of the plot
-        y = Var{iVar}(~isinf(Var{iVar}));
-        limy1 = [min(y), max(y)];
+        tp = eval(Vars{iVar});
+        limy1 = [min([0,min(tp(:))]), max([1,max(tp(:))])];
         margin = diff(limy1).*(1/4);
         limy2 = limy1 + [-1,1].*margin;
         
@@ -133,7 +138,7 @@ for iSeq = 1:nSeq
         plot(find(Seq{iSeq} == 1), pos(2), 'k.', 'MarkerSize', 6);
         
         % Display the beliefs of the ideal observer
-        plot(1:nObs, Var{iVar}(iSeq,:), '.-', 'Color', col(iSeq,:), ...
+        plot(1:nObs, tp(iSeq,:), '.-', 'Color', col(iSeq,:), ...
             'LineWidth', 1, 'MarkerSize', 8); hold('on');
         
         % Customize the axes

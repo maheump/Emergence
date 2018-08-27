@@ -21,10 +21,10 @@ N = numel(seq);
 % Prepare the output variables
 seqlh    = NaN(1,N);   % p(y|M)
 margpost = cell(1,N);  % p(theta|y,M)
-predA    = NaN(1,N+1); % p(y_k+1=A|y,M)
-surp     = NaN(1,N);   % -log p(y_k+1|y,M)
-predent	 = NaN(1,N);   % H(p(y_k+1=A|y,M))
-pe       = NaN(1,N);   % |y_k+1 - p(y_k+1|y,M)|
+predA    = NaN(1,N+1); % p(y_k=A|y_1:k-1,M)
+surp     = NaN(1,N);   % -log p(y_k|y_1:k-1,M)
+predent	 = NaN(1,N);   % H(p(y_k=A|y,M))
+pe       = NaN(1,N);   % |y_k - p(y_k|y,M)|
 postent  = NaN(1,N);   % H(p(theta|y,M))
 
 % The initial prediction is simply the probability of observing one

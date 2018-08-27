@@ -1,111 +1,154 @@
-% This script displays the inference a n-order Markov chain on an example
-% binary sequence.
+% This script displays the inference of different observers learning
+% different types of probabilistic regularities when faced to the same
+% input sequence that is biased in terms of first-order transition
+% probabilities.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % Clear the place
 clear;
 close('all');
 
-% Create a sequence
+% Add ideal observer functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
+% Set default figure properties
+Emergence_DefaultFigureProperties;
+
+% Create a sequence biased toward repetitions
 nObs = 200;
 pAgB = 1/3;
 pBgA = 1/3;
-seq = GenRandSeq(nObs, [pAgB, pBgA]);
+y = GenRandSeq(nObs, [pAgB, pBgA]);
 
-%% Run the n-order Markov chain
-%  ============================
+%% RUN THE BAYESIAN IDEAL OBSERVERS LEARNING DIFFERENT PROBABILISTIC REGULARITIES
+%  ==============================================================================
 
-% Define properties of the n-order Markov chain
-N = 3; % order of the chain
-options = {'log', 'Bayes-Laplace', N, 0.01};
+% Prepare outputs
+nMod = 3;
+pYgMp  = NaN(nMod,nObs);
+pAgYMp = NaN(nMod,nObs);
+IgYMp  = NaN(nMod,nObs);
+pTgYMp = cell(1,nMod);
 
-% Run the chain iteratively each time an observation is received
-[pYgM, post, pred, surp, entr] = Emergence_IO_RunIO(@Emergence_IO_Chains, seq, options);
+% Define the observers to 
+iofun = {@Emergence_IO_Bernoulli, @Emergence_IO_Markov, @Emergence_IO_Chain};
 
-% Likelihood of the null model
-pYgM0 = -(1:nObs)*log(2);
+% Define the same properties for these observers
+dt      = 0.01; % precision of the posterior
+scaleme = 'log'; % scale of the model evidence
+prior   = 'Bayes-Laplace'; % prior over observers' parameter(s)
+options = {{scaleme, false, prior, [],    dt}, ...
+           {scaleme, false, prior, [],    dt}, ...
+           {scaleme,        prior,     2, dt}};
 
-% Log-likelihood ratio
-LLR = pYgM - pYgM0;
-
-% Posterior belief
-pMgY = exp(pYgM) ./ (exp(pYgM) + exp(pYgM0));
-
-%% Display sequential inference
-%  ============================
-
-% Likelihood against a null model
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-figure('Units', 'Normalized', 'Position', [0.2 0.07 0.3 0.8]);
-
-subplot(5,1,1);
-plot([1,nObs], zeros(1,2), '-', 'Color', ones(1,3)/2); hold('on');
-plot(1:nObs, LLR, 'k.-', 'MarkerSize', 10);
-set(gca, 'Box', 'Off');
-ylabel('Log likelihood ratio');
-
-subplot(5,1,2);
-plot([1,nObs], ones(1,2)/2, '-', 'Color', ones(1,3)/2); hold('on');
-plot(1:nObs, pMgY, 'k.-', 'MarkerSize', 10);
-set(gca, 'Box', 'Off', 'YLim', [0,1]);
-ylabel('Posterior probability');
-
-% Predictions
-% ~~~~~~~~~~~
-
-subplot(5,1,3);
-plot([1,nObs], ones(1,2)/2, '-', 'Color', ones(1,3)/2); hold('on');
-plot(find(seq == 1), 1.1, 'b.', 'MarkerSize', 10);
-plot(find(seq == 2), -.1, 'r.', 'MarkerSize', 10); 
-plot(1:nObs, pred, 'k.-', 'MarkerSize', 10); 
-set(gca, 'Box', 'Off', 'YLim', [-0.2,1.2]);
-ylabel('Prediction');
-
-% Entropy
-% ~~~~~~~
-
-subplot(5,1,4);
-plot(1:nObs, entr, 'k.-', 'MarkerSize', 10); 
-set(gca, 'Box', 'Off', 'YLim', [0,1]);
-xlabel('Observation #');
-ylabel('Entropy');
-
-% Surprise
-% ~~~~~~~~
-
-subplot(5,1,5);
-plot([1,nObs], ones(1,2), '-', 'Color', ones(1,3)/2); hold('on');
-plot(1:nObs, surp, 'k.-', 'MarkerSize', 10); 
-set(gca, 'Box', 'Off');
-xlabel('Observation #');
-ylabel('Surprise');
-
-% Posterior marginal distributions
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-if N < 5
-figure('Units', 'Normalized', 'Position', [0.5 0.07 0.3 0.8]);
-
-pgrid = linspace(0, 1, size(post, 2));
-trans = mat2cell(ff2n(N)+1, ones(2^N,1), N);
-trans = cellfun(@(x) pat2str(x, {'A','B'}, 1:2), trans, 'UniformOutput', 0);
-ntrans = 2^N;
-
-for t = 1:ntrans
-    subplot(ntrans, 1, t)
-    imagesc(1:nObs, pgrid, squeeze(post(t,:,:)));
-    caxis([0, max(post(:))]);
-    axis('xy');
-    if t ~= ntrans, set(gca, 'XTickLabel', {}); end
-    set(gca, 'YTick', [0,1]);
-    ylabel(['p(\theta_{A|', trans{t}, '}|y)'], 'Rotation', 0, ...
-        'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Middle');
+% Present the same input sequence to all the different observers
+for iMod = 1:nMod
+    [pYgMp(iMod,:), pAgYMp(iMod,:), ~, ~, IgYMp(iMod,:), pTgYMp{iMod}] = ...
+        Emergence_IO_RunIO(iofun{iMod}, y, options{iMod});
 end
-ScaleAxis('c');
-xlabel('Observation #');
+
+% (log-)Likelihood of the sequence under a null model
+pYgMs = Emergence_IO_Null(1:nObs, scaleme);
+
+% (log-)Likelihood ratio
+if     strcmpi(scaleme, 'lin'), LR = pYgMp ./ pYgMs;
+elseif strcmpi(scaleme, 'log'), LR = pYgMp  - pYgMs;
+end
+
+% Observers posterior probabilities
+if     strcmpi(scaleme, 'lin'), pMpgY =     pYgMp  ./ (    pYgMp  +     pYgMs );
+elseif strcmpi(scaleme, 'log'), pMpgY = exp(pYgMp) ./ (exp(pYgMp) + exp(pYgMs));
+end
+
+%% DISPLAY THE RESULT OF THE INFERENCE
+%  ===================================
+
+% Define the variables to look at
+Vars = {'LR', 'pMpgY', 'pAgYMp', 'IgYMp'};
+VarLab = {{'Likelihood ratio', '$\frac{p(y|\mathcal{M}_{i})}{p(y|\mathcal{M}_{\rm{S}})}$'}, ...
+          {'Posterior probability', '$p(\mathcal{M}_{i}|y)$'}, ...
+          {'Prediction', '$p(y_{k}=\mathrm{A}|y_{1:k-1},\mathcal{M}_{i})$'}, ...
+          {'Surprise', '$-\log_{2} p(y_{k}|y_{1:k-1}\mathcal{M}_{i})$'}};
+nVar = numel(VarLab);
+
+% Prepare a new figure
+figure('Units', 'Normalized', 'Position', [0.1 0.5 0.8 0.4]);
+col = lines(nMod);
+
+% For each type of observer
+for iMod = 1:nMod
+    
+    % Variables
+    % ~~~~~~~~~
+    
+    % For each variable from the ideal observer
+    for iVar = 1:nVar
+        subplot(nVar+2, nMod, iMod+(iVar-1)*nMod);
+        
+        % Define vertical limits of the plot
+        tp = eval(Vars{iVar});
+        limy1 = [min([0,min(tp(:))]), max([1,max(tp(:))])];
+        margin = diff(limy1).*(1/4);
+        limy2 = limy1 + [-1,1].*margin;
+        
+        % Display the sequence
+        pos = (limy2 - limy1) / 2 + limy1;
+        plot(find(y == 2), pos(1), 'k.', 'MarkerSize', 6); hold('on');
+        plot(find(y == 1), pos(2), 'k.', 'MarkerSize', 6);
+        
+        % Display the beliefs of the ideal observer
+        plot(1:nObs, tp(iMod,:), '-', 'Color', col(iMod,:), ...
+            'LineWidth', 2, 'MarkerSize', 8); hold('on');
+        
+        % Customize the axes
+        axis([1/2, nObs+1/2, limy2]);
+        set(gca, 'XTick', [1, get(gca, 'XTick')]);
+        set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
+            'TickLabelInterpreter', 'LaTeX');
+        
+        % Add some text labels
+        if iMod == 1
+            ylabel(VarLab{iVar}, 'Interpreter', ...
+                'LaTeX', 'Rotation', 0, 'HorizontalAlignment', 'Right', ...
+                'VerticalAlignment', 'Middle');
+        end
+        if iVar == 1
+            ttl = func2str(iofun{iMod});
+            title(ttl(max(strfind(ttl,'_'))+1:end), 'Interpreter', 'LaTeX');
+        end
+    end
+    
+    % Posterior distribution over observer's parameters
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    % Display the posterior beliefs over patterns
+    sp = subplot(nVar+2, nMod, iMod + nMod*(nVar) + [0,nMod]);
+    tp = pTgYMp{iMod}; nTdim = size(tp,3);
+    tp = reshape(permute(tp, [2,1,3]), [nObs, size(tp,1)*nTdim])';
+    imagesc(1:nObs, [], tp); hold('on');
+    
+    % Display the limit between the different marginal distributions
+    plot([1,nObs], repmat(cumsum(repmat(1/dt, 1, nTdim)),2,1), 'k-');
+    
+    % Customize the colormap
+    colormap(parula); caxis([min(tp(:)), max(tp(:))]);
+    
+    % Customize the axes
+    set(gca, 'XTick', [1, get(gca, 'XTick')]); axis('xy');
+    set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
+        'TickLabelInterpreter', 'LaTeX');
+    
+    % Add some text labels
+    xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
+    if iMod == 1
+        ylabel({'Posterior', 'distribution', '$p(\theta|y,\mathcal{M}_{i})$'}, ...
+            'Interpreter', 'LaTeX', 'Rotation', 0, ...
+            'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Middle');
+    end
 end
