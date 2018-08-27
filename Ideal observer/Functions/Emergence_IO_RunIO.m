@@ -1,4 +1,4 @@
-function [ seqlh, post, predA, surp, predent, update, pe, postent ] = ...
+function [ seqlh, predA, predent, pe, surp, margpost, jointpost, postent, update ] = ...
     Emergence_IO_RunIO( IOfun, seq, inputs )
 % EMERGENCE_IO_RUNIO runs iteratively a given ideal observer algorithm on a
 % sequential input. This allows to get updated beliefs of the ideal
@@ -19,13 +19,13 @@ if nargin < 3, inputs = {}; end
 N = numel(seq);
 
 % Prepare the output variables
-seqlh   = NaN(1,N);   % p(y|M)
-post    = cell(1,N);  % p(theta|y,M)
-predA   = NaN(1,N+1); % p(y_k+1=A|y,M)
-surp    = NaN(1,N);   % -log p(y_k+1|y,M)
-predent	= NaN(1,N);   % H(p(y_k+1=A|y,M))
-pe      = NaN(1,N);   % |y_k+1 - p(y_k+1|y,M)|
-postent = NaN(1,N);   % H(p(theta|y,M))
+seqlh    = NaN(1,N);   % p(y|M)
+margpost = cell(1,N);  % p(theta|y,M)
+predA    = NaN(1,N+1); % p(y_k+1=A|y,M)
+surp     = NaN(1,N);   % -log p(y_k+1|y,M)
+predent	 = NaN(1,N);   % H(p(y_k+1=A|y,M))
+pe       = NaN(1,N);   % |y_k+1 - p(y_k+1|y,M)|
+postent  = NaN(1,N);   % H(p(theta|y,M))
 
 % The initial prediction is simply the probability of observing one
 % observation or the other by chance, which is 1/2 because sequences are
@@ -50,23 +50,53 @@ for k = 1:N
     % Update the beliefs of the ideal observer
     [seqlh(k), ...      % likelihood of the sequence up to the k-th observation
      predA(k+1), ...    % probability that the k+1-th observation will be a A
-     post{k}, ...       % posterior probability distribution over model's parameters
+     margpost{k}, ...   % posterior probability distribution over model's parameters
      postent(k)] = ...  % entropy of the posterior distribution over model's parameters
      IOfun(seq(1:k), inputs{:});
 end
 
 % Discard the last prediction because we do not have any observation to
 % compare with (the sequence is over)
-predA = predA(1:end-1);
+if nargout > 1, predA = predA(1:end-1); end
 
-% Transform the posterior distribution into a matrix
-post = cell2mat(reshape(post, [ones(1,ndims(post{end})), N]));
-post = squeeze(post);
+% If posterior distributions are marginal distributions, we assume
+% they are independend ones and derive the joint posterior distribution
+% by making a product out of the different dimensions (i.e. the
+% different marginal distributions)
+nTdim = size(margpost{1},2);
+if nTdim > 1
+    if nargout > 5
+        if nargout > 6
+            jointpost = cellfun(@indepmarg2joint, margpost, 'UniformOutput', 0);
+            jointpost = cell2mat(reshape(jointpost, [ones(1,nTdim), N]));
+        end
+        margpost  = permute(cell2mat(reshape(margpost,  [ones(1,nTdim), N])), [1,3,2]);
+    end
+elseif nTdim == 1
+    if nargout > 5
+        margpost  = cell2mat(margpost);
+        if nargout > 6, jointpost = margpost; end
+    end        
+end
 
-% Compute the iterative update induced by each observation. To do so, we
-% measure the Jensen-Shannon divergence between posterior distributions
-% before and after having received each observation:
+% Compute the iterative update induced by each observation. To do so,
+% we measure the Jensen-Shannon divergence between posterior
+% distributions before and after having received each observation:
 % D(p(theta|y_1:K-1,M)||p(theta|y_1:K,M))
-update = Emergence_IO_DistDist(post);
+if nargout > 8
+    update = Emergence_IO_DistDist(permute(jointpost, [nTdim+1, 1:nTdim]));
+end
+
+end
+
+% Useful function to turn independent marginal distributions into a joint
+% distribution
+function joint = indepmarg2joint( marg )
+
+[ngrid,ndim] = size(marg);
+idim = 1:ndim;
+step1 = arrayfun(@(x) repmat(marg(:,x), [1,repmat(ngrid,1,ndim-1)]), idim, 'UniformOutput', 0);
+step2 = reshape(step1, [ones(1,ndim),ndim]);
+joint = prod(cell2mat(step2), ndim+1);
 
 end
