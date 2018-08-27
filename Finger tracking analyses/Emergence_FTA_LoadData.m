@@ -3,9 +3,6 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% LOAD DATA
-%  =========
-
 % Add functions to the MATLAB path
 scriptpath = mfilename('fullpath');
 folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
