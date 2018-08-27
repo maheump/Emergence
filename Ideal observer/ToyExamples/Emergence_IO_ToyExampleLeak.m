@@ -72,8 +72,8 @@ y = cell(1,2);
 y{1} = GenRandSeq(nObs, [1/4, 1/4]);        % probabilistic regularity
 y{2} = repmat(str2pat('AAAABBBB'), [1, 6]); % deterministic regularity
 
-%% RUN BAYESIAN IDEAL OBSERVES WITH A LEAKY INTEGRATION
-%  ====================================================
+%% RUN BAYESIAN IDEAL OBSERVERS WITH A LEAKY INTEGRATION
+%  =====================================================
 
 % Prepare outputs
 pYgM  = NaN( nParam,nObs,2);
