@@ -196,9 +196,7 @@ for iObs = 1:2
             
             % Customize the axes
             axis([1/2, nObs+1/2, limy2]);
-            set(gca, 'XTick', [1, 10:10:nObs]);
-            set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
-                'TickLabelInterpreter', 'LaTeX');
+            set(gca, 'XTick', [1, 10:10:nObs], 'TickLabelInterpreter', 'LaTeX');
             
             % Add some text labels
             if iParam == 1
@@ -212,7 +210,7 @@ for iObs = 1:2
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         % Display the posterior beliefs over patterns
-        sp = subplot(nVar+3, nParam, iParam + nParam*(nVar+1) + [0,nParam]);
+        subplot(nVar+3, nParam, iParam + nParam*(nVar+1) + [0,nParam]);
         tp = pTgYM{iParam,iObs}; nTdim = size(tp,3);
         tp = reshape(permute(tp, [2,1,3]), [nObs, size(tp,1)*nTdim])';
         imagesc(1:nObs, [], tp); hold('on');
@@ -224,9 +222,8 @@ for iObs = 1:2
         colormap(parula); caxis([min(tp(:)), max(tp(:))]);
         
         % Customize the axes
-        set(gca, 'XTick', [1, 10:10:nObs]); axis('xy');
-        set(gca, 'Color', 'None', 'LineWidth', 1, 'Layer', 'Top', ...
-            'TickLabelInterpreter', 'LaTeX');
+        axis('xy');
+        set(gca, 'XTick', [1, 10:10:nObs], 'TickLabelInterpreter', 'LaTeX');
         
         % Add some text labels
         xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
