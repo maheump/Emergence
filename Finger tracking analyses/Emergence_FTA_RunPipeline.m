@@ -14,34 +14,37 @@ scriptpath = mfilename('fullpath');
 folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
 addpath(genpath(folderpath));
 
+% Set default properties for the figures
+Emergence_DefaultFigureProperties;
+
+%% PREPROCESS DATA
+%  ===============
+
 % Preprocess behavioural data and run the ideal observer on the sequences
 % that were presented to the subjects
 Emergence_FTA_PreprocData;
 
-% Set default properties for the figures
-Emergence_DefaultFigureProperties;
-
-%% DESCRIBE THE EXEPERIMENTAL DESIGN
-%  =================================
-
-% Load data from all the subjects
-rmbadsub = false;
-Emergence_FTA_LoadData;
+%% DESCRIBE THE EXPERIMENTAL DESIGN
+%  ================================
 
 % Show the different conditions and the hypotheses
 Emergence_Design_Conditions;
 Emergence_Design_Hypotheses;
 
 % Show how to use the triangular arena
-Emergence_Design_Triangle
+Emergence_Design_Triangle;
 
 %% PERFORM SUBJECT-LEVEL ANALYSES
 %  ==============================
 
+% Load data from all the subjects
+rmbadsub = false;
+Emergence_FTA_LoadData;
+
 % Get trajectories of all the subjects in all the conditions
 Emergence_FTA_SubjectAnalysis;
 
-% Display example trajectories (Figure 1)
+% Display example trajectories
 Emergence_FTA_ExampleTrajectories;
 Emergence_FTA_TrajMovie;
 
@@ -69,7 +72,7 @@ for iLoop = 1:2
     if     iLoop == 1, D = G;
     elseif iLoop == 2, D = IO;
     end
-
+    
     Emergence_FTA_Detection1;
     Emergence_FTA_Detection2;
     Emergence_FTA_DistributionOfBeliefs;
