@@ -1,15 +1,25 @@
 % Display the triangle as well as remarkable boundaries and locations of
 % the triangle.
-% 
-% Maxime Maheu, March 2018
+%
+% Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============
 
+% Clear the place
+clear;
+close('all');
+
+% Add functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
+% Set default figure properties
+Emergence_DefaultFigureProperties;
+
 % Coordinates of the triangles limits (cartesian coordinates)
-tricc = [0,   sqrt(3)/2; ... % top left (P)
-         1,   sqrt(3)/2; ... % top right (D)
-         1/2, 0        ];    % bottom (R)
+tricc = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
 
 % Colors associated to each vertex of the triangle
 tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
@@ -32,18 +42,18 @@ alpha(2/3);
 
 % For each side of the triangle
 for iSide = 1:3
-    
+
     % For each boundary to display
     for iBnd = 1:numel(thr)
 
         % Specify that the first dimension should be equal to the currently
         % considered threshold
         x1 = eval(thr{iBnd});
-        
+
         % Deduce what degrees of freedom we have left for the other
         % dimensions
         rem = 1-x1;
-        
+
         % Precise how many scenarios we should look at. Since the boundary
         % is a straight line, we just need two points to draw it.
         dt = rem;
@@ -53,7 +63,7 @@ for iSide = 1:3
         % take
         x2 = 0:dt:rem;
         x3 = rem:-dt:0;
-        
+
         % Combine the three barycentric coordinates
         n = numel(x2);
         if     iSide == 1, bc = [repmat(x1, [n,1]), x2', x3'];
@@ -63,10 +73,10 @@ for iSide = 1:3
 
         % Convert barycentric to cartesian coordinates
         cc = bc*tricc;
-        
+
         % Display the boundary
         plot(cc(:,1), cc(:,2), '-', 'Color', tricol(iSide,:), 'LineWidth', 2);
-        
+
         % Specify where the put the text labels
         x = cc(1,1);
         y = cc(1,2);
@@ -77,7 +87,7 @@ for iSide = 1:3
             y = mean(cc(:,2));
             loc = 'Center';
         end
-        
+
         % Display remarkable boundaries of the triangle
         text(x, y, ['$p(\mathcal{H}_{\mathrm{S \rightarrow ', m{iSide}, '}}) = ', thr{iBnd}, '$'], ...
             'Interpreter', 'LaTeX', 'Color', tricol(iSide,:), ...
@@ -86,8 +96,8 @@ for iSide = 1:3
 end
 
 % Display example dot
-c = [1/10, 8/10, 1/10] * tricc;
-plot(c(1), c(2), 'k.', 'MarkerSize', 30);
+expc = [1/10, 8/10, 1/10] * tricc;
+plot(expc(1), expc(2), 'k.', 'MarkerSize', 30);
 
 % Display remarkable dots of the triangle
 for i = 1:3

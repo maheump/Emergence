@@ -1,8 +1,29 @@
 % This script displays the theoretical differences between the different
 % conditions (fully-stochastic, probabilistic and deterministic ones) in
 % terms of Shannon's entropy.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
+
+%% INITIALIZATION
+%  ==============
+
+% Clear the place
+clear;
+close('all');
+
+% Add functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
+% Set default figure properties
+Emergence_DefaultFigureProperties;
+
+% Coordinates of the triangles limits (cartesian coordinates)
+tricc = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
+
+% Colors associated to each vertex of the triangle
+tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 
 %% DISPLAY THE DIFFERENT CONDITIONS ON THE ENTROPY FUNCTION
 %  ========================================================

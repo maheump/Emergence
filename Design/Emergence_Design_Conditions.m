@@ -2,7 +2,25 @@
 % (both the probabilistic and the deterministic ones) as well as the
 % different types of stimuli.
 % 
-% Maxime Maheu, March 2017
+% Copyright (c) 2018 Maxime Maheu
+
+%% INITIALIZATION
+%  ==============
+
+% Clear the place
+clear;
+close('all');
+
+% Add functions to the MATLAB path
+scriptpath = mfilename('fullpath');
+folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+addpath(genpath(folderpath));
+
+% Set default figure properties
+Emergence_DefaultFigureProperties;
+
+% Get the probabilistic and deterministic regularities used in the experiment
+load('Emergence_Behaviour_GroupData.mat', 'det', 'prob');
 
 %% PROBABILISTIC REGULARITIES
 %  ==========================
@@ -60,7 +78,7 @@ ncols = 3;
 figure('Position', [257 939 630 166]); j = 1;
 
 % For each deterministic regularity
-for i = 1:numel(dr)
+for i = 1:numel(det)
     
     % Create a subplot
     subplot(nrows, ncols, j);
@@ -80,7 +98,7 @@ for i = 1:numel(dr)
         'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Middle');
     
     % Customize the axes
-    axis([1,max(cellfun(@numel, dr)),0,2]);
+    axis([1,max(cellfun(@numel, det)),0,2]);
     axis('off');
     set(gca, 'FontSize', 15, 'LineWidth', 1);
 end
