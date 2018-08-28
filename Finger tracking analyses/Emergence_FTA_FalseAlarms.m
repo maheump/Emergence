@@ -85,6 +85,12 @@ figure('Position', [1 805 200 300]);
 % Create a colormap whose length equals the number of bins
 cmap = cbrewer2('Blues', nBin);
 
+% Customize the colormap and add a colorbar
+cbr = colorbar('Location', 'SouthOutside');
+caxis(avgiotraj([1,end],iHyp)');
+cbr.Label.String = sprintf('p(M_%s|y) from the ideal observer', proclab{iHyp}(1));
+colormap(cmap);
+
 % Display the triangle
 Emergence_PlotTrajOnTri; alpha(0);
 Emergence_PlotGridOnTri(10, iHyp, tricol(iHyp,:));
@@ -100,11 +106,6 @@ for iBin = 1:nBin-1
 	plot(cartcoord(iBin,1), cartcoord(iBin,2), 'o', 'MarkerSize', 7, 'LineWidth', ...
         1/2, 'MarkerEdgeColor', 'none', 'MarkerFaceColor', cmap(coli,:));
 end
-
-% Customize the colormap and add a colorbar
-colormap(cmap); caxis(avgiotraj([1,end],iHyp)');
-cbr = colorbar('Location', 'SouthOutside');
-cbr.Label.String = sprintf('p(M_%s|y) from the ideal observer', proclab{iHyp}(1));
 
 % Save the figure
 save2pdf('figs/F_FA_Tri.pdf');
