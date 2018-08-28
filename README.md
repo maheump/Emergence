@@ -2,9 +2,7 @@
 
 This is the companion repository for the following article: *Human detection of probabilistic versus deterministic regularities in sequences*.
 
-The repository contains the codes to reproduce the analyses, simulations and fits presented in the paper.
-
-The code is written for MATLAB, it has been developed under MATLAB 2018a.
+The repository contains the codes to reproduce the analyses, simulations and fits presented in the paper. The code is written for MATLAB, it has been developed under MATLAB 2018a. Simply run the script ```SETUP.m``` to set up the environment required to run the different scripts.
 
 ## Abstract of the paper
 
