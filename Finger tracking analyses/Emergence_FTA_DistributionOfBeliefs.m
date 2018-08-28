@@ -134,7 +134,7 @@ for iMap = 1:nMap+1
         colormap(sp, [flipud(cbrewer2('YlGnBu', 2000)); ...
                             (cbrewer2('YlOrRd', 2000))]);
         caxis([-abs(max(caxis)), abs(max(caxis))]);
-    else, colormap(sp, LoadCWcbr); caxis([0, max(caxis)]);
+    else, colormap(sp, parula); caxis([0, max(caxis)]);
     end
     cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
     cbr.Label.String = {'Normalized density map', '(in log scale)'};
@@ -207,7 +207,7 @@ end
 plot([0,1], zeros(1,2),  'k-');
 
 % Customize the axes
-SymAxis('y')
+ylim([-max(abs(ylim)), max(abs(ylim))]);
 set(gca, 'Box', 'Off', 'XLim', [0,1]);
 set(gca, 'YTick', get(gca, 'YTick'), 'YTickLabel', cellfun(@(x) ...
     sprintf('%1.2f', x), num2cell(abs(get(gca, 'YTick'))), 'UniformOutput', 0));
