@@ -127,9 +127,11 @@ for lock = 1:2
     % Display a useful custom grid on the triangle
     for k = 1:3
         lgd = Emergence_PlotGridOnTri(2, k, tricol(k,:), tricc);
-        set(lgd(1,k), 'EdgeAlpha', 3/4);
+        set(lgd(1,k), 'Color', [get(lgd(1,k), 'Color'), 3/4]);
         lgd = Emergence_PlotGridOnTri(3, k, tricol(k,:), tricc);
-        for kk = 1:3, set(lgd(kk,k), 'LineStyle', '--', 'EdgeAlpha', 3/4); end
+        for kk = 1:3
+            set(lgd(kk,k), 'LineStyle', '--', 'Color', [get(lgd(kk,k), 'Color'), 3/4]);
+        end
     end
     
     % Display the trajectories
@@ -231,7 +233,7 @@ for iHyp = 1:2
     % Order trials according to the position the change point
     detec = detec(idx,:);
     
-    % Verticaly (ovser trials) smooth the map to make it easier to read
+    % Verticaly (over trials) smooth the map to make it easier to read
     detec = smoothdata(detec, 1, 'movmean', 'SmoothingFactor', 0.3);
     
     % Display the change in beliefs as a heatmap 
@@ -239,8 +241,7 @@ for iHyp = 1:2
     imagesc(detec); hold('on');
     
     % Customize the colormap
-    colorbar('Location', 'EastOutside');
-    colormap(sp, inferno); caxis([0,1]);
+    colorbar('Location', 'EastOutside'); caxis([0,1]);
     if     iHyp == 1, colormap(sp, cbrewer2('Blues'));
     elseif iHyp == 2, colormap(sp, cbrewer2('Reds'));
     end
@@ -269,9 +270,9 @@ end
 lock = 1;
 
 % Try to load results from the previous analysis
-try
 funname = @(x) fullfile(folderpath, 'Finger tracking analyses', ...
     'ppdata', sprintf('Dyn1_MFX_%s.mat', x));
+try
 if isfield(D{1}, 'Seq'), load(funname('S'));
 else, load(funname('IO'));
 end
@@ -313,13 +314,16 @@ for iHyp = 1:2
         % Explaining variable: position of the observation post-change-point
         for iSub = 1:nSub, options{iSub}.inG.p = find(~nanloc{iSub})-1; end
         
+        % Subjects that missed the regularity
+        mos = ~cellfun(@isempty, y);
+        
         % Run the mixed-effect fitting scheme (it deduces priors through
         % empirical Bayes) using a variational procedure (it uses Laplace
         % approximation) in order to estimate the best parameters for each
         % model, each condition and each subject
-        [p_sub{iHyp}(iSeq,:), o_sub{iHyp}(iSeq,:), ...
-         p_gp{iHyp}(iSeq,:),  o_gp{iHyp}(iSeq,:)] = ...
-            VBA_MFX(y, [], [], @g_SIGM, dim, options, [], optiongp);
+        [p_sub{iHyp}(iSeq,mos), o_sub{iHyp}(iSeq,mos), ...
+         p_gp{iHyp}(iSeq,mos),  o_gp{iHyp}(iSeq,mos)] = ...
+            VBA_MFX(y(mos), [], [], @g_SIGM, dim, options(mos), [], optiongp);
     end
 end
 
@@ -336,13 +340,15 @@ end
 sigparam = cell(1,2);
 for iHyp = 1:2
     
+    % For non-identified sequences, fill with NaNs
+    idx = find(cellfun(@isempty, p_sub{iHyp}));
+    for i = 1:numel(idx)
+        p_sub{iHyp}{idx(i)}.muPhi = NaN(4,1);
+    end
+    
     % Get the (4) fitted parameters of the sigmoid function
     sigparam{iHyp} = cellfun(@(x) reshape(x.muPhi, [1,1,4]), ...
         p_sub{iHyp}, 'UniformOutput', 0);
-    
-    % Consider only sequences for which regularities were correctly identified
-    detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
-    sigparam{iHyp}(~detecmask) = {NaN(1,1,4)};
     sigparam{iHyp} = cell2mat(sigparam{iHyp});
 end
 
