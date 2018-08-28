@@ -16,7 +16,7 @@ folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
 addpath(genpath(folderpath));
 
 % Define the location of the data
-datadir = fullfile(folderpath, 'Stimulation', 'bhv', 'data');
+datadir = fullfile(folderpath, 'Stimulation', 'data');
 
 % Get subjects' list
 subjects = dir(fullfile(datadir, 'Subject*'));
@@ -240,7 +240,7 @@ for iSub = 1:nSub
         IOf = fields(IO{iCond,iSub});
         fieldstokeep = {'pMssgY', 'pMspgY', 'pMsdgY', 'Mhat', ... % posterior over models' likelihood
                         'pJkgYMsp', 'pJkgYMsd', 'pJkgY', ...      % posterior over change point's pos.
-                        'JSpMgY', 'covpMsi', 'eqalpha'};          % update quantities
+                        'JSpMgY', 'HpMgY'};                       % other metrics
         fieldstorem  = cellfun(@(x) ~any(strcmpi(x, fieldstokeep)), IOf);
         IO{iCond,iSub} = rmfield(IO{iCond,iSub}, IOf(fieldstorem));
         
@@ -316,8 +316,9 @@ letters = {'A','B'};
 g = repmat(0.7,1,3); % grey
 
 % Save the group data file
-filename = fullfile(folderpath, 'Finger tracking analyses', 'ppdata', ...
-    'Emergence_Behaviour_GroupData.mat');
-save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'homedir', ...
+savefolder = fullfile(folderpath, 'Finger tracking analyses', 'ppdata');
+mkdir(savefolder);
+filename = fullfile(savefolder, 'Emergence_Behaviour_GroupData.mat');
+save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'folderpath', ...
     'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...
     'tricol', 'tricc', 'letters', 'prob', 'det', 'g');
