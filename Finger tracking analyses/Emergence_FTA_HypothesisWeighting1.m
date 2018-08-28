@@ -68,11 +68,8 @@ strpat = cellfun(@(xval) pat2str(xval), numpat, 'UniformOutput', 0);   % strings
 [pA, pAlt, pAgB, pBgA] = cellfun(@(xval) pat2proba(xval, [1 2], true), numpat);
 
 % Get corresponding entropy levels
-% N.B. if not computable it means that one of p E {0,1}
-H = @(p) -(p .* log2(p) + (1-p) .* log2(1-p)); % entropy function
-HpAgB = H(pAgB); HpAgB(isnan(HpAgB)) = 0;
-HpBgA = H(pBgA); HpBgA(isnan(HpBgA)) = 0;
-TPent = HpAgB + HpBgA; % entropy of transition probabilities
+TPent = arrayfun(@Emergence_IO_Entropy, pAgB) + ...
+        arrayfun(@Emergence_IO_Entropy, pBgA);
 
 % Define limits of the entropy bins
 EntLab = {'Low', 'Med', 'High'};
@@ -90,8 +87,8 @@ EntGrid = linspace(0, 1, 1001);
 EntCMap = plasma(numel(EntGrid));
 
 % Compute 2D entropy map
-EntMap = H(EntGrid) + H(EntGrid');
-EntMap(isnan(EntMap)) = 0;
+EntMap = arrayfun(@Emergence_IO_Entropy, EntGrid);
+EntMap = EntMap' + EntMap;
 EntMap(EntMap < 1) = NaN;
 
 % Deduce colors corresponding to each entropy level

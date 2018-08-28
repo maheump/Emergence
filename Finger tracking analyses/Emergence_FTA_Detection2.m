@@ -81,16 +81,19 @@ end
 % Depending on the entropy
 % ~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Entropy function
-H = @(p) -(p .* log2(p) + (1-p) .* log2(1-p));
+% Get theoretical transition probabilities
+pXgY = cell2mat(prob');
+pAgB = pXgY(:,1);
+pBgA = pXgY(:,1);
 
 % Compute entropy levels
-h = cellfun(@(x) H(x(1))*H(x(2)), prob);
+TPent = arrayfun(@Emergence_IO_Entropy, pAgB) + ...
+        arrayfun(@Emergence_IO_Entropy, pBgA);
 
 % Define bins
 nEnt = 2;
-[~,edges] = histcounts(h, nEnt);
-entgpidx = {find(h < edges(2)), find(h > edges(2))};
+[~,edges] = histcounts(TPent, nEnt);
+entgpidx = {find(TPent < edges(2)), find(TPent > edges(2))};
 entgpttl = {sprintf('Low (< %1.1f)', edges(2)), sprintf('High (> %1.1f)', edges(2))};
 
 % Get the average detection rate in each entropy bins
