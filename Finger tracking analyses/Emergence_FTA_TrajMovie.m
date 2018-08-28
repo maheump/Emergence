@@ -205,5 +205,9 @@ if strcmpi(tosave, 'avi'), close(vidObj); end
 
 % Combine auditory and visual files into a movie
 if strcmpi(tosave, 'avi')
-    system('avconv -i vid.avi -i aud.wav -c copy figs/F_M.avi');
+    % The avconv plugin works on Mac OS and allow to combine visual and auditory
+    % files together. Instructions for installation can be found at:
+    % https://libav.org/avconv.html
+    try system('avconv -i vid.avi -i aud.wav -c copy figs/F_M.avi');
+    catch, end
 end

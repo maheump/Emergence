@@ -21,16 +21,13 @@ Here is an example sequence with the beliefs from an example subject and from th
 * **Finger tracking analyses**: Series of scripts, that can be run as a pipeline, that reproduce the analyses and figures of the paper.
 * **Functions**: A set of functions used by many different scripts in the repository. It contains mostly
 * **Ideal observer**: Functions implementing the full ideal observer of the task as well as partial observers learning one type of regularity (e.g. Bernoulli, ...). "Toy examples" simulation scripts are also provided to easily run the different models and inspect their behavior based on visual displays.
-$ **Stimulation**: Scripts and functions used to run the behavioural experiment.
+$ **Stimulation**: Scripts and functions used to run the behavioral experiment.
 
 ## Dependencies
 
-* [Custom functions for sequence processing](https://github.com/maheump/matlab/tree/master/sequences)
 * [VBA toolbox](http://mbb-team.github.io/VBA-toolbox/)
-* [cbrewer2](https://github.com/scottclowe/cbrewer2)
-* [avconv](https://libav.org/avconv.html)
-* [Perceptually uniform colormaps](https://fr.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps)
 
 ## Related toolboxes
 
 * [Minimal transition probability model](https://github.com/florentmeyniel/MinimalTransitionProbsModel)
+* [Custom functions for sequence processing](https://github.com/maheump/matlab/tree/master/sequences)
