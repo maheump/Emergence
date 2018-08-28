@@ -131,11 +131,11 @@ SemMat = cat(3, sem(CorMat, 3), sem(MseMat, 3));
 %  ==========================
 
 % Prepare a new window
-figure('Units', 'Normalized');
+figure('Units', 'Normalized', 'Position', [0.35 0.3 0.3 0.35]);
 
 % Define useful variables
 cmap = cat(3, cbrewer2('Spectral', 101), (cbrewer2('PuBuGn', 101)));
-labfun = @(x) sprintf('p(\\mathcal{M}_{D}|y,\\nu_{%1.0f})', x);
+labfun = @(x) sprintf('p(\\mathcal{M}_{\\mathrm{D}}|y,\\nu_{%1.0f})', x);
 cbrlab = {sprintf('$\\rho(%s,%s)$', labfun(1), labfun(2)), ...
           sprintf('$-\\log((%s-%s)^{2})$', labfun(1), labfun(2))};
 
@@ -159,12 +159,10 @@ for iSp = 1:2
     % Customize the colormap
     cbr = colorbar('Location', 'SouthOutside');
     colormap(sp, flipud(cmap(:,:,iSp)));
-    if     iSp == 1, caxis([-1,1]);
-    elseif iSp == 2, %caxis([min(caxis),0]);
-    end
+    if iSp == 1, caxis([-1,1]); end
     
     % Customize the axes
-    axis('square'); axis('xy');
+    axis('square'); axis('xy'); set(gca, 'TickLabelInterpreter', 'LaTeX');
     set(gca, 'XTick', 1:nNu, 'XTickLabel', cellfun(@(x) sprintf('%1.0f', x), ...
         num2cell(Nu), 'UniformOutput', 0));
     set(gca, 'YTick', 1:nNu, 'YTickLabel', get(gca, 'XTickLabel')); 
@@ -172,8 +170,10 @@ for iSp = 1:2
     % Add some text labels
     cbr.Label.String = cbrlab{iSp};
     cbr.Label.Interpreter = 'LaTeX';
-    xlabel('\nu_{1}'); ylabel('\nu_{2}');
-    if     iSp == 1, title('Average correlation coefficients');
-    elseif iSp == 2, title('Average log-mean squared difference');
+    xlabel('$\nu_{1}$', 'Interpreter', 'LaTeX');
+    ylabel('$\nu_{2}$', 'Interpreter', 'LaTeX');
+    if     iSp == 1, t = title('Average correlation coefficients');
+    elseif iSp == 2, t = title('Average log-mean squared difference');
     end
+    set(t, 'Interpreter', 'LaTeX');
 end
