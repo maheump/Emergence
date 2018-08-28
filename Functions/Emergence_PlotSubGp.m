@@ -53,8 +53,9 @@ hold('on');
 
 % Display individual differences
 for iSub = 1:nSub
-    patchline(x(iSub,:), y(iSub,:), 'EdgeColor', 'k', ...
-        'LineStyle', '-', 'LineWidth', 1/2, 'EdgeAlpha', aval);
+    p = plot(x(iSub,:), y(iSub,:), 'Color', 'k', ...
+        'LineStyle', '-', 'LineWidth', 1/2);
+    set(p, 'Color', [get(p, 'Color'), aval]);
 end
 
 % Display individual data points
