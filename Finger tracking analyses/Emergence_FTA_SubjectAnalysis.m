@@ -9,6 +9,10 @@
 % N.B. To be run without subject exclusion. To do so, turn the boolean
 % variable "rmbadsub" in "Emergence_FTA_LoadData" to false.
 
+% Define the folder in which to save the subject-specific figures
+pathtofile = fullfile(folderpath, 'Finger tracking analyses', 'subfig');
+mkdir(pathtofile);
+
 % For each subject
 for iSub = 1:nSub
     fprintf('Generating figure based on data from subject %2.0f/%2.0f.\n', iSub, nSub);
@@ -112,6 +116,5 @@ for iSub = 1:nSub
     fig = cell2mat(F');
     fig = fig(:,400:3550,:);
     filename = sprintf('F_Ind_Sub%02i.png', iSub);
-    pathtofile = fullfile(folderpath, 'Finger tracking analyses', 'subfig', filename);
-    imwrite(fig, pathtofile, 'png');
+    imwrite(fig, fullfile(pathtofile, filename), 'png');
 end
