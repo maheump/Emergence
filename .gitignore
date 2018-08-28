@@ -35,7 +35,10 @@ Temporary Items
 *.m~
 
 # Ignore data files
-*.mat
+*Demo*.mat
+*Training*.mat
+*Seq*.mat
+*Settings.mat
 
 # Ignore private folders
 private
@@ -59,3 +62,4 @@ Examples
 Notes
 instr
 admin
+ppdata
