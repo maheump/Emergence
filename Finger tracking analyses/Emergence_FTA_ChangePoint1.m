@@ -30,7 +30,7 @@ for iHyp = 1:2
     % Get beliefs about the change point's position at the end of each
     % sequence
     lab = sprintf('pJkgYMs%s', lower(proclab{iHyp}(1)));
-    bel = cellfun(@(x) x.(lab)(end,:), IO(cidx{iHyp},:), 'UniformOutput', 0);
+    bel = cellfun(@(x) x.(lab)(:,end)', IO(cidx{iHyp},:), 'UniformOutput', 0);
 
     % Look around the change point's position in the window defined earlier
     belwrtcp = cellfun(@(b,c) b(c-winwidth/2:c+winwidth/2), bel, cp, 'UniformOutput', 0);
@@ -70,6 +70,7 @@ for iHyp = fliplr(1:2)
     % Perform a t-test against the uniform (prior) distribution at each
     % position around the true change point's position
     h = ttest(cppost(:,:,iHyp), 1/N, 'tail', 'right');
+    h(isnan(h)) = 0;
     plot(x(logical(h)), repmat(0.34+0.005*(iHyp-1),1,sum(h)), ...
         '-', 'Color', tricol(iHyp,:), 'LineWidth', 2);
 end
