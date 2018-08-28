@@ -273,9 +273,9 @@ for iSub = 1:nSub
             
             % 3) p(Jump)?
             if IO{iCond,iSub}.Questions(2) == 1
-                pJump = IO{iCond,iSub}.pJkgYMsp(end,:);
+                pJump = IO{iCond,iSub}.pJkgYMsp(:,end);
             elseif IO{iCond,iSub}.Questions(2) == 2
-                pJump = IO{iCond,iSub}.pJkgYMsd(end,:);
+                pJump = IO{iCond,iSub}.pJkgYMsd(:,end);
             end
             [val,idx] = max(pJump);
             IO{iCond,iSub}.Questions(3) = idx; % change point's position
