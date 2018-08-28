@@ -248,6 +248,10 @@ end
 gamma = P(1);
 p0 = P(2);
 
+% Logit functions
+logit = @(b) log(b./(1-b));
+logitinv = @(b) 1./(1+exp(b));
+
 % Compute predictions of the probabilistic weighting function
 g = logitinv(gamma .* logit(in.p) + (1 - gamma) * logit(p0));
 
