@@ -8,8 +8,14 @@ function [ pY, pAgY ] = Emergence_IO_Null( K, scaleme )
 % 
 % Copyright (c) 2018 Maxime Maheu
 
+%% INITIALIZATION
+%  ==============
+
 % By default, return model evidence in log scale
 if nargin < 2, scaleme = 'log'; end
+
+%% SEQUENCE'S MARGINAL LIKELIHOOD
+%  ==============================
 
 % Compute the marginal likelihood of a sequence of length K under a 
 % p(y) = (1/2)^N(A) + (1/2)^N(B)
@@ -18,6 +24,9 @@ if nargin < 2, scaleme = 'log'; end
 if     strcmpi(scaleme, 'lin'), pY = (1/2) .^ K;
 elseif strcmpi(scaleme, 'log'), pY = -K .* log(2);
 end
+
+%% PREDICTION
+%  ==========
 
 % The likelihood that the next observation will be an A is simply chance
 % level, which is in the case of binary sequences 1/2

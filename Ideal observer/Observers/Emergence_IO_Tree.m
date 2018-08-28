@@ -34,7 +34,7 @@ function [ pY, pAgY, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, use
 % |                  (X) (Y) (X) (Y)                                 |
 % ===================================================================|==> nu = 5
     
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % Make sure the sequence of observations is organised as a column vector.
@@ -80,8 +80,8 @@ end
 % (e.g. when the tree has been fully explored and no patterns have been found)
 if nargin < 7 || isempty(corout), corout = true; end
 
-%% Get the dimensionality of the problem
-%  =====================================
+%% GET CHARACTERISTICS OF THE TREE
+%  ===============================
 
 % The number of possible patterns depends on the sequence's length and the
 % depth of the tree to explore
@@ -105,7 +105,7 @@ elseif ~usegrid
     nR = nRo + nRu;           % total number of patterns
 end
 
-%% Patterns' likelihood
+%% PATTERNS' LIKELIHOOD
 %  ====================
 
 % Prepare output variables for the patterns
@@ -192,7 +192,7 @@ for i = ilRo
     end
 end
 
-%% Prior probabilities
+%% PRIOR PROBABILITIES
 %  ===================
 
 % In the case of a uniform (Bayes-Laplace) prior distribution
@@ -221,7 +221,7 @@ end
 p_pRio = p_pRi(1:nlRo);
 p_pRiu = p_pRi((nlRo+1):nu);
 
-%% Sequence's marginal likelihood
+%% SEQUENCE'S MARGINAL LIKELIHOOD
 %  ==============================
 
 % Entirely observed patterns
@@ -268,8 +268,8 @@ if islog, pY = log(pY); end
 % floating point number.
 if corout && islog && isinf(pY), pY = log(realmin); end
 
-%% Predictions
-%  ===========
+%% PREDICTION
+%  ==========
 
 % If the expectation has to be returned 
 if nargout > 1
@@ -308,8 +308,8 @@ if nargout > 1
     if corout && (pRogY + pRugY) == 0, pAgY = 1/2; end
 end
 
-%% Wrap things up
-%  ==============
+%% ENTROPY OF THE POSTERIOR DISTRIBUTION
+%  =====================================
 
 % If the posterior distribution over patterns has to be returned 
 if nargout > 2

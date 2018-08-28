@@ -18,7 +18,7 @@ function [ pY, pAgY, mpTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid,
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % Get the number of observations in the sequence
@@ -71,7 +71,7 @@ if usegrid || ~usegrid && returnpost
     nt = 1/dt; % number of values for one dimension of theta
 end
 
-%% Prior probabilities
+%% PRIOR PROBABILITIES
 %  ===================
 
 % In case of a perfect integration, we can resort on analytical solutions
@@ -133,7 +133,7 @@ elseif usegrid
     if islog, pT = log(pT); end
 end
 
-%% Sequence's marginal likelihood
+%% SEQUENCE'S MARGINAL LIKELIHOOD
 %  ==============================
 
 % Initialization
@@ -268,8 +268,8 @@ elseif usegrid
     pXgB = [pAgB, 1 - pAgB]; % p(A|B) & p(B|B)
 end
 
-%% Predictions
-%  ===========
+%% PREDICTION
+%  ==========
 
 % Compute the likelihood that the next observation will be a A (an
 % analytical formula can be used, which is simply a ratio).
@@ -280,7 +280,7 @@ if nargout > 1
     pAgY  = pAgXY(X); % returns p(A) conditionaly on the last observation
 end
 
-%% Entropy of the posterior distribution
+%% ENTROPY OF THE POSTERIOR DISTRIBUTION
 %  =====================================
 
 % If the entropy of the posterior distribution has to be returned

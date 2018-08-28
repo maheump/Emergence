@@ -17,7 +17,7 @@ function [ pY, pAgY, pTgY, H_pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegri
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % Number of observations in the sequence
@@ -70,7 +70,7 @@ if usegrid || ~usegrid && returnpost
     nt = 1/dt; % number of values for theta
 end
 
-%% Prior probabilities
+%% PRIOR PROBABILITIES
 %  ===================
 
 % In case of a perfect integration, we can resort on analytical solutions
@@ -122,7 +122,7 @@ elseif usegrid
     if islog, pT = log(pT); end
 end
 
-%% Sequence's marginal likelihood
+%% SEQUENCE'S MARGINAL LIKELIHOOD
 %  ==============================
 
 % Initialization
@@ -195,8 +195,8 @@ elseif usegrid
     end
 end
 
-%% Predictions
-%  ===========
+%% PREDICTION
+%  ==========
 
 % Compute the likelihood that the next observation will be a A
 if nargout > 1
@@ -205,7 +205,7 @@ if nargout > 1
     end
 end
 
-%% Entropy of the posterior distribution
+%% ENTROPY OF THE POSTERIOR DISTRIBUTION
 %  =====================================
 
 % Return posterior distribution as a column vector

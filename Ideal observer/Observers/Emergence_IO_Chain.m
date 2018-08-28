@@ -12,7 +12,7 @@ function [ pYgMp, pAgYMp, mpTgY, H_pTgY, pXgX ] = Emergence_IO_Chain( y, scaleme
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % Get the number of observations in the sequence
@@ -37,7 +37,7 @@ if returnpost
 elseif ~returnpost, mpTgY = []; % return empty vector
 end
 
-%% Construct the chain
+%% CONSTRUCT THE CHAIN
 %  ===================
 
 % Derive all the transitions in the chain
@@ -60,7 +60,7 @@ for c = 1:ncond
     o_nXgX(2,c) = sum(y(following) == 2); % for Bs
 end
 
-%% Prior probabilities
+%% PRIOR PROBABILITIES
 %  ===================
 
 % Uniform and non-informative Bayes-Laplace prior
@@ -79,7 +79,7 @@ elseif isa(prior, 'double') && numel(prior) == ncond*2
 else, error('The prior input has the wrong form.');
 end
 
-%% Sequence's marginal likelihood
+%% SEQUENCE'S MARGINAL LIKELIHOOD
 %  ==============================
 
 % Get the likelihood of the first observations (chance) for which the chain
@@ -126,8 +126,8 @@ if returnpost
 else, mpTgY = [];
 end
 
-%% Predictions
-%  ===========
+%% PREDICTION
+%  ==========
 
 % If the expectation has to be returned 
 if nargout > 1
@@ -153,7 +153,7 @@ if nargout > 1
     end
 end
 
-%% Entropy of the posterior distribution
+%% ENTROPY OF THE POSTERIOR DISTRIBUTION
 %  =====================================
     
 % If the entropy of the posterior distribution has to be returned
