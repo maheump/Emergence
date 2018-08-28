@@ -7,7 +7,7 @@ function traj = Emergence_ProjOnTri( traj, tripxl )
 %       finger's positions over time.
 %   - "tripxl": a binary matrix specifying the screen's pixels in which the
 %       triangle was displayed.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 % Check wether the position is not within the triangle

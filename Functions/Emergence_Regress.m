@@ -33,19 +33,19 @@ n = numel(y);
 % Ordinary least squares: predictor variables are measured exactly, and
 % only the response variable has an error component
 if strcmpi(method, 'OLS')
-    
+
     % Create the design matrix
     X = [x, ones(n,1)];
-    
+
     % General linear model
     [b,~,~,~,stats] = regress(y, X);
     beta0 = b(2);
     beta1 = b(1);
     R2 = stats(1);
-    
+
     % 95% confidence interval
     [confint, confintx] = regerr(beta0, beta1, x, y);
-    
+
     % Export relevant metrics in the output structure
     out = struct('beta0', beta0, 'beta1', beta1, 'R2', R2, ...
         'confint', confint, 'confintx', confintx);
@@ -53,39 +53,39 @@ if strcmpi(method, 'OLS')
 % Orthogonal regression / total least squares mathod / Deming regression:
 % both predictor and response variables are measured with error
 elseif strcmpi(method, 'TLS')
-    
+
     % 2D matrix
     X = [x,y];
-    
+
     % For conveniency, we use PCA as an implementation of TLS regression
     [coeff,score,~,~,explained,~] = pca(X);
-    
+
     % Compute projection onto the boundary
     meanX = mean(X, 1);
     dirVect = coeff(:,1);
     t = [min(score(:,1)), max(score(:,1))];
     endpts = [meanX + t(1)*dirVect'; meanX + t(2)*dirVect'];
-    
+
     % Deduce beta coefficients
     beta1 = (endpts(2,2) - endpts(1,2)) / (endpts(2,1) - endpts(1,1));
     beta0 = endpts(1,2) - beta1*endpts(1,1);
 
     % Compute the determinant coefficient
     R2 = explained(1)/100;
-    
+
     % 95% confidence interval
     [confint, confintx] = regerr(beta0, beta1, x, y);
-    
+
     % Export relevant metrics in the output structure
     out = struct('beta0', beta0, 'beta1', beta1, 'R2', R2, ...
         'confint', confint, 'confintx', confintx);
-    
+
 % Simple correlation
 elseif strcmpi(method, 'CC')
-    
+
     % Correlation coefficient
     r = corr(x,y);
-    
+
     % Output the asked variable
     out = struct('r', r, 'r2', r^2);
 end
@@ -103,7 +103,7 @@ function [ yval, xval ] = regerr(beta0, beta1, x, y, ng, alpha)
 
 if nargin < 5, ng = 100; end % precision of the grid
 if nargin < 6, alpha = 0.05; end % significance threshold
-    
+
 n = length(x);
 X = linspace(min(x), max(x), ng);
 Y = ones(size(X))*beta0 + beta1*X;

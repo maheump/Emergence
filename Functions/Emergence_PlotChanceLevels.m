@@ -4,6 +4,7 @@ function Emergence_PlotChanceLevels( tricc )
 %   - "tricc": a 3x2 matrix specifying the x/y coordinates (columns) of
 %       each vertex of the triangle. By default the width is 1, the height
 %       sqrt(3)/2 and it is drawn at (0,0).
+% 
 % Copyright (c) 2018 Maxime Maheu
 
 % Coordinates of the triangles limits (cartesian coordinates)
