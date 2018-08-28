@@ -22,7 +22,7 @@ nBin = 8;
 % Create the bins in which the positions will be averaged
 pgrid = linspace(0, 100, nBin+1);
 allcp = cellfun(@(x) x.Jump-1/2, D(cat(2, cidx{1:2}),:));
-pct = percentile(allcp, pgrid);
+pct = prctile(allcp, pgrid);
 
 % Prepare output variable
 coef = NaN(nSub,2);
