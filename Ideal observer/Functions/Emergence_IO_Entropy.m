@@ -21,8 +21,13 @@ if nargin < 3, corr = true; end
 infloc = isinf(dist);
 if corr && any(infloc), dist(infloc) = NaN; end
 
-% Get positions of zeros
-if corr, zeroloc = (dist == 0); end
+% Remove zeros and ones
+if corr
+    zeroloc = (dist <= 0);
+    oneloc  = (dist >= 1);
+    if any(zeroloc(:)), dist(zeroloc) =   eps; end
+    if any(oneloc(:)),  dist(oneloc)  = 1-eps; end
+end
 
 % Get the number of dimensions of the input
 nDim = ndims(dist);
@@ -35,16 +40,11 @@ if nDim <= 2 && any(Sz == 1)
     % ~~~~~~~~~~~~~~~~~~~~~~~~~
     if all(Sz == 1) % scalar
         p = dist;
-        if p < 0 || p > 1, error('Check the input scalar'); end
-        if     corr && p == 0, p = eps;
-        elseif corr && p == 1, p = 1-eps;
-        end
         H = -(p .* log2(p) + (1-p) .* log2(1-p));
     
     % 2) Unidimensional distribution
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     else % array
-        if corr && any(zeroloc), dist(zeroloc) = eps; end % remove zeros
         dist = dist ./ sum(dist, 'OmitNaN'); % normalization
         H = -sum(dist .* log2(dist), 'OmitNaN');
     end
@@ -52,7 +52,6 @@ if nDim <= 2 && any(Sz == 1)
 % Multidimensional distributions
 else % N-D matrix
     if nargin < 2, isindep = false; end % by default, assume non-independency
-    if corr && any(zeroloc), dist(zeroloc) = eps; end % remove zeros
     dist = dist ./ sum(dist(:), 'OmitNaN'); % normalization
     
     % 3) Independent multidimensional distribution

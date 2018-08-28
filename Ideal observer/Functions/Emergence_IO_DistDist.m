@@ -16,7 +16,7 @@ function [ D_JS, D_KL ] = Emergence_IO_DistDist( varargin )
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% Initialization
+%% INITIALIZATION
 %  ==============
 
 % If two distribution of the same size are provided, compute the distance between them
@@ -25,10 +25,11 @@ if numel(varargin) == 2 && ...
         numel(size(varargin{1})) == numel(size(varargin{2})) && ...
         all(size(varargin{1}) == size(varargin{2}))
     
-    % Get (joint) distributions to be column vectors
-    dist1 = varargin{1}(:);
-    dist2 = varargin{2}(:);
-
+    % Get (joint) distributions to be row vectors
+    dist1 = varargin{1}(:)';
+    dist2 = varargin{2}(:)';
+    flag = false; 
+    
 % If a single distribution is provided, compute iterative update
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 else
@@ -42,12 +43,18 @@ else
     flag = true;
 end
 
-% Remove zeros
-if any(dist1 == 0), dist1(dist1 == 0) = NaN; end
-if any(dist2 == 0), dist2(dist2 == 0) = NaN; end
+% Make sure the distributions are normalized
+dist1 = dist1 ./ sum(dist1, 2);
+dist2 = dist2 ./ sum(dist2, 2);
 
-%% Compute update
-%  ==============
+% Make sure the distribution evolves between 0 and 1
+if any(dist1(:) <= 0), dist1(dist1 < 0) =   eps; end
+if any(dist1(:) >  1), dist1(dist1 > 1) = 1-eps; end
+if any(dist2(:) <= 0), dist2(dist2 < 0) =   eps; end
+if any(dist2(:) >  1), dist2(dist2 > 1) = 1-eps; end
+
+%% COMPUTE MODEL UPDATE
+%  ====================
 
 % Define Kullback-Leibler divergence
 % !!! It is NOT symmetrical: D_KL(p,q) =/ D_KL(q,p))
@@ -65,11 +72,22 @@ D_JS = JS(dist1, dist2);
 % Compute the Kullback-Leibler divergence
 if nargout > 1, D_KL = KL(dist1, dist2); end
 
+%% WRAP THINGS UP
+%  ==============
+
 % Add a first NaN such that the output variables have the same dimension as
 % the input
 if flag
     D_JS = cat(2, NaN, D_JS);
     if nargout > 1, D_KL = cat(2, NaN, D_KL); end
+end
+
+% Make sure the output evolve between 0 and 1
+D_JS(D_JS < 0) = 0;
+D_JS(D_JS > 1) = 1;
+if nargout > 1
+    D_KL(D_KL < 0) = 0;
+    D_KL(D_KL > 1) = 1;
 end
 
 end
