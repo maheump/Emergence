@@ -255,7 +255,7 @@ figure('Position', [353 806 360 300]);
 % Prepare gaussian distributions
 X = -3:0.01:3; % grid for the gaussian distribution
 Y = normpdf(X, 0, 1); % 1D gaussian distribution
-Y = setminmax(Y, [0,1]); % easier to scale below
+Y = Y./ max(Y); % easier to scale below
 Y = Y'*Y; % 2D gaussian distribution
 
 % Overlap underlying gaussian distributions that gave rise to the observed
