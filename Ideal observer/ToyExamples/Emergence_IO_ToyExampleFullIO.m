@@ -504,7 +504,7 @@ for imod = 1:3
         tp = io.([var{ivar}, 'pA', mod{imod}]);
         if ivar == 4, tp = sqrt(tp); end
         plot(1:N, tp, '-', 'Color', modcol(imod,:), 'LineWidth', wid2);
-
+        
         % Customize the axes
         defaxprop(gca);
         if ivar == 2, set(gca, 'YLim', [0,4]);
@@ -525,6 +525,7 @@ end
 %  ==============
 
 % Define the folder where to save the figures
+try
 figpath = fullfile(scriptpath(1:max(strfind(scriptpath,'/'))), 'figs/');
 
 % Save the figures as separate files
@@ -535,6 +536,8 @@ cellfun(@(x,y) imwrite(x, [figpath, sprintf('Emergence_IO_ToyExampleFullIO_fig%i
 % Save all the figures as a single files
 figimg = cat(1, cat(2, figimg{1}, figimg{2}), cat(2, figimg{3}, figimg{4}));
 imwrite(figimg, [figpath, 'Emergence_IO_ToyExampleFullIO.jpeg']);
+catch
+end
 
 % Reoder figures on the screen
 arrayfun(@figure, 4:-1:1);

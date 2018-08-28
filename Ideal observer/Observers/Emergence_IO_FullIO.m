@@ -333,6 +333,9 @@ if     strcmpi(scaleme, 'lin'), islin = true;  islog = false;
 elseif strcmpi(scaleme, 'log'), islin = false; islog = true;
 end
 
+% Turn the prior on change point positions to log scale if required
+if islog, p_pJk = log(p_pJk); end
+
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Define whether to return posterior distribution over models' unknown parameters %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
@@ -349,17 +352,19 @@ if ~isempty(postprec), nTprec = 1/postprec; end
 %  ========================
 
 % Output variables for the model evidence
+% p(y|Msi)
 pYgMsp = NaN(1,N);
 pYgMsd = NaN(1,N);
 pYgMss = NaN(1,N);
 
 % Output variables for models' posterior distribution over theta (unknown
 % model parameters)
+% p(theta|y,Msi)
 if ~isempty(postprec), pTgYMsp = NaN(nTprec, N, nTdim); end
 pTgYMsd = NaN(patlen, N);
 
 % Output variables for the posterior belief over change point's position
-% p(Jk|y) & p(Jk|y,Msi)
+% p(Jk|y,Msi)
 pJkgYMsp = NaN(N,N);
 pJkgYMsd = NaN(N,N);
 
@@ -367,9 +372,6 @@ pJkgYMsd = NaN(N,N);
 % p(A|y,Msi)
 pAgYMsp = NaN(1,N);
 pAgYMsd = NaN(1,N);
-
-%
-if islog, p_pJk = log(p_pJk); end
 
 %% Compute models evidence, beliefs regarding change point's position and predictions
 %  ==================================================================================
@@ -767,12 +769,27 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Define models' prior probability %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+
 % We use a uniform uninformative Bayes-Laplace prior, which is in that case:
 % p(Msi) = 1/{M} = 1/3
 % with i E {D,P,S} and where {M} is the number of possible models (i.e. 3).
-p_pMss = 1/3; % fully-stochastic model
-p_pMsp = 1/3; % stochastic-to-probabilistic model
-p_pMsd = 1/3; % stochastic-to-deterministic model
+if     islin, p_pMi = 1/3;
+elseif islog, p_pMi = -log(3);
+end
+p_pMss = p_pMi; % fully-stochastic model
+p_pMsp = p_pMi; % stochastic-to-probabilistic model
+p_pMsd = p_pMi; % stochastic-to-deterministic model
+p_pMsi = [p_pMss; p_pMsp; p_pMsd];
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~ %
+% Get Bayes' rule numerator %
+% ~~~~~~~~~~~~~~~~~~~~~~~~~ %
+
+% This term is proportional to the posterior over models
+pYgMsi = [pYgMss; pYgMsp; pYgMsd];
+if     islin, ppMsigY = pYgMsi .* p_pMsi;
+elseif islog, ppMsigY = pYgMsi  + p_pMsi;
+end
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Compute the normalization factor %
@@ -782,30 +799,26 @@ p_pMsd = 1/3; % stochastic-to-deterministic model
 % of models' evidences over all possible models times models' prior
 % probabilities
 % p(y) = sum(i E {S,P,D}) p(y|Msi) * p(Msi)
-if     islin, pYgMsi =     [pYgMss; pYgMsp; pYgMsd];
-elseif islog, pYgMsi = exp([pYgMss; pYgMsp; pYgMsd]);
+if     islin, pY =     sum(    ppMsigY , 1);
+elseif islog, pY = log(sum(exp(ppMsigY), 1));
 end
-p_pMsi = [p_pMss; p_pMsp; p_pMsd];
-pY = sum(pYgMsi.*p_pMsi, 1);
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Compute the models' posterior probability %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 
-% Bayes' pattern states that the model's posterior probability is proportional
-% to its model evidence times its prior probability. Dividing this product
-% by the normalization factor computed just above gives probabilities
-% that evolve from 0 to 1.
+% Bayes' rule states that the model's posterior probability is
+% proportional to its model evidence times its prior probability. Dividing
+% this product by the normalization factor computed just above gives
+% probabilities that evolve from 0 to 1.
 % for all i E {s,p,d}: p(Msi|y) = (p(y|Msi) * p(Msi)) / p(y)
-if islin
-    pMssgY =     pYgMss  .* (p_pMss ./ pY);
-    pMspgY =     pYgMsp  .* (p_pMsp ./ pY);
-    pMsdgY =     pYgMsd  .* (p_pMsd ./ pY);
-elseif islog
-    pMssgY = exp(pYgMss) .* (p_pMss ./ pY);
-    pMspgY = exp(pYgMsp) .* (p_pMsp ./ pY);
-    pMsdgY = exp(pYgMsd) .* (p_pMsd ./ pY);
+if     islin, pMsigY =     ppMsigY ./ pY;
+elseif islog, pMsigY = exp(ppMsigY  - pY);
 end
+pMssgY = pMsigY(1,:);
+pMspgY = pMsigY(2,:);
+pMsdgY = pMsigY(3,:);
+
 % N.B. The sequence begins with a fully stochastic part, therefore beliefs 
 % at the very beginnning are simply the following ones.
 pMssgY(1) = 1; % p(Mss|y_1) = 1
@@ -817,7 +830,6 @@ pMsdgY(1) = 0; % p(Msd|y_1) = 0
 % ~~~~~~~~~~~~~~~~~~ %
 
 % Get the model with the highest posterior probability
-pMsigY = [pMspgY; pMsdgY; pMssgY];
 [~, Mhat] = max(pMsigY, [], 1);
 
 % Detect when one of the model reaches a significant threshold
@@ -899,6 +911,9 @@ JSpJkgY    = Emergence_IO_DistDist(pJkgY');
 % ~~~~~~~~~~ %
 % Prediction %
 % ~~~~~~~~~~ %
+% This the expected probability of receiving an A at position K given the
+% beliefs derived from the sequence up to position K-1:
+% p(y_K=A|y_1:K-1,Msi)
 
 % The prediction from the fully-stochastic observer is simply chance level
 pAgYMss = ones(1,N) ./ 2; % p(A|y_0,Mss) = 1/2
@@ -906,22 +921,20 @@ pAgYMss = ones(1,N) ./ 2; % p(A|y_0,Mss) = 1/2
 % Before seeing any observation, the probability of observing a A is equal
 % to chance level, which is 1/2 for a binary sequence
 % for all i E {S,P,D}, p(A|y_0,Mi) = 1/2
-pAgYMsp(1) = 1/2; % p(A|y_0,Msp) = 1/2
-pAgYMsd(1) = 1/2; % p(A|y_0,Msd) = 1/2
-
-% Make sure expectations evolve between 0 and 1 (errors may happen because
-% of numeric overflows)
-pAgYMsd(pAgYMsd < 0) = 0;
-pAgYMsp(pAgYMsp < 0) = 0;
-pAgYMsd(pAgYMsd > 1) = 1;
-pAgYMsp(pAgYMsp > 1) = 1;
+pAgYMsp = cat(2, ones(1,2) ./ 2, pAgYMsp(2:N-1)); % p(A|y_0,Msp) = 1/2
+pAgYMsd = cat(2, ones(1,2) ./ 2, pAgYMsd(2:N-1)); % p(A|y_0,Msd) = 1/2
 
 % Probability that the forthcoming stimulus will be a A computed using
 % Bayesian Model Averaging
 % p(A|y) = sum(i) p(A|y,Mi) * p(Mi|y)
-pAgY = (pAgYMss .* pMssgY) + ... % p(A|y,Mss) * p(Mss|y)
-       (pAgYMsp .* pMspgY) + ... % p(A|y,Msp) * p(Msp|y)
-       (pAgYMsd .* pMsdgY);      % p(A|y,Msd) * p(Msd|y)
+pAgY = (pAgYMss .* pMssgY) + ...   % p(A|y,Mss) * p(Mss|y)
+       (pAgYMsp .* pMspgY) + ...   % p(A|y,Msp) * p(Msp|y)
+       (pAgYMsd .* pMsdgY) ;       % p(A|y,Msd) * p(Msd|y)
+
+% Posterior Bernoulli distributions
+pXgYMsp = [pAgYMsp; 1-pAgYMsp];
+pXgYMsd = [pAgYMsd; 1-pAgYMsd];
+pXgY    = [pAgY   ; 1-pAgY   ];
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Equivalent learning rate %
@@ -929,12 +942,13 @@ pAgY = (pAgYMss .* pMssgY) + ... % p(A|y,Mss) * p(Mss|y)
 
 % Compute the prediction error (distance to prediction in lin scale)
 pe = NaN(1,N);
-pe(s == 1) = 1 -      pAgY(s == 1);
-pe(s == 2) = 1 - (1 - pAgY(s == 2));
+pe(s == 1) = 1 -      pAgY(S == 1);
+pe(s == 2) = 1 - (1 - pAgY(S == 2));
 
 % Equivalent learning rate
 % equivalent alpha = update / prediction error
 eqalpha = JSpMgY ./ pe;
+eqalpha(pe == 0) = 0;
 
 % ~~~~~~~~ %
 % Surprise %
@@ -954,20 +968,20 @@ B = B(B > 1);
 % Surprise evoked by the current observation (K) given previous beliefs
 % (K-1) from the stochastic-to-probabilistic model
 IpAgYMsp    = NaN(1,N);
-IpAgYMsp(A) = -log2(  pAgYMsp(A-1));
-IpAgYMsp(B) = -log2(1-pAgYMsp(B-1));
+IpAgYMsp(A) = -log2(  pAgYMsp(A));
+IpAgYMsp(B) = -log2(1-pAgYMsp(B));
 
 % Surprise evoked by the current observation (K) given previous beliefs
 % (K-1) from the stochastic-to-deterministic model
 IpAgYMsd    = NaN(1,N);
-IpAgYMsd(A) = -log2(  pAgYMsd(A-1));
-IpAgYMsd(B) = -log2(1-pAgYMsd(B-1));
+IpAgYMsd(A) = -log2(  pAgYMsd(A));
+IpAgYMsd(B) = -log2(1-pAgYMsd(B));
 
 % Surprise evoked by the current observation (K) given previous beliefs
 % (K-1) marginalized (through Bayesian Model Averaging) over models
 IpAgY    = NaN(1,N);
-IpAgY(A) = -log2(  pAgY(A-1));
-IpAgY(B) = -log2(1-pAgY(B-1));
+IpAgY(A) = -log2(  pAgY(A));
+IpAgY(B) = -log2(1-pAgY(B));
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Entropy of the distribution of next observation being A/B %
@@ -975,9 +989,9 @@ IpAgY(B) = -log2(1-pAgY(B-1));
 
 % Compute the entropy of the posterior distributions over the identity of
 % the next observation (see previous chunks for the mathematical definition)
-HpAgYMsp = cellfun(@Emergence_IO_Entropy, num2cell(pAgYMsp));
-HpAgYMsd = cellfun(@Emergence_IO_Entropy, num2cell(pAgYMsd));
-HpAgY    = cellfun(@Emergence_IO_Entropy, num2cell(pAgY));
+HpAgYMsp = cellfun(@Emergence_IO_Entropy, mat2cell(pXgYMsp, 2, ones(1,N)));
+HpAgYMsd = cellfun(@Emergence_IO_Entropy, mat2cell(pXgYMsd, 2, ones(1,N)));
+HpAgY    = cellfun(@Emergence_IO_Entropy, mat2cell(pXgY,    2, ones(1,N)));
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Update of beliefs regarding the likelihood of the next observation being A/B %
@@ -985,9 +999,9 @@ HpAgY    = cellfun(@Emergence_IO_Entropy, num2cell(pAgY));
 
 % Compute the entropy of the posterior distributions over the identity of
 % the next observation (see previous chunks for the mathematical definition)
-JSpAgYMsp = Emergence_IO_DistDist([pAgYMsp; 1-pAgYMsp]');
-JSpAgYMsd = Emergence_IO_DistDist([pAgYMsd; 1-pAgYMsd]');
-JSpAgY    = Emergence_IO_DistDist([pAgY;    1-pAgY   ]');
+JSpAgYMsp = Emergence_IO_DistDist(pXgYMsp');
+JSpAgYMsd = Emergence_IO_DistDist(pXgYMsd');
+JSpAgY    = Emergence_IO_DistDist(pXgY');
 
 %% Wrap things up
 %  ==============
@@ -1015,21 +1029,24 @@ out.in.Jprior = Jprior;
 out.in.p_pJ   = p_pJk;
 out.in.p_pR   = p_pRi;
 out.in.p_pT   = p_pTi;
-out.in.p_pMss = p_pMss ./ sum(p_pMsi);
-out.in.p_pMsp = p_pMsp ./ sum(p_pMsi);
-out.in.p_pMsd = p_pMsd ./ sum(p_pMsi);
+out.in.p_pMss = p_pMss;
+out.in.p_pMsp = p_pMsp;
+out.in.p_pMsd = p_pMsd;
 
 % Computation options
-out.in.computfor = computfor;
-out.in.scaleme   = scaleme;
-out.in.verbose   = verbose;
 out.in.postgrid  = postprec;
+out.in.scaleme   = scaleme;
+out.in.computfor = computfor;
+out.in.verbose   = verbose;
 
 % ~~~~~~ %
 % Models %
 % ~~~~~~ %
 
-% Export models' evidence
+% Sequence marginal likelihood
+out.pY = pY;
+
+% Export model evidences
 out.pYgMss = pYgMss;
 out.pYgMsp = pYgMsp;
 out.pYgMsd = pYgMsd;
@@ -1131,12 +1148,12 @@ out.JSpAgY    = JSpAgY;
 if verbose == 1 && strcmpi(computfor, 'all'), fprintf('. Done! '); end
 if verbose == 2, fprintf('\n%s\n', repmat('-', 1, numel(cols))); end
     
+% Get the names of all the output variables
+f = fieldnames(out);
+f = f(~strcmpi(f, 'in')); % except the "input" field
+
 % In the case of computations made only after the last observation
 if strcmpi(computfor, 'last')
-    
-    % Get the names of all the output variables
-    f = fieldnames(out);
-    f = f(~strcmpi(f, 'in')); % except the "input" field
     
     % Squeeze the second dimension that corresponds to the different
     % observations in the sequence
@@ -1147,6 +1164,7 @@ end
 
 % Get the elapsed time since the beginning of the function
 toc;
+out.in.exectime = toc;
 
 % Go back to line
 if verbose == 1, fprintf('%s\n', repmat('=', 1, eqnum)); end
