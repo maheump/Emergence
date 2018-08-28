@@ -270,7 +270,7 @@ lock = 1;
 
 % Try to load results from the previous analysis
 try
-funname = @(x) fullfile(homedir, 'Finger tracking analyses', ...
+funname = @(x) fullfile(folderpath, 'Finger tracking analyses', ...
     'ppdata', sprintf('Dyn1_MFX_%s.mat', x));
 if isfield(D{1}, 'Seq'), load(funname('S'));
 else, load(funname('IO'));

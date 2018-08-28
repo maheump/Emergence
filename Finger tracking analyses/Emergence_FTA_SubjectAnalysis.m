@@ -112,6 +112,6 @@ for iSub = 1:nSub
     fig = cell2mat(F');
     fig = fig(:,400:3550,:);
     filename = sprintf('F_Ind_Sub%02i.png', iSub);
-    pathtofile = fullfile(homedir, 'Finger tracking analyses', 'subfig', filename);
+    pathtofile = fullfile(folderpath, 'Finger tracking analyses', 'subfig', filename);
     imwrite(fig, pathtofile, 'png');
 end

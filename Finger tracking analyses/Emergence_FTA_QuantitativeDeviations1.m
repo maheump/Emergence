@@ -81,7 +81,7 @@ y = mat2cell(squeeze(binbel(:,2,:)), nBin, ones(nSub,1))';
 
 % Try to load results from the previous analysis
 try
-filename = fullfile(homedir, 'Finger tracking analyses', 'ppdata', 'QD1_MFX.mat');
+filename = fullfile(folderpath, 'Finger tracking analyses', 'ppdata', 'QD1_MFX.mat');
 load(filename);
 catch
 
