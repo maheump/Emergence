@@ -79,12 +79,6 @@ for iSub = 1:nSub, options{iSub}.inG.p = binbel(:,1,iSub); end
 % Variable to explain
 y = mat2cell(squeeze(binbel(:,2,:)), nBin, ones(nSub,1))';
 
-% Try to load results from the previous analysis
-try
-filename = fullfile(folderpath, 'Finger tracking analyses', 'ppdata', 'QD1_MFX.mat');
-load(filename);
-catch
-
 % Prepare output variables
 p_sub = cell(2,nSub); p_gp = cell(2,1); % posterior over parameters
 o_sub = cell(2,nSub); o_gp = cell(2,1); % quality of fit
@@ -95,11 +89,6 @@ o_sub = cell(2,nSub); o_gp = cell(2,1); % quality of fit
 for m = 1:2
     [p_sub(m,:), o_sub(m,:), p_gp{m}, o_gp{m}] = ...
         VBA_MFX(y, [], [], g_fname{m}, dim, options, [], optiongp);
-end
-
-% Save the result of this analysis in a MATLAB file
-save(filename, 'p_sub', 'o_sub', 'p_gp', 'o_gp');
-    
 end
 
 % Perform model comparison
@@ -248,16 +237,25 @@ end
 gamma = P(1);
 p0 = P(2);
 
-% Logit functions
-logit = @(b) log(b./(1-b));
-logitinv = @(b) 1./(1+exp(b));
-
 % Compute predictions of the probabilistic weighting function
 g = logitinv(gamma .* logit(in.p) + (1 - gamma) * logit(p0));
 
 % Rely on numerical derivatives
 dgdx = [];
 dgdP = [];
+end
+
+% Inverse of the logit transformation
+function u = logitinv(v)
+maxcut = -log(eps);
+mincut = -log(1/realmin - 1);
+u = 1 ./ (1 + exp(-max(min(v,maxcut),mincut)));
+end
+
+% Logit function
+function a = logit(b)
+a = log(b./(1-b));
+a(real(a)~=a) = NaN;
 end
 
 % General linear model

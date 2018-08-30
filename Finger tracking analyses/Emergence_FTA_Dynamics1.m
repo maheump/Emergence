@@ -269,15 +269,6 @@ end
 % Fit the trajectories that are locked on the detection point
 lock = 1;
 
-% Try to load results from the previous analysis
-funname = @(x) fullfile(folderpath, 'Finger tracking analyses', ...
-    'ppdata', sprintf('Dyn1_MFX_%s.mat', x));
-try
-if isfield(D{1}, 'Seq'), load(funname('S'));
-else, load(funname('IO'));
-end
-catch
-
 % Prepare output variables
 p_sub = cell(1,2); p_gp = cell(1,2); % posterior over parameters
 o_sub = cell(1,2); o_gp = cell(1,2); % quality of fit
@@ -325,12 +316,6 @@ for iHyp = 1:2
          p_gp{iHyp}(iSeq,mos),  o_gp{iHyp}(iSeq,mos)] = ...
             VBA_MFX(y(mos), [], [], @g_SIGM, dim, options(mos), [], optiongp);
     end
-end
-
-% Save the result of this analysis in a MATLAB file
-if isfield(D{1}, 'Seq'), save(funname('S'), 'p_sub', 'o_sub', 'p_gp', 'o_gp');
-else, save(funname('IO'), 'p_sub', 'o_sub', 'p_gp', 'o_gp');
-end
 end
 
 % Get back the fitted parameters of the sigmoid
@@ -447,16 +432,16 @@ intcp = P(2); % E ]-inf,+inf[
 y = slope .* in.p + intcp; % linear relationship
 
 % Compute predictions of the sigmoid functions
-g = 1 ./ (1 + exp(-y));
+g = VBA_sigmoid(y);
 
 % If provided, allows the sigmoid to start above zero
 if numel(P) > 2
-    lowerlim = sigmoid(P(3)); % E [0,1]
+    lowerlim = VBA_sigmoid(P(3)); % E [0,1]
     g = g .* lowerlim;
     
     % If provided, allows the sigmoid to end below one
     if numel(P) > 3
-        upperlim = sigmoid(P(4)); % E [0,1]
+        upperlim = VBA_sigmoid(P(4)); % E [0,1]
         g = g + upperlim;
     end
 end

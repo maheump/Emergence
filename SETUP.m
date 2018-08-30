@@ -8,8 +8,7 @@ clear;
 close('all');
 
 % Locate
-scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+folderpath = fileparts(mfilename('fullpath'));
 
 % Unzip folder containing various general purpose functions
 unzip(fullfile(folderpath, 'Functions', 'dependencies.zip'), ...
@@ -18,12 +17,15 @@ unzip(fullfile(folderpath, 'Functions', 'dependencies.zip'), ...
 % Add scripts and functions to the MATLAB path
 addpath(genpath(folderpath));
 
+% Set default properties for the figures
+Emergence_DefaultFigureProperties;
+
 % Add the VBA toolbox to the path
 try
-    VBA_Setup;
+    VBAsetupscript = 'VBA_setup.m';
+    cd(fileparts(which(VBAsetupscript)));
+    run(VBAsetupscript);
+    cd(folderpath);
 catch
     warning('The VBA toolbox is not available. Some scripts will not run');
 end
-
-% Set default properties for the figures
-Emergence_DefaultFigureProperties;
