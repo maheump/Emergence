@@ -1,7 +1,7 @@
 function [ D_JS, D_KL ] = Emergence_IO_DistDist( varargin )
-%EMERGENCE_IO_DISTDIST measures the distance between distributions. It
-%returns both the Jensen-Shannon (symmetrical) and Kullback-Leibler
-%(non-symmetrical) divergences.
+% EMERGENCE_IO_DISTDIST measures the distance between distributions. It
+% returns both the Jensen-Shannon (symmetrical) and Kullback-Leibler
+% (non-symmetrical) divergences.
 %   - Emergence_IO_DistDist(dist1, dist2): measures the distance between
 %       the two distributions "dist1" and "dist2". They must have the same
 %       size. It can be joint distributions (i.e. n-dimensional matrices).
