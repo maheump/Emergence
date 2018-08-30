@@ -1,5 +1,6 @@
 function pval = Emergence_DispStatTest( y, ref )
-% EMERGENCE_DISPSTATTEST displays on top of the current plot 
+% EMERGENCE_DISPSTATTEST displays statistical significiance on top of the
+% current plot 
 %   - "y": a NxK matrix where N is the number of subjects and K the number
 %       of conditions. If K = 1, a t-test against zero (or what is
 %       specified in "ref) is performed; if K = 2, a paired t-test is
