@@ -1,3 +1,3 @@
-[submodule "Dependencies"]
-	path = Dependencies
+[submodule "Dependencies/cbrewer2"]
+	path = Dependencies/cbrewer2
 	url = https://maheump@github.com/scottclowe/cbrewer2.git
