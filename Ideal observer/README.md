@@ -29,22 +29,22 @@ We estimate the posterior probability of each possible model:
 
 The first group of plots display the posterior distribution over models (and related metrics).
 
-![Fig1](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg)
+![Fig1](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg =1x)
 
 ### Posterior distribution over models' parameters
 
 The second group of plots display the posterior distribution over models' parameters.
 
-![Fig2](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg)
+![Fig2](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg =1x)
 
 ### Posterior distribution over change point's position
 
 The third group of plots display the posterior distribution over change point's position (and related metrics).
 
-![Fig3](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg)
+![Fig3](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg =1x)
 
-### Expectation and surprise 
+### Expectation and surprise
 
 The fourth group of plots display the expectations regarding the identity of the next observation (and related metrics).
 
-![Fig4](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg)
+![Fig4](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg =1x)
