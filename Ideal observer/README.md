@@ -12,31 +12,38 @@ The full Bayesian ideal observer of the task is implemented in  ```Emergence_IO_
 
 Toy examples scripts are available for each of there observers.
 
+## Observers learning statistics
+
+## Observer learning patterns
+
 ## Full Bayesian ideal observer of the task
-
-We estimate the posterior probability of each possible model:
-<a href="https://www.codecogs.com/eqnedit.php?latex=p\left(\mathcal{H}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{H}_{i}\right)&space;\cdot&space;p\left(\mathcal{H}_{i}\right)}{p\left(y\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(\mathcal{H}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{H}_{i}\right)&space;\cdot&space;p\left(\mathcal{H}_{i}\right)}{p\left(y\right)}" title="p\left(\mathcal{H}_{i}|y\right) = \frac{p\left(y|\mathcal{H}_{i}\right) \cdot p\left(\mathcal{H}_{i}\right)}{p\left(y\right)}" /></a>
-
-## Example inference
 
 Here is the result of the inference by the full Bayesian ideal observer of the task (the function ```Emergence_IO_FullIO```).
 These figures can be reproduced using the script ```Emergence_IO_ToyExampleFullIO```.
 
-![Example inference](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO.jpeg)
+### Posterior probability of
 
-Let's now take a look at the different subplots
+We estimate the posterior probability of each possible model:
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=p\left(\mathcal{M}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{M}_{i}\right)&space;\cdot&space;p\left(\mathcal{M}_{i}\right)}{p\left(y\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(\mathcal{M}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{M}_{i}\right)&space;\cdot&space;p\left(\mathcal{M}_{i}\right)}{p\left(y\right)}" title="p\left(\mathcal{M}_{i}|y\right) = \frac{p\left(y|\mathcal{M}_{i}\right) \cdot p\left(\mathcal{M}_{i}\right)}{p\left(y\right)}" /></a>
 
 The first group of plots display the posterior distribution over models (and related metrics).
 
-![Fig1](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO.jpeg)
+![Fig1](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg)
+
+### Posterior distribution over models' parameters
 
 The second group of plots display the posterior distribution over models' parameters.
 
 ![Fig2](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg)
 
+### Posterior distribution over change point's position
+
 The third group of plots display the posterior distribution over change point's position (and related metrics).
 
 ![Fig3](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg)
+
+### Expectation and surprise 
 
 The fourth group of plots display the expectations regarding the identity of the next observation (and related metrics).
 
