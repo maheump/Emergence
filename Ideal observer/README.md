@@ -14,6 +14,9 @@ Toy examples scripts are available for each of there observers.
 
 ## Full Bayesian ideal observer of the task
 
+We estimate the posterior probability of each possible model:
+<a href="https://www.codecogs.com/eqnedit.php?latex=p\left(\mathcal{H}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{H}_{i}\right)&space;\cdot&space;p\left(\mathcal{H}_{i}\right)}{p\left(y\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(\mathcal{H}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{H}_{i}\right)&space;\cdot&space;p\left(\mathcal{H}_{i}\right)}{p\left(y\right)}" title="p\left(\mathcal{H}_{i}|y\right) = \frac{p\left(y|\mathcal{H}_{i}\right) \cdot p\left(\mathcal{H}_{i}\right)}{p\left(y\right)}" /></a>
+
 ## Example inference
 
 Here is the result of the inference by the full Bayesian ideal observer of the task (the function ```Emergence_IO_FullIO```).
