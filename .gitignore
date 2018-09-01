@@ -35,18 +35,15 @@ __MACOSX
 # Ignore automatically backup MATLAB files
 *.m~
 
-# Ignore data files
-*Demo*.mat
-*Training*.mat
-*Seq*.mat
-*Settings.mat
+# Ignore MATLAB data files except subjects' global data files
+*.mat
+!Experiment_All.mat
 
 # Ignore private folders
 private
 
 # Ignore zip files
 *.zip
-!dependencies.zip
 
 # Ignore LaTeX files
 *.log
