@@ -1,3 +1,6 @@
 [submodule "Dependencies/cbrewer2"]
 	path = Dependencies/cbrewer2
 	url = https://maheump@github.com/scottclowe/cbrewer2.git
+[submodule "Dependencies/matlab"]
+	path = Dependencies/matlab
+	url = https://maheump@github.com/maheump/matlab
