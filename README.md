@@ -34,7 +34,9 @@ Here is an example sequence with the beliefs from an example subject and from th
 
 ## Compatibility issues
 
-The code is written for MATLAB. Note that it has been developed under MATLAB 2018a (v9.5) and that compatibility with earlier versions of MATLAB has not been tested and is therefore not granted. In particular at line 151 of the function ```Emergence_IO_Tree```, instead of using the time-consuming```repmat``` function, we use a MATLAB fairly recently developed matrix logical computation.
+The code is written for MATLAB. Note that it has been developed under MATLAB 2018a (v9.5) with the *Image Processing* (v10.3), *Signal Processing* (v8.1) and *Statistics and Machine Learning* (v11.4) toolboxes.
+
+Compatibility with earlier versions of MATLAB has not been tested and is therefore not granted. In particular at line 151 of the function ```Emergence_IO_Tree```, instead of using the time-consuming```repmat``` function, we use a MATLAB fairly recently developed matrix logical computation.
 
 ## Dependencies
 
