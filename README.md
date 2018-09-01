@@ -5,7 +5,7 @@ This is the companion repository for the following article: *Human detection of 
 In order to get the toolbox up and running, run the following commands in the MATLAB command window:
 
 ```
->> system('git clone https://github.com/maheump/Emergence.git')
+>> !git clone https://github.com/maheump/Emergence.git
 >> cd Emergence
 >> SETUP
 ```
