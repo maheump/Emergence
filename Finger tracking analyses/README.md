@@ -4,6 +4,12 @@ The script ```Emergence_FTA_PreprocData``` preprocesses the raw data, it has to 
 
 The script ```Emergence_FTA_LoadData``` loads the preprocessed data in the MATLAB workspace.
 
-The script ```Emergence_FTA_RunPipeline``` runs the entire analysis pipeline.
+All other scripts are analyses scripts that can be run either after calling ```Emergence_FTA_LoadData``` as follows.
 
-All other scripts are analyses scripts that can be run either after calling ```Emergence_FTA_LoadData``` or by running the entire pipeline script ```Emergence_FTA_RunPipeline```.
+```
+>> Emergence_FTA_LoadData
+Loading data... Done! Bad subjects are excluded.
+>> Emergence_FTA_HypothesisWeighting1
+```
+
+The script ```Emergence_FTA_RunPipeline``` runs the entire analysis pipeline.
