@@ -107,7 +107,7 @@ for iHyp = 1:3
     axis('equal'); axis('off');
     axis([1, nSub, 1, nR]);
     set(gca, 'YDir', 'Reverse', 'Box', 'Off');
-
+    
     % Add some text labels
     text(mean(1:nSub), nR+1, 'Subjects');
     text(0, nR/2, 'Sequences', 'Rotation', 90);
@@ -143,11 +143,11 @@ for sub = 1:nSub
     
     % For each type of regularity
     for iHyp = 1:2
-    
+        
         % Get data
         signal = regornot(cidx{iHyp},sub); % sequences with a regularity
         noise  = regornot(cidx{3},sub);    % fully-stochastic sequences
-
+        
         % Get frequencies for each possible answer
         H  = sum(signal == 1); % hit
         M  = sum(signal == 0); % miss
@@ -157,11 +157,11 @@ for sub = 1:nSub
         % Create a contingency table and pad unobserved values
         t = [H, M; FA, CR];
         t(t == 0) = pad;
-
+        
         % Compute the proportions of hits and false alarms
         pH  = t(1,1) / sum(t(1,:));
         pFA = t(2,1) / sum(t(2,:));
-
+        
         % Compute sensitivity and bias measures
         dprime(sub,iHyp) = (norminv(pH) - norminv(pFA));
         crit(sub,iHyp) = (1/2) * (norminv(pH) + norminv(pFA));

@@ -55,18 +55,18 @@ figure('Position', [1 906 340 200]);
 
 % For each type of regularity
 lgd = NaN(1,2);
-for iHyp = fliplr(1:2)
-
+for iHyp = [2,1]
+    
     % Average posterior distributions
     d = cppost(:,:,iHyp);
     m = mean(d,1);
-
+    
     % Display the posterior distribution of change point's positions
     % centered around the real position of the change point
     lgd(iHyp) = fill([x(1), x, x(end)], [0, m, 0], 'k', 'FaceColor', ...
         tricol(iHyp,:), 'EdgeColor', 'None', 'FaceAlpha', 1/3); hold('on');
     plot(x, m, '-', 'Color', tricol(iHyp,:), 'LineWidth', 2)
-
+    
     % Perform a t-test against the uniform (prior) distribution at each
     % position around the true change point's position
     h = ttest(cppost(:,:,iHyp), 1/N, 'tail', 'right');

@@ -75,7 +75,7 @@ gppoints = cell(1,nMap);
 
 % For each density map to be created
 for iMap = 1:nMap
-
+    
     % Get the finger's positions in the current condition
     points = cellfun(@(x,y) x.BarycCoord(y,:), ...
         D, idxtrimap{iMap}, 'UniformOutput', 0);
@@ -96,7 +96,7 @@ for iMap = 1:nMap
     
     % Smooth the density map
     density = convn(density, imageFilter, 'same');
-
+    
     % Convert it to log scale
     density = log(density+1);
     
@@ -120,12 +120,12 @@ nBin = 30;
 % For each density map
 for iMap = 1:nMap+1
     sp = subplot(1, 4, iMap);
-
+    
     % Display the density maps of finger's position
     imagesc(xgrid, ygrid, trajmap{iMap}, 'AlphaData', mask); hold('on');
     contour(xgrid, ygrid, trajmap{iMap}, 5, 'k-', 'LineWidth', 1/2);
     image(xgrid, ygrid, repmat(~mask, [1,1,3]), 'AlphaData', ~mask);
-
+    
     % Display an empty triangle
     tr = Emergence_PlotTriInfo(tcn, tricol);
     

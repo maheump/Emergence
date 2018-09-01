@@ -89,39 +89,39 @@ end
 
 % After each observation
 for iObs = 1:N
-
+    
     % For subject's and IO's inference
     for ind = 1:2
         shift = (2*3)*(ind-1);
-
+        
         % Triangle
         % ~~~~~~~~
         subplot(4,3,[1,4]+shift); cla;
-
+        
         % Check whether the change point already happened or not
         J = X{ind}.Jump+1/2;
         if iObs < J, J = NaN; end
-
+        
         % Plot the trajectory (up to sample "i") on the triangle
         Emergence_PlotTrajOnTri(X{ind}.BarycCoord(1:iObs,:), J, ...
             tricol, eps, markers, false, fs);
         Emergence_PlotGridOnTri(3);
-
+        
         % Display the type of observer
         text(min(xlim), min(ylim), obslab{ind}, 'FontWeight', 'Bold', ...
             'HorizontalAlignment', 'Left', 'FontSize', fs);
-
+        
         % Customize the axes
         set(gca, 'FontSize', fs);
-
+        
         % Add some labels
         txt = condlab{sub};
         spc = strfind(txt, ' ');
-
+        
         % Auditory sequence
         % ~~~~~~~~~~~~~~~~~
         subplot(4,3,(2:3)+shift); cla;
-
+        
         % Display the sequence (up to sample "i")
         for j = 1:2
             idx = find(X{ind}.Seq(1:iObs) == j);
@@ -129,14 +129,14 @@ for iObs = 1:N
             text(0, j, {letters{j},''}, 'Color', stimcol{j}, 'FontSize', fs, ...
                 'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
         end
-
+        
         % Display the change point's position if it already occured
         if iObs >= J
             plot(repmat(X{ind}.Jump,1,2), [0,3], 'k-');
             plot(X{ind}.Jump, 3, markers{2}, 'MarkerSize', ms, ...
                 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
         end
-
+        
         % Customize the axes
         axis([1,N,0,3]);
         set(gca, 'XTick', [1,20:20:N], 'YColor', 'none');
@@ -144,47 +144,47 @@ for iObs = 1:N
         if ind == 1
             title(sprintf('%s sequence (%s)', txt(1:spc(1)-1), txt(spc(1)+1:end)));
         end
-
+        
         % Barycentric coordinates
         % ~~~~~~~~~~~~~~~~~~~~~~~
         if iObs > 1
             subplot(4,3,(5:6)+shift); cla;
-
+            
             % Display the cumulative Barycentric coordinates
             Emergence_PlotBarycTraj(X{ind}.BarycCoord(1:iObs,:), tricol);
-
+            
             % Draw help lines (change levels)
             plot([1,iObs], repmat(1/3,1,2), '-', 'Color', g);
             plot([1,iObs], repmat(2/3,1,2), '-', 'Color', g);
-
+            
             % Display the change point's position if it already occured
             if iObs >= J
                 plot(repmat(X{ind}.Jump,1,2), [0,1], 'k-');
                 plot(X{ind}.Jump, 1, markers{2}, 'MarkerSize', ms, ...
                     'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
             end
-
+            
             % Customize the axes
             axis([1,N,0,1]);
             set(gca, 'XTick', [1,20:20:N]);
             set(gca, 'YTick', 0:1/3:1, 'YTickLabel', {'0','1/3','2/3','1'});
             set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs);
-
+            
             % Add some labels
             if ind == 2, xlabel('Observation (#)'); end
             ylabel({'Barycentric','coordinates'});
         end
     end
-
+    
     % Draw iteratively and get the frame
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    
     % Update the figure
     drawnow;
-
+    
     % Get the image
     frame = getframe(ff);
-
+    
     % Append to the file
     if strcmpi(tosave, 'gif')
         im = frame2im(frame);

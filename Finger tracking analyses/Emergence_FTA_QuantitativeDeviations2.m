@@ -25,7 +25,7 @@ bchm = NaN(nParam, nCond, nSub); % benchmark R2
 % For each subject
 for iSub = 1:nSub
     fprintf('Performing correlation for subject #%2.0f/%2.0f.\n', iSub, nSub);
-
+    
     % For each considered value of the shift (in # of observations)
     % between subject and ideal observer beliefs
     for iParam = 1:nParam
@@ -33,7 +33,7 @@ for iSub = 1:nSub
         
         % For each sequence
         for iCond = 1:nCond
-
+            
             % Get relevant trajectories
             subbel = G{iCond,iSub}.BarycCoord; % from the subject
             iobel  = IO{iCond,iSub}.BarycCoord; % from the ideal observer
