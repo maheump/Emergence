@@ -146,8 +146,8 @@ for lock = 1:2
 end
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_TriS.pdf');
-else, save2pdf('figs/F_Dyn_TriIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_TriS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_TriIO.pdf'));
 end
 
 % Display beliefs in each hypothesis locked to both change- and detection- points
@@ -204,8 +204,8 @@ for lock = 1:2
 end
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_CoordS.pdf');
-else, save2pdf('figs/F_Dyn_CoordIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordIO.pdf'));
 end
 
 %% DISPLAY TRIAL-BY-TRIAL UPDATES OF BELIEFS IN THE CORRECT HYPOTHESIS
@@ -256,8 +256,8 @@ for iHyp = 1:2
 end
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_MapS.pdf');
-else, save2pdf('figs/F_Dyn_MapIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_MapS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_MapIO.pdf'));
 end
 
 %% FIT INDIVIDUAL TRAJECTORIES USING SIGMOID FUNCTIONS
@@ -377,8 +377,8 @@ ylabel('Fitted posterior belief p(M_i|y)');
 legend(lgd, proclab, 'Location', 'SouthEast');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_SigmS.pdf');
-else, save2pdf('figs/F_Dyn_SigmIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SigmS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SigmIO.pdf'));
 end
 
 % Compare the slope of the sigmoid in the two types of regularity
@@ -411,8 +411,8 @@ Emergence_DispStatTest(avgslope);
 ylabel('Slope parameter');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_Dyn_SlopeS.pdf');
-else, save2pdf('figs/F_Dyn_SlopeIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SlopeS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SlopeIO.pdf'));
 end
 
 % The sigmoid function

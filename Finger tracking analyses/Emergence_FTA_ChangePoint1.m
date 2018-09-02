@@ -91,7 +91,7 @@ xlabel('Position w.r.t. change point');
 ylabel('p(j_k|H_i,y)');
 
 % Save the figure
-save2pdf('figs/F_CP_PredCorr.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_CP_PredCorr.pdf'));
 
 % Display precision of posterior distributions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,4 +113,4 @@ Emergence_DispStatTest(varcppost);
 ylabel('1/std');
 
 % Save the figure
-save2pdf('figs/F_CP_PredConf.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_CP_PredConf.pdf'));

@@ -59,7 +59,7 @@ for iSeq = 1:nSeq
 end
 
 % Save the figure
-save2pdf('figs/F_ET_ExpSeqs.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_ET_ExpSeqs.pdf'));
 
 %% SUBJECT AND IDEAL OBSERVER BELIEFS IN 3 EXAMPLE TRAJECTORIES
 %  ============================================================
@@ -103,7 +103,7 @@ for iSeq = 1:nSeq
 end
 
 % Save the figure
-save2pdf('figs/F_ET_SubVsIO.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_ET_SubVsIO.pdf'));
 
 %% DIVERSITY OF TRAJECTORIES
 %  =========================
@@ -165,4 +165,4 @@ for iSeq = 1:numel(trajnames)
 end
 
 % Save the figure
-save2pdf('figs/F_ET_TrajDiv.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_ET_TrajDiv.pdf'));

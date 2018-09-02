@@ -155,8 +155,8 @@ end
 ScaleAxis('c', 1:3); ScaleAxis('x'); ScaleAxis('y');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_D_DensityMapsS.pdf');
-else, save2pdf('figs/F_D_DensityMapsIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsIO.pdf'));
 end
 
 %% COMPARE MARGINAL HISTOGRAMS FOR PROBABILISTIC AND DETERMINISTIC REGULARITIES
@@ -227,6 +227,6 @@ legend(lgd, cellfun(@(x) x(1:5), proclab(1:2), 'UniformOutput', 0), ...
     'Orientation', 'Horizontal', 'Location', 'NorthOutside');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_D_MargHistS.pdf');
-else, save2pdf('figs/F_D_MargHistIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_MargHistS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_D_MargHistIO.pdf'));
 end

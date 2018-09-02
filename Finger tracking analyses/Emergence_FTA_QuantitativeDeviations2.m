@@ -111,7 +111,7 @@ xlabel('Delay btw subjects and the IO (# obs.)');
 ylabel('Correlation coefficient');
 
 % Save the figure
-save2pdf('figs/F_QD_CorrSubIO.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_CorrSubIO.pdf'));
 
 % Display dispersion of lag over subjects
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -139,7 +139,7 @@ Emergence_DispStatTest(paramlist(submaxidxavgR2));
 ylabel('Estimated delay (# obs.)');
 
 % Save the figure
-save2pdf('figs/F_QD_Delay.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_Delay.pdf'));
 
 % Correlate average lag and quality of fit with the IO over subjects
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,4 +176,4 @@ set(gca, 'Box', 'Off');
 xlabel('Estimated delay (# obs.)'); ylabel('Correlation with the IO');
 
 % Save the figure
-save2pdf('figs/F_QD_Corr.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_Corr.pdf'));

@@ -82,7 +82,7 @@ xlabel('Ideal observer');
 ylabel('Subjects');
 
 % Save the figure
-save2pdf('figs/F_HW_GpCorr.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_HW_GpCorr.pdf'));
 
 % Display individual regression coefficients
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,4 +109,4 @@ ylabel('Correlation coefficients');
 disptstats(pval,tci,stats);
 
 % Save the figure
-save2pdf('figs/F_HW_SubCorr.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_HW_SubCorr.pdf'));

@@ -14,6 +14,10 @@ addpath(genpath(folderpath));
 % Set default properties for the figures
 Emergence_DefaultFigureProperties;
 
+% Make sure there is a folder to receive figure files
+ftapath = fullfile(folderpath, 'Finger tracking analyses');
+mkdir(fullfile(ftapath, 'figs'));
+
 % Load the data
 load('Emergence_Behaviour_GroupData.mat');
 

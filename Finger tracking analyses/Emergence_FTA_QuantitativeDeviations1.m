@@ -130,7 +130,7 @@ set(gca, 'Box', 'Off');
 ylabel('Model frequencies');
 
 % Save the figure
-save2pdf('figs/F_QD_BMS.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_BMS.pdf'));
 
 % Display the fit at the group level
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -175,7 +175,7 @@ set(gca, 'Box', 'Off');
 xlabel('Beliefs from the ideal observer'); ylabel('Beliefs from subjects');
 
 % Save the figure
-save2pdf('figs/F_QD_AvgPWFit.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgPWFit.pdf'));
 
 % Display best parameters
 % ~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +217,7 @@ for iParam = 1:2
 end
 
 % Save the figure
-save2pdf('figs/F_QD_GpPWFit.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_GpPWFit.pdf'));
 
 % Probability weighting function
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

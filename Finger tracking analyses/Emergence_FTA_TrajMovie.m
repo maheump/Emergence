@@ -35,9 +35,9 @@ if strcmpi(tosave, 'avi')
 % Define properties of the auditory stimuli
 AudioFreq = 44100; % hertz
 StimFreqs = [350, 700, 1400; 500, 1000, 2000]; % hertz
-StimRise  = 0.007; % seconds
-StimDur   = 0.05; % seconds
-SOA       = 0.3; % seconds
+StimRise  = 0.007; % second
+StimDur   = 0.050; % second
+SOA       = 0.300; % second
 StimOff   = SOA - StimDur; % seconds
 
 % Choose sounds
@@ -58,7 +58,8 @@ end
 % Create the entire auditory sequence
 audseq = cell2mat(SoundMatrix(X{1}.Seq));
 seqdur = size(audseq,2) / AudioFreq;
-audiowrite('aud.wav', audseq(1,:), AudioFreq);
+audfile = fullfile(ftapath, 'figs', 'aud.wav');
+audiowrite(audfile, audseq(1,:), AudioFreq);
 
 end
 
@@ -80,10 +81,11 @@ obslab = {{'Example', 'subject'}, {'Ideal','observer'}};
 
 % Prepare the video file
 if strcmpi(tosave, 'gif')
-    filename = 'figs/F_M.gif';
+    filename = fullfile(ftapath, 'figs', 'F_M.gif');
     delete(filename);
 elseif strcmpi(tosave, 'avi')
-    vidObj = VideoWriter('vid.avi');
+    vidfile = fullfile(ftapath, 'figs', 'vid.avi');
+    vidObj = VideoWriter(vidfile);
     vidObj.FrameRate = N/seqdur;
     open(vidObj);
 end
@@ -213,6 +215,8 @@ if strcmpi(tosave, 'avi')
     % The avconv plugin works on Mac OS and allow to combine visual and auditory
     % files together. Instructions for installation can be found at:
     % https://libav.org/avconv.html
-    try system('avconv -i vid.avi -i aud.wav -c copy figs/F_M.avi');
+    allfile = fullfile(ftapath, 'figs', 'F_M.avi');
+    cmd = sprintf('avconv -i ''%s'' -i ''%s'' -c copy ''%s''', vidfile, audfile, allfile);
+    try system(cmd);
     catch, end
 end

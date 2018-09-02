@@ -157,7 +157,7 @@ set(gca, 'XTick', 0:0.2:1, 'YTick', 0:0.2:1);
 xlabel('p(A|B)'); ylabel('p(B|A)');
 
 % Save the figure
-save2pdf('figs/F_HW_DeterRegTP.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_HW_DeterRegTP.pdf'));
 
 %% SHOW THAT THE TRANSIENT BELIEFS DEPENDS UPON THE ENTROPY OF THE RULES
 %  =====================================================================
@@ -209,8 +209,8 @@ Emergence_PlotGridOnTri(2,  2, tricol(2,:), tricc);
 axis('equal'); axis('off');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_HW_TriS.pdf');
-else, save2pdf('figs/F_HW_TriIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_TriS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_TriIO.pdf'));
 end
 
 % Display corresponding barycentric coordinates
@@ -241,8 +241,8 @@ xlabel('Observation w.r.t. detection point');
 ylabel('Posterior beliefs p(M_i|y)');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_HW_DynS.pdf');
-else, save2pdf('figs/F_HW_DynIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_DynS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_DynIO.pdf'));
 end
 
 % Average beliefs in the probabilistic hypothesis between the change and
@@ -288,6 +288,6 @@ Emergence_DispStatTest(data);
 ylabel('Posterior beliefs p(M_P|y)');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_HW_EntS.pdf');
-else, save2pdf('figs/F_HW_EntIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_EntS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_EntIO.pdf'));
 end

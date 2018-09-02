@@ -108,7 +108,7 @@ for iBin = 1:nBin-1
 end
 
 % Save the figure
-save2pdf('figs/F_FA_Tri.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_FA_Tri.pdf'));
 
 % Display the correlation between subjects' and ideal observer's beliefs
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,7 +137,7 @@ xlabel('Ideal observer');
 ylabel('Subjects');
 
 % Save the figure
-save2pdf('figs/F_FA_Corr.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_FA_Corr.pdf'));
 
 % Display the distribution of correlation coefficients over subjects
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,7 +162,7 @@ Emergence_DispStatTest(coef);
 ylabel('Correlation coefficient');
 
 % Save the figure
-save2pdf('figs/F_FA_Gp.pdf');
+save2pdf(fullfile(ftapath, 'figs', 'F_FA_Gp.pdf'));
 
 % Perform a t-test against chance 
 [~,pval,tci,stats] = ttest(coef);

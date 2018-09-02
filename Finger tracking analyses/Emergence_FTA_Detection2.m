@@ -71,8 +71,8 @@ xlabel({'Probabilistic', 'regularities'});
 ylabel('Belief p(M_P|y) from the IO');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_D_BelUndetS.pdf');
-else, save2pdf('figs/F_D_BelUndetIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_BelUndetS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_D_BelUndetIO.pdf'));
 end
 
 %% DETERMINANTS OF DETECTION FOR PROBABILISTIC REGULARITIES
@@ -155,8 +155,8 @@ xlabel('Biased dimension');
 ylabel('Average detection rate');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_D_ProbRegS.pdf');
-else, save2pdf('figs/F_D_ProbRegIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_ProbRegS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_D_ProbRegIO.pdf'));
 end
 
 %% DETERMINANTS OF DETECTION FOR DETERMINISTIC REGULARITIES
@@ -228,6 +228,6 @@ xlabel('Rule''s difficulty');
 ylabel('Average detection rate');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_D_DetRegS.pdf');
-else, save2pdf('figs/F_D_DetRegIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DetRegS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DetRegIO.pdf'));
 end

@@ -141,8 +141,8 @@ set(gca, 'YColor', 'None');
 axis([x([1,end]), 0, 1]);
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_Corr1S.pdf');
-else, save2pdf('figs/F_CP_Corr1IO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr1S.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr1IO.pdf'));
 end
 
 % Display individual correlation coefficient from the correlation between
@@ -174,8 +174,8 @@ Emergence_DispStatTest(coef);
 ylabel('Correlation coefficient');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_Corr2S.pdf');
-else, save2pdf('figs/F_CP_Corr2IO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr2S.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr2IO.pdf'));
 end
 
 %% CONFIDENCE IN THE ESTIMATE
@@ -218,6 +218,6 @@ Emergence_DispStatTest(avgConf);
 ylabel('Confidence in the estimate');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf('figs/F_CP_ConfS.pdf');
-else, save2pdf('figs/F_CP_ConfIO.pdf');
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfIO.pdf'));
 end
