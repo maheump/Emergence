@@ -2,6 +2,20 @@
 
 This is the companion repository for the following article: *Human detection of probabilistic versus deterministic regularities in sequences*. The repository contains the scripts and functions needed to reproduce the analyses, simulations and fits presented in the paper.
 
+## Abstract of the paper
+
+The environment is highly structured in time thus allowing the brain to generate expectations about future events. To maximize the accuracy of its predictions, and thus better adjust behavior, the brain must however correctly identify the process generating the observations it receives. In particular, it must accurately distinguish between processes for which it is possible to perfectly predict the future (deterministic processes) from those for which a certain degree of uncertainty remains (probabilistic processes). How does the brain infer and arbitrate between these two hypotheses? Using a novel sequence learning experiment combined with finger-tracking, we show that human subjects are able to detect both types of regularities when suddenly appearing out of randomness. Crucially, they were able to estimate, and to update as observations were delivered, the likelihood of each of these two hypotheses in a manner that was predicted by normative principles. This suggests that the brain may approximate Bayesian inference when comparing hypotheses that involved different learning policies such as to maximize its predictability power.
+
+## Example inference
+
+Here is an example sequence with the beliefs from an example subject and from the ideal observer when presented with the very same sequence.
+
+<p align="center">
+  <img src="Finger%20tracking%20analyses/figs/F_M.gif" width="500" align="middle">
+</p>
+
+## Installation
+
 In order to get the toolbox up and running, run the following commands in the MATLAB command window:
 
 ```
@@ -13,16 +27,6 @@ In order to get the toolbox up and running, run the following commands in the MA
 The script ```SETUP.m``` sets up the environment required to run the different scripts. It should be re-run each time MATLAB is restarted as the toolbox do not save any change (be them paths added to MATLAB path list or figures' default properties) it does to the MATLAB default configurations.
 
 After calling that script, you are good to go!
-
-## Abstract of the paper
-
-The environment is highly structured in time thus allowing the brain to generate expectations about future events. To maximize the accuracy of its predictions, and thus better adjust behavior, the brain must however correctly identify the process generating the observations it receives. In particular, it must accurately distinguish between processes for which it is possible to perfectly predict the future (deterministic processes) from those for which a certain degree of uncertainty remains (probabilistic processes). How does the brain infer and arbitrate between these two hypotheses? Using a novel sequence learning experiment combined with finger-tracking, we show that human subjects are able to detect both types of regularities when suddenly appearing out of randomness. Crucially, they were able to estimate, and to update as observations were delivered, the likelihood of each of these two hypotheses in a manner that was predicted by normative principles. This suggests that the brain may approximate Bayesian inference when comparing hypotheses that involved different learning policies such as to maximize its predictability power.
-
-## Example inference
-
-Here is an example sequence with the beliefs from an example subject and from the ideal observer when presented with the very same sequence.
-
-<img src="Finger%20tracking%20analyses/figs/F_M.gif" width="400" align="middle">
 
 ## Organization of the repository
 
