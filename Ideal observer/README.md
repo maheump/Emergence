@@ -12,10 +12,6 @@ The full Bayesian ideal observer of the task is implemented in  ```Emergence_IO_
 
 Toy examples scripts are available for each of there observers.
 
-## Observers learning statistics
-
-## Observer learning patterns
-
 ## Full Bayesian ideal observer of the task
 
 Here is the result of the inference by the full Bayesian ideal observer of the task (the function ```Emergence_IO_FullIO```).
@@ -29,22 +25,30 @@ We estimate the posterior probability of each possible model:
 
 The first group of plots display the posterior distribution over models (and related metrics).
 
-![Fig1](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg){:height="50%" width="50%"}
+<p align="center">
+  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg" width="500" align="middle">
+</p>
 
 ### Posterior distribution over models' parameters
 
 The second group of plots display the posterior distribution over models' parameters.
 
-![Fig2](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg){:height="50%" width="50%"}
+<p align="center">
+  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg" width="500" align="middle">
+</p>
 
 ### Posterior distribution over change point's position
 
 The third group of plots display the posterior distribution over change point's position (and related metrics).
 
-![Fig3](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg){:height="50%" width="50%"}
+<p align="center">
+  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg" width="500" align="middle">
+</p>
 
 ### Expectation and surprise
 
 The fourth group of plots display the expectations regarding the identity of the next observation (and related metrics).
 
-![Fig4](https://github.com/maheump/Emergence/blob/initialdev/Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg){:height="50%" width="50%"}
+<p align="center">
+  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg" width="500" align="middle">
+</p>
