@@ -26,7 +26,7 @@ We estimate the posterior probability of each possible model:
 The first group of plots display the posterior distribution over models (and related metrics).
 
 <p align="center">
-  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg" width="500" align="middle">
+  <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg" width="500" align="middle">
 </p>
 
 ### Posterior distribution over models' parameters
@@ -34,7 +34,7 @@ The first group of plots display the posterior distribution over models (and rel
 The second group of plots display the posterior distribution over models' parameters.
 
 <p align="center">
-  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg" width="500" align="middle">
+  <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg" width="500" align="middle">
 </p>
 
 ### Posterior distribution over change point's position
@@ -42,7 +42,7 @@ The second group of plots display the posterior distribution over models' parame
 The third group of plots display the posterior distribution over change point's position (and related metrics).
 
 <p align="center">
-  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg" width="500" align="middle">
+  <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg" width="500" align="middle">
 </p>
 
 ### Expectation and surprise
@@ -50,5 +50,5 @@ The third group of plots display the posterior distribution over change point's 
 The fourth group of plots display the expectations regarding the identity of the next observation (and related metrics).
 
 <p align="center">
-  <img src="Ideal%20observer/ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg" width="500" align="middle">
+  <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg" width="500" align="middle">
 </p>
