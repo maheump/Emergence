@@ -1,30 +1,39 @@
-function S1 = Emergence_Stimulation_CreateSound( stim_freq, stim_rise, stim_dur, aud_freq )
-% From El Karoui et al Cereb Cortex 2014.
+function stim = Emergence_Stimulation_CreateSound( freq, rise, dur, audfreq )
+% EMERGENCE_STIMULATION_CREATESOUND creates auditory stimuli.
+% 
+% Same technical details as El Karoui et al., Cereb. Cortex, 2014.
 % Each sound was 50-ms long and composed of 3 sinusoidal tones 
 % (350, 700, and 1400 Hz, sound A; or 500, 1000, and 2000 Hz, sound B). 
 % All tones were prepared with 7-ms rise and 7-ms fall times.
+% 
+% Copyright (c) 2018 Maxime Maheu
 
+% Fill the inputs
 if nargin < 4
     dv = PsychPortAudio('GetDevices');
-    aud_freq = dv(1).DefaultSampleRate;
+    audfreq = dv(1).DefaultSampleRate;
     if nargin < 3
-        stim_dur = 0.05; % ms
+        dur = 0.050; % second
         if nargin < 2
-            stim_rise = 0.007; % ms
+            rise = 0.007; % second
             if nargin < 1
-                stim_freq = [350, 700, 1400]; % Hz
+                freq = [350, 700, 1400]; % Hertz
             end
         end
     end
 end
 
-% make S1, add waning and waxing and clip range to [-1 1];
-S1 = zeros(1, round(stim_dur*aud_freq));
+% Make the stimulus
+stim = zeros(1, round(dur*audfreq));
 for k = 1:3
-    S1 = S1 + sin(2*pi*stim_freq(k)/aud_freq*(1:round(stim_dur*aud_freq)));
+    stim = stim + sin(2*pi*freq(k)/audfreq*(1:round(dur*audfreq)));
 end
-S1(1:round(stim_rise*aud_freq)) = linspace(0, 1, round(stim_rise*aud_freq)) .* S1(1:round(stim_rise*aud_freq));
-S1(end-round(stim_rise*aud_freq)+1:end) = linspace(1, 0, round(stim_rise*aud_freq)) .* S1(end-round(stim_rise*aud_freq)+1:end);
-S1 = S1 / max(abs(S1));
+
+% Add waning and waxing 
+stim(1:round(rise*audfreq))         = linspace(0, 1, round(rise*audfreq)) .* stim(1:round(rise*audfreq));
+stim(end-round(rise*audfreq)+1:end) = linspace(1, 0, round(rise*audfreq)) .* stim(end-round(rise*audfreq)+1:end);
+
+% Clip range to [-1 1]
+stim = stim / max(abs(stim));
 
 end

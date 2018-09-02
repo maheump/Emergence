@@ -1,6 +1,7 @@
-% Stimulation script for the EMERGENCE experiment.
+% This is the stimulation script. It presents auditory sequences and record
+% finger motions.
 % 
-% Maxime Maheu, 2016
+% Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZE THE MATLAB ENVIRONMENT
 %  =================================
@@ -19,6 +20,8 @@ if strcmpi(user, 'Maxime')
     homepath = '/Users/Maxime/Documents/My projects/Emergence';
 elseif strcmpi(user, 'marie')
     homepath = 'C:\Users\marie\Documents\MATLAB\Emergence';
+else
+    homepath = mfilename('fullpath');
 end
 
 % Add it to the path

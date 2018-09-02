@@ -1,3 +1,7 @@
+% This script presents the different conditions to the subjects.
+% 
+% Copyright (c) 2018 Maxime Maheu
+
 %% PREPARE THE AUDITORY STIMULI
 %  ============================
 
@@ -18,9 +22,9 @@ AudioChan = 2;
 pahandle = PsychPortAudio('Open', [], [], 1, AudioFreq, AudioChan);
 
 % Define properties of the auditory stimuli
-StimFreqs = [350, 700, 1400; 500, 1000, 2000]; % Hz
-StimRise  = 0.007; % ms
-StimDur   = 0.05; % ms
+StimFreqs = [350, 700, 1400; 500, 1000, 2000]; % Herzt
+StimRise  = 0.007; % second
+StimDur   = 0.050; % second
 
 % Choose sounds
 soundsname = {'bip', 'boup'};
@@ -38,25 +42,30 @@ for k = 1:nSnd
     PsychPortAudio('FillBuffer', pahandle, SoundMatrix{k});
     wantedt = GetSecs+1;
     obtainedt = PsychPortAudio('Start', pahandle, sndforced, wantedt, 1);
-    fprintf('\nSound delay %s (%i/%i) = %1.4fs\n', soundsname{k}, k, nSnd, obtainedt - wantedt);
+    fprintf('\nSound delay %s (%i/%i) = %1.4fs\n', ...
+        soundsname{k}, k, nSnd, obtainedt - wantedt);
 end
 WaitSecs(1);
 
 %% PLAY SEQUENCES THAT ARE USED AS EXAMPLES IN THE INSTRUCTIONS
 %  ============================================================
 
+% Select which sequence to present
 t = 1;
-SOA = 0.3;
 
+% Define example sequences
 seqs = {[2 1 1 1 2 1 1 2 2 1 1 1 1 2 1 2 2 1 1 1 1 1 1 2], ...
         [2 1 1 1 1 1 1 2 2 2 2 1 1 2 2 2 2 2 2 1 1 1 1 2], ...
         [2 1 1 2 1 2 1 2 1 2 1 2 1 2 2 1 2 1 1 2 1 2 1 2], ...
         [1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2], ...
         [2 2 2 1 2 2 2 1 2 2 2 1 2 2 2 1 2 2 2 1 2 2 2 1]};
     
+% Define SOA
+SOA = 0.3;
+
+% Play sequentially each observation in the sequence
 xg = GetSecs;
 for tt = 1:numel(seqs{t})
-
     PsychPortAudio('FillBuffer', pahandle, SoundMatrix{seqs{t}(tt)});
     xg = PsychPortAudio('Start', pahandle, sndforced, xg + SOA, 1);
 end
@@ -64,11 +73,13 @@ end
 %% DISPLAY EXAMPLE SEQUENCES
 %  =========================
 
-clear; close('all'); clc
+% Load the demo
 load('Emergence_Stimulation_Demo.mat');
 
+% Define colors
 col = [255 081 117; 049 132 182] ./ 255;
 
+% Display the sequences
 figure('Color', ones(1,3), 'Position', [1 456 1920 200]);
 for i = 1:numel(D)
     subplot(numel(D), 1, i);

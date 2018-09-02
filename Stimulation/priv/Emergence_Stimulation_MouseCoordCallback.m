@@ -1,4 +1,9 @@
 function Emergence_Stimulation_MouseCoordCallback( timerObj, event, trial, txtfile ) 
+% EMERGENCE_STIMULATION_MOUSECOORDCALLBACK tracks finger position (mouse
+% position actually) in the background in order to reach high sampling
+% rate.
+% 
+% Copyright (c) 2018 Maxime Maheu
 
 % Read the coordinates
 coords = get(0, 'PointerLocation');
