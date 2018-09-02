@@ -26,12 +26,12 @@ badsubs = [1, 7, 13, 14, 19];
 goodsubs = setdiff(1:nSub, badsubs);
 
 % Remove data from bad subjects
-if ~exist('rmbadsub', 'var') || rmbadsub
+if ~exist('rmbadsub', 'var'), rmbadsub = true; end
+if rmbadsub
     G = G(:,goodsubs);
     S = S(goodsubs);
     IO = IO(:,goodsubs);
     rmbadsub = true;
-else, rmbadsub = false;
 end
 
 % Get the number of subjects and the number of conditions

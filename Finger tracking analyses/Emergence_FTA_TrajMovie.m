@@ -10,6 +10,12 @@
 %% INITIALIZATION
 %  ==============
 
+% Make sure data from bad subjects is available
+if rmbadsub
+    rmbadsub = false;
+    Emergence_FTA_LoadData;
+end
+
 % Save the file
 tosave = 'gif'; % can be '', 'gif' or 'avi'
 
@@ -23,9 +29,6 @@ X{1} = G{sub,seq};
 X{2} = IO{sub,seq};
 X{2}.Seq = G{sub,seq}.Seq;
 N = numel(X{1}.Seq);
-
-% Colors
-g = repmat(0.6,1,3); % grey
 
 %% PREPARE THE AUDITORY STIMULI
 %  ============================
@@ -65,11 +68,6 @@ end
 
 %% GET FINGER'S TRAJECTORY
 %  =======================
-
-% Coordinates of the triangles limits (cartesian coordinates)
-normtrglc = [0, sqrt(3)/2; ... % top left (P)
-             1, sqrt(3)/2; ... % top right (D)
-             1/2, 0];          % bottom (R)
 
 % Prepare the window
 ff = figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 806 400 300]);
@@ -218,5 +216,9 @@ if strcmpi(tosave, 'avi')
     allfile = fullfile(ftapath, 'figs', 'F_M.avi');
     cmd = sprintf('avconv -i ''%s'' -i ''%s'' -c copy ''%s''', vidfile, audfile, allfile);
     try system(cmd);
-    catch, end
+    catch
+    end
+    fprintf(['If the *.avi file has not been generated. First, make ', ...
+        'sure you have installed ''avconv'' from ''https://libav.org/avconv.html''. ', ...
+        'Then directly run the following command in the terminal:\n%s\n'], cmd);
 end

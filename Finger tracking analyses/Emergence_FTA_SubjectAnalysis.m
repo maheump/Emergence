@@ -9,6 +9,12 @@
 % N.B. To be run without subject exclusion. To do so, turn the boolean
 % variable "rmbadsub" in "Emergence_FTA_LoadData" to false.
 
+% Make sure data from bad subjects is available
+if rmbadsub
+    rmbadsub = false;
+    Emergence_FTA_LoadData;
+end
+
 % Define the folder in which to save the subject-specific figures
 pathtofile = fullfile(folderpath, 'Finger tracking analyses', 'subfig');
 mkdir(pathtofile);
