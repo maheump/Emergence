@@ -527,6 +527,7 @@ end
 % Define the folder where to save the figures
 try
 figpath = fullfile(scriptpath(1:max(strfind(scriptpath,'/'))), 'figs/');
+mkdir(figpath);
 
 % Save the figures as separate files
 figimg = arrayfun(@(x) frame2im(getframe(figure(x))), 1:4, 'UniformOutput', 0);
