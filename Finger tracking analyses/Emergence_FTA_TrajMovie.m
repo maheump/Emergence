@@ -4,6 +4,9 @@
 %
 % Copyright (c) 2018 Maxime Maheu
 
+% N.B. To be run without subject exclusion. To do so, turn the boolean
+% variable "rmbadsub" in "Emergence_FTA_LoadData" to false.
+
 %% INITIALIZATION
 %  ==============
 
@@ -69,13 +72,11 @@ normtrglc = [0, sqrt(3)/2; ... % top left (P)
 
 % Prepare the window
 ff = figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 806 400 300]);
-markers = {'.', 'p', 'o'};
-stimcol = {'b', 'r'};
 fs = 8;
 ms = 8;
 
 % Type of observer
-obslab = {'Subject', {'Ideal','observer'}};
+obslab = {{'Example', 'subject'}, {'Ideal','observer'}};
 
 % Prepare the video file
 if strcmpi(tosave, 'gif')
@@ -104,12 +105,14 @@ for iObs = 1:N
         
         % Plot the trajectory (up to sample "i") on the triangle
         Emergence_PlotTrajOnTri(X{ind}.BarycCoord(1:iObs,:), J, ...
-            tricol, eps, markers, false, fs);
+            tricol, eps, {'', '', ''}, false, fs);
         Emergence_PlotGridOnTri(3);
+        cc = X{ind}.BarycCoord(iObs,:)*tricc;
+        plot(cc(1), cc(2), 'k.', 'MarkerSize', 10)
         
         % Display the type of observer
-        text(min(xlim), min(ylim), obslab{ind}, 'FontWeight', 'Bold', ...
-            'HorizontalAlignment', 'Left', 'FontSize', fs);
+        text(min(xlim), min(ylim), obslab{ind}, 'HorizontalAlignment', ...
+            'Left', 'FontSize', fs, 'Interpreter', 'LaTeX');
         
         % Customize the axes
         set(gca, 'FontSize', fs);
@@ -125,24 +128,26 @@ for iObs = 1:N
         % Display the sequence (up to sample "i")
         for j = 1:2
             idx = find(X{ind}.Seq(1:iObs) == j);
-            plot(idx, repmat(j, [1,numel(idx)]), '.', 'Color', stimcol{j}); hold('on');
-            text(0, j, {letters{j},''}, 'Color', stimcol{j}, 'FontSize', fs, ...
+            plot(1.2+(X{ind}.Seq(1:iObs)-1).*0.6, '-', 'Color', g, ...
+                'LineWidth', 1/2); hold('on');
+            plot(idx, repmat(j, [1,numel(idx)]), 'k.', 'MarkerSize', 5); 
+            text(0, j, {letters{j},''}, 'Color', 'k', 'FontSize', fs, ...
                 'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
         end
         
         % Display the change point's position if it already occured
         if iObs >= J
-            plot(repmat(X{ind}.Jump,1,2), [0,3], 'k-');
-            plot(X{ind}.Jump, 3, markers{2}, 'MarkerSize', ms, ...
-                'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
+            plot(repmat(X{ind}.Jump,1,2), [0.8,2.2], 'k-', 'LineWidth', 1/2);
         end
         
         % Customize the axes
-        axis([1,N,0,3]);
-        set(gca, 'XTick', [1,20:20:N], 'YColor', 'none');
-        set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs);
+        axis([1,N,-1,3]); axis('off');
+        set(gca, 'XTick', [1,20:20:N], 'XTickLabel', {}, 'YDir', 'reverse');
+        set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs, ...
+            'TickLabelInterpreter', 'LaTeX', 'LineWidth', 1/2);
         if ind == 1
-            title(sprintf('%s sequence (%s)', txt(1:spc(1)-1), txt(spc(1)+1:end)));
+            title(sprintf('%s sequence (%s)', txt(1:spc(1)-1), ...
+                txt(spc(1)+1:end)), 'Interpreter', 'LaTeX');
         end
         
         % Barycentric coordinates
@@ -159,20 +164,19 @@ for iObs = 1:N
             
             % Display the change point's position if it already occured
             if iObs >= J
-                plot(repmat(X{ind}.Jump,1,2), [0,1], 'k-');
-                plot(X{ind}.Jump, 1, markers{2}, 'MarkerSize', ms, ...
-                    'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
+                plot(repmat(X{ind}.Jump,1,2), [0,1], 'k-', 'LineWidth', 1/2);
             end
             
             % Customize the axes
             axis([1,N,0,1]);
             set(gca, 'XTick', [1,20:20:N]);
             set(gca, 'YTick', 0:1/3:1, 'YTickLabel', {'0','1/3','2/3','1'});
-            set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs);
+            set(gca, 'Box', 'Off', 'Layer', 'Bottom', 'FontSize', fs, ...
+                'TickLabelInterpreter', 'LaTeX', 'LineWidth', 1/2);
             
             % Add some labels
-            if ind == 2, xlabel('Observation (#)'); end
-            ylabel({'Barycentric','coordinates'});
+            if ind == 2, xlabel('Observation ($K$)', 'Interpreter', 'LaTeX'); end
+            ylabel('$p(\mathcal{M}|y_{1:K})$', 'Interpreter', 'LaTeX');
         end
     end
     
