@@ -22,7 +22,7 @@ The environment is highly structured in time thus allowing the brain to generate
 
 Here is an example sequence with the beliefs from an example subject and from the ideal observer when presented with the very same sequence.
 
-<img src="Finger%20tracking%20analyses/figs/F_M.gif" width="150" align="center">
+<img src="Finger%20tracking%20analyses/figs/F_M.gif" width="400" align="middle">
 
 ## Organization of the repository
 
