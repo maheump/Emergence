@@ -11,6 +11,12 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
+%% INITIALIZATION
+%  ==============
+
+% The following script must be run beforehand
+Emergence_FTA_Detection1;
+
 %% GET THE IO'S POTERIOR BELIEFS IN DETECTED AN UNDETECTED PROBABILISTIC REGULARITIES
 %  ==================================================================================
 
