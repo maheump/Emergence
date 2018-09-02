@@ -132,7 +132,8 @@ for iObs = 1:N
                 'LineWidth', 1/2); hold('on');
             plot(idx, repmat(j, [1,numel(idx)]), 'k.', 'MarkerSize', 5); 
             text(0, j, {letters{j},''}, 'Color', 'k', 'FontSize', fs, ...
-                'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
+                'HorizontalAlignment', 'Right', 'VerticalAlignment', 'Top', ...
+                'Interpreter', 'LaTeX');
         end
         
         % Display the change point's position if it already occured
