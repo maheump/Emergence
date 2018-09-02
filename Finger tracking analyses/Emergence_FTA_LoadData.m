@@ -4,7 +4,7 @@
 % Copyright (c) 2018 Maxime Maheu
 
 % Display info
-fprintf('Loading data... ');
+fprintf('Loading preprocessed data... ');
 
 % Add functions to the MATLAB path
 scriptpath = mfilename('fullpath');
