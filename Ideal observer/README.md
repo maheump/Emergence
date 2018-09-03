@@ -7,10 +7,11 @@ The different observers available are:
 * ```Emergence_IO_Markov``` estimates the frequency of first-order transitions (A|A, A|B, B|A, and B|B).
 * ```Emergence_IO_Chain``` estimates the frequency of transitions of any order.
 * ```Emergence_IO_Tree``` detects repetition of pattern of any length up to a given limit.
+They all return the marginal likelihood of the sequence and the probability that the next observation will be an A.
 
 The full Bayesian ideal observer of the task is implemented in  ```Emergence_IO_FullIO``` and considers there might be a change point in the sequence separating a fully-stochastic part from a regular part that can be described using one of the previous observers.
 
-Toy examples scripts are available for each of there observers.
+Toy examples scripts are available for each of these observers.
 
 ## Full Bayesian ideal observer of the task
 
@@ -19,7 +20,7 @@ These figures can be reproduced using the script ```Emergence_IO_ToyExampleFullI
 
 ### Posterior probability of each model
 
-We estimate the posterior probability of each possible model:
+We estimate the posterior probability of each possible model as:
 
 <p align="center">
 <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(\mathcal{M}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{M}_{i}\right)&space;\cdot&space;p\left(\mathcal{M}_{i}\right)}{p\left(y\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(\mathcal{M}_{i}|y\right)&space;=&space;\frac{p\left(y|\mathcal{M}_{i}\right)&space;\cdot&space;p\left(\mathcal{M}_{i}\right)}{p\left(y\right)}" title="p\left(\mathcal{M}_{i}|y\right) = \frac{p\left(y|\mathcal{M}_{i}\right) \cdot p\left(\mathcal{M}_{i}\right)}{p\left(y\right)}" /></a>
@@ -84,13 +85,13 @@ The second group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the 
 The posterior over change point's position is defined as:
 
 <p align="center">
-  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" title="p\left(j_{k}|y_{1:K}\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{M}_{\text{S}\rightarrow i}|y_{1:K}\right)" /></a>
+  <a href="https://www.codecogs.com/eqnedit.php?latex=\forall&space;j_{k}\in\{1,2,\ldots,N\}:&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow&space;i}\right)&space;=&space;\frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}{\sum_{k=1}^{N}&space;p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\forall&space;j_{k}\in\{1,2,\ldots,N\}:&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow&space;i}\right)&space;=&space;\frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}{\sum_{k=1}^{N}&space;p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}" title="\forall j_{k}\in\{1,2,\ldots,N\}: p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow i}\right) = \frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(j_{k}\right)}{\sum_{k=1}^{N} p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(j_{k}\right)}" /></a>
 </p>
 
 This can be marginalized over models by using Bayesian Model Averaging:
 
 <p align="center">
-  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{H}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{H}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{H}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{H}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" title="p\left(j_{k}|y_{1:K}\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y_{1:K},\mathcal{H}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{H}_{\text{S}\rightarrow i}|y_{1:K}\right)" /></a>
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" title="p\left(j_{k}|y_{1:K}\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{M}_{\text{S}\rightarrow i}|y_{1:K}\right)" /></a>
 </p>
 
 The third group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over change point's position (and related metrics).
