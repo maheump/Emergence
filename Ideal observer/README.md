@@ -67,6 +67,7 @@ In the case of the deterministic hypothesis, the posterior over patterns is defi
 
 <p align="center">
   <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(r|y_{k&plus;1:K},\mathcal{M}_{\text{D}}\right)&space;\propto&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(r|y_{k&plus;1:K},\mathcal{M}_{\text{D}}\right)&space;\propto&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)" title="p\left(r|y_{k+1:K},\mathcal{M}_{\text{D}}\right) \propto p\left(y_{k+1:K}|r,\mathcal{M}_{\text{D}}\right) \cdot p\left(r|\mathcal{M}_{\text{D}}\right)" /></a>
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y|r\right)&space;\in&space;\left\{\frac{1}{2},0\right\}&space;\text{&space;and&space;}&space;p\left(r\right)&space;=&space;\frac{1}{3^{|r|}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y|r\right)&space;\in&space;\left\{\frac{1}{2},0\right\}&space;\text{&space;and&space;}&space;p\left(r\right)&space;=&space;\frac{1}{3^{|r|}}" title="p\left(y|r\right) \in \left\{\frac{1}{2},0\right\} \text{ and } p\left(r\right) = \frac{1}{3^{|r|}}" /></a>
 </p>
 
 The second group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over models' parameters.
@@ -77,6 +78,18 @@ The second group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the 
 
 ### Posterior distribution over change point's position
 
+The posterior over change point's position is defined as:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=\forall&space;j_{k}\in\{1,2,\ldots,N\}:&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow&space;i}\right)&space;=&space;\frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}{\sum_{k=1}^{N}&space;p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\forall&space;j_{k}\in\{1,2,\ldots,N\}:&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow&space;i}\right)&space;=&space;\frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}{\sum_{k=1}^{N}&space;p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}" title="\forall j_{k}\in\{1,2,\ldots,N\}: p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow i}\right) = \frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(j_{k}\right)}{\sum_{k=1}^{N} p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(j_{k}\right)}" /></a>
+</p>
+
+This can be marginalized over models by using Bayesian Model Averaging:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y,\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y,\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y\right)" title="p\left(j_{k}|y\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y,\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{M}_{\text{S}\rightarrow i}|y\right)" /></a>
+</p>
+
 The third group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over change point's position (and related metrics).
 
 <p align="center">
@@ -84,6 +97,42 @@ The third group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the p
 </p>
 
 ### Expectation and surprise
+
+The expectation regarding the identity of the next observation for the fully-stochastic model is simply chance level:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\mathrm{S}}\right)&space;=&space;\frac{1}{2}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\mathrm{S}}\right)&space;=&space;\frac{1}{2}" title="p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\mathrm{S}}\right) = \frac{1}{2}" /></a>
+</p>
+
+The expectation regarding the identity of the next observation for stochastic-to-regular models is computed by marginalizing over possible change point's positions:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\mathrm{S}&space;\rightarrow&space;i}\right)&space;=&space;\sum_{k&space;=&space;1}^{K-2}&space;p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1},\mathcal{M}_{i}\right)&space;\cdot&space;p\left(j_{k}|y_{1:K-1}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\mathrm{S}&space;\rightarrow&space;i}\right)&space;=&space;\sum_{k&space;=&space;1}^{K-2}&space;p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1},\mathcal{M}_{i}\right)&space;\cdot&space;p\left(j_{k}|y_{1:K-1}\right)" title="p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\mathrm{S} \rightarrow i}\right) = \sum_{k = 1}^{K-2} p\left(y_{K}=\mathrm{A}|y_{k+1:K-1},\mathcal{M}_{i}\right) \cdot p\left(j_{k}|y_{1:K-1}\right)" /></a>
+</p>
+
+In the case of the probabilistic hypothesis, the expectation is obtained by integrating over models' parameters:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{P}}\right)&space;=&space;\int_{0}^{1}&space;p\left(y_{K}=\mathrm{A}|y_{K-1},\theta,\mathcal{M}_{\mathrm{P}}\right)&space;\cdot&space;p\left(\theta|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{P}}\right)&space;\mathrm{d}\theta" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{P}}\right)&space;=&space;\int_{0}^{1}&space;p\left(y_{K}=\mathrm{A}|y_{K-1},\theta,\mathcal{M}_{\mathrm{P}}\right)&space;\cdot&space;p\left(\theta|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{P}}\right)&space;\mathrm{d}\theta" title="p\left(y_{K}=\mathrm{A}|y_{k+1:K-1},\mathcal{M}_{\mathrm{P}}\right) = \int_{0}^{1} p\left(y_{K}=\mathrm{A}|y_{K-1},\theta,\mathcal{M}_{\mathrm{P}}\right) \cdot p\left(\theta|y_{k+1:K-1},\mathcal{M}_{\mathrm{P}}\right) \mathrm{d}\theta" /></a>
+</p>
+
+In the case of the deterministic hypothesis, the expectation is obtained by marginalizing over patterns:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{D}}\right)&space;=&space;\sum_{r&space;\in&space;\{\mathcal{R}\}}&space;p\left(y_{K}=\mathrm{A}|r,\mathcal{M}_{\mathrm{D}}\right)&space;\cdot&space;p\left(r|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{d}}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{D}}\right)&space;=&space;\sum_{r&space;\in&space;\{\mathcal{R}\}}&space;p\left(y_{K}=\mathrm{A}|r,\mathcal{M}_{\mathrm{D}}\right)&space;\cdot&space;p\left(r|y_{k&plus;1:K-1},\mathcal{M}_{\mathrm{d}}\right)" title="p\left(y_{K}=\mathrm{A}|y_{k+1:K-1},\mathcal{M}_{\mathrm{D}}\right) = \sum_{r \in \{\mathcal{R}\}} p\left(y_{K}=\mathrm{A}|r,\mathcal{M}_{\mathrm{D}}\right) \cdot p\left(r|y_{k+1:K-1},\mathcal{M}_{\mathrm{d}}\right)" /></a>
+</p>
+
+Expectations can also be marginalized over models by using Bayesian Model Averaging:
+
+<p align="center">
+
+</p>
+
+The surprise can then be computed by comparing expectations and actually received observations:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=I_{K}&space;=&space;\left\{&space;\begin{array}{ll}&space;-\log_{2}\left(p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1}\right)\right&space;)&space;&&space;\mbox{si&space;}&space;y_{K}=\mathrm{A}&space;\\&space;-\log_{2}\left(1-p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1}\right)\right&space;)&space;&&space;\mbox{si&space;}&space;y_{K}=\mathrm{B}&space;\end{array}&space;\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?I_{K}&space;=&space;\left\{&space;\begin{array}{ll}&space;-\log_{2}\left(p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1}\right)\right&space;)&space;&&space;\mbox{si&space;}&space;y_{K}=\mathrm{A}&space;\\&space;-\log_{2}\left(1-p\left(y_{K}=\mathrm{A}|y_{k&plus;1:K-1}\right)\right&space;)&space;&&space;\mbox{si&space;}&space;y_{K}=\mathrm{B}&space;\end{array}&space;\right." title="I_{K} = \left\{ \begin{array}{ll} -\log_{2}\left(p\left(y_{K}=\mathrm{A}|y_{k+1:K-1}\right)\right ) & \mbox{si } y_{K}=\mathrm{A} \\ -\log_{2}\left(1-p\left(y_{K}=\mathrm{A}|y_{k+1:K-1}\right)\right ) & \mbox{si } y_{K}=\mathrm{B} \end{array} \right." /></a>
+</p>
 
 The fourth group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the expectations regarding the identity of the next observation (and related metrics).
 
