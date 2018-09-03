@@ -17,7 +17,7 @@ Toy examples scripts are available for each of there observers.
 Here is the result of the inference by the full Bayesian ideal observer of the task (the function ```Emergence_IO_FullIO```).
 These figures can be reproduced using the script ```Emergence_IO_ToyExampleFullIO```.
 
-### Posterior probability of
+### Posterior probability of each model
 
 We estimate the posterior probability of each possible model:
 
@@ -49,7 +49,7 @@ In the case of the stochastic-to-deterministic hypothesis, the likelihood of the
   <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\sum_{r\in\{\mathcal{R}\}}&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)&space;\\&space;p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\frac{1}{2}&space;\cdot&space;\left(\sum_{i=1}^{\min\left(K,\nu\right)}&space;(y_{k&plus;1:K}&space;\equiv&space;[y_{k&plus;1:k&plus;i}]^{n})&space;\cdot&space;\frac{1}{3^{i}}&space;&plus;&space;\sum_{i=K&plus;1}^{\nu}&space;2^{i-K}&space;\cdot&space;\frac{1}{3^{i}}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\sum_{r\in\{\mathcal{R}\}}&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)&space;\\&space;p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\frac{1}{2}&space;\cdot&space;\left(\sum_{i=1}^{\min\left(K,\nu\right)}&space;(y_{k&plus;1:K}&space;\equiv&space;[y_{k&plus;1:k&plus;i}]^{n})&space;\cdot&space;\frac{1}{3^{i}}&space;&plus;&space;\sum_{i=K&plus;1}^{\nu}&space;2^{i-K}&space;\cdot&space;\frac{1}{3^{i}}\right)" title="p\left(y_{k+1:K}|\mathcal{M}_{\text{D}}\right) = \sum_{r\in\{\mathcal{R}\}} p\left(y_{k+1:K}|r,\mathcal{M}_{\text{D}}\right) \cdot p\left(r|\mathcal{M}_{\text{D}}\right) \\ p\left(y_{k+1:K}|\mathcal{M}_{\text{D}}\right) = \frac{1}{2} \cdot \left(\sum_{i=1}^{\min\left(K,\nu\right)} (y_{k+1:K} \equiv [y_{k+1:k+i}]^{n}) \cdot \frac{1}{3^{i}} + \sum_{i=K+1}^{\nu} 2^{i-K} \cdot \frac{1}{3^{i}}\right)" /></a>
 </p>
 
-The first group of plots from ```Emergence_IO_ToyExampleFullIO``` display the posterior distribution over models (and related metrics).
+The first group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over models (and related metrics).
 
 <p align="center">
   <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig1.jpeg" width="800" align="middle">
@@ -57,7 +57,19 @@ The first group of plots from ```Emergence_IO_ToyExampleFullIO``` display the po
 
 ### Posterior distribution over models' parameters
 
-The second group of plots from ```Emergence_IO_ToyExampleFullIO``` display the posterior distribution over models' parameters.
+In the case of the probabilistic hypothesis, the posterior over transition probabilities is defined as:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(\theta^{\mathrm{A}|\mathrm{B}}|y_{k&plus;1:K},\mathcal{M}_{\text{P}}\right)&space;\sim&space;\mathrm{Beta}\left(\theta^{\mathrm{A}|\mathrm{B}}|N_{y_{k&plus;1:K}}^{\mathrm{A}|\mathrm{B}}&plus;1,&space;N_{y_{k&plus;1:K}}^{\mathrm{B}|\mathrm{B}}&plus;1\right)&space;\\&space;p\left(\theta^{\mathrm{B}|\mathrm{A}}|y_{k&plus;1:K},\mathcal{M}_{\text{P}}\right)&space;\sim&space;\mathrm{Beta}\left(\theta^{\mathrm{B}|\mathrm{A}}|N_{y_{k&plus;1:K}}^{\mathrm{B}|\mathrm{A}}&plus;1,&space;N_{y_{k&plus;1:K}}^{\mathrm{A}|\mathrm{A}}&plus;1\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(\theta^{\mathrm{A}|\mathrm{B}}|y_{k&plus;1:K},\mathcal{M}_{\text{P}}\right)&space;\sim&space;\mathrm{Beta}\left(\theta^{\mathrm{A}|\mathrm{B}}|N_{y_{k&plus;1:K}}^{\mathrm{A}|\mathrm{B}}&plus;1,&space;N_{y_{k&plus;1:K}}^{\mathrm{B}|\mathrm{B}}&plus;1\right)&space;\\&space;p\left(\theta^{\mathrm{B}|\mathrm{A}}|y_{k&plus;1:K},\mathcal{M}_{\text{P}}\right)&space;\sim&space;\mathrm{Beta}\left(\theta^{\mathrm{B}|\mathrm{A}}|N_{y_{k&plus;1:K}}^{\mathrm{B}|\mathrm{A}}&plus;1,&space;N_{y_{k&plus;1:K}}^{\mathrm{A}|\mathrm{A}}&plus;1\right)" title="p\left(\theta^{\mathrm{A}|\mathrm{B}}|y_{k+1:K},\mathcal{M}_{\text{P}}\right) \sim \mathrm{Beta}\left(\theta^{\mathrm{A}|\mathrm{B}}|N_{y_{k+1:K}}^{\mathrm{A}|\mathrm{B}}+1, N_{y_{k+1:K}}^{\mathrm{B}|\mathrm{B}}+1\right) \\ p\left(\theta^{\mathrm{B}|\mathrm{A}}|y_{k+1:K},\mathcal{M}_{\text{P}}\right) \sim \mathrm{Beta}\left(\theta^{\mathrm{B}|\mathrm{A}}|N_{y_{k+1:K}}^{\mathrm{B}|\mathrm{A}}+1, N_{y_{k+1:K}}^{\mathrm{A}|\mathrm{A}}+1\right)" /></a>
+</p>
+
+In the case of the deterministic hypothesis, the posterior over patterns is defined as:
+
+<p align="center">
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(r|y_{k&plus;1:K},\mathcal{M}_{\text{D}}\right)&space;\propto&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(r|y_{k&plus;1:K},\mathcal{M}_{\text{D}}\right)&space;\propto&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)" title="p\left(r|y_{k+1:K},\mathcal{M}_{\text{D}}\right) \propto p\left(y_{k+1:K}|r,\mathcal{M}_{\text{D}}\right) \cdot p\left(r|\mathcal{M}_{\text{D}}\right)" /></a>
+</p>
+
+The second group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over models' parameters.
 
 <p align="center">
   <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig2.jpeg" width="500" align="middle">
@@ -65,7 +77,7 @@ The second group of plots from ```Emergence_IO_ToyExampleFullIO``` display the p
 
 ### Posterior distribution over change point's position
 
-The third group of plots from ```Emergence_IO_ToyExampleFullIO``` display the posterior distribution over change point's position (and related metrics).
+The third group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over change point's position (and related metrics).
 
 <p align="center">
   <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig3.jpeg" width="600" align="middle">
@@ -73,7 +85,7 @@ The third group of plots from ```Emergence_IO_ToyExampleFullIO``` display the po
 
 ### Expectation and surprise
 
-The fourth group of plots from ```Emergence_IO_ToyExampleFullIO``` display the expectations regarding the identity of the next observation (and related metrics).
+The fourth group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the expectations regarding the identity of the next observation (and related metrics).
 
 <p align="center">
   <img src="ToyExamples/figs/Emergence_IO_ToyExampleFullIO_fig4.jpeg" width="700" align="middle">
