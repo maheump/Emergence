@@ -84,7 +84,7 @@ end
 
 % Get colormap for the entropy
 EntGrid = linspace(0, 1, 1001);
-EntCMap = plasma(numel(EntGrid));
+EntCMap = hot(numel(EntGrid));
 
 % Compute 2D entropy map
 EntMap = arrayfun(@Emergence_IO_Entropy, EntGrid);
