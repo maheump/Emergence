@@ -46,7 +46,7 @@ if availdep
     fprintf('All dependencies are available.\n\n');
 elseif ~availdep
     fprintf('It appears that at least one dependency is missing.\n');
-    instaldep = logical(input('Do you wish to install the dependencies? (0 for no, 1 for yes)'));
+    instaldep = logical(input('Do you wish to install the dependencies? (0 for no, 1 for yes) '));
     if instaldep
         fprintf('Installing dependencies.\n');
         system('git submodule init', '-echo');
@@ -61,8 +61,6 @@ end
 fprintf('Adding the toolbox functions to the MATLAB path... ');
 addpath(genpath(folderpath));
 fprintf('Done!\n\n');
-
-% Remove git folders from the path
 
 % Set default properties for the figures
 fprintf('Changing the default figures'' options... ');
