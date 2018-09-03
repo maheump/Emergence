@@ -67,6 +67,9 @@ In the case of the deterministic hypothesis, the posterior over patterns is defi
 
 <p align="center">
   <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(r|y_{k&plus;1:K},\mathcal{M}_{\text{D}}\right)&space;\propto&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(r|y_{k&plus;1:K},\mathcal{M}_{\text{D}}\right)&space;\propto&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)" title="p\left(r|y_{k+1:K},\mathcal{M}_{\text{D}}\right) \propto p\left(y_{k+1:K}|r,\mathcal{M}_{\text{D}}\right) \cdot p\left(r|\mathcal{M}_{\text{D}}\right)" /></a>
+</p>
+
+<p align="center">
   <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y|r\right)&space;\in&space;\left\{\frac{1}{2},0\right\}&space;\text{&space;and&space;}&space;p\left(r\right)&space;=&space;\frac{1}{3^{|r|}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y|r\right)&space;\in&space;\left\{\frac{1}{2},0\right\}&space;\text{&space;and&space;}&space;p\left(r\right)&space;=&space;\frac{1}{3^{|r|}}" title="p\left(y|r\right) \in \left\{\frac{1}{2},0\right\} \text{ and } p\left(r\right) = \frac{1}{3^{|r|}}" /></a>
 </p>
 
@@ -81,13 +84,13 @@ The second group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the 
 The posterior over change point's position is defined as:
 
 <p align="center">
-  <a href="https://www.codecogs.com/eqnedit.php?latex=\forall&space;j_{k}\in\{1,2,\ldots,N\}:&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow&space;i}\right)&space;=&space;\frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}{\sum_{k=1}^{N}&space;p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\forall&space;j_{k}\in\{1,2,\ldots,N\}:&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow&space;i}\right)&space;=&space;\frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}{\sum_{k=1}^{N}&space;p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(j_{k}\right)}" title="\forall j_{k}\in\{1,2,\ldots,N\}: p\left(j_{k}|y_{1:K},\mathcal{M}_{\mathrm{S}\rightarrow i}\right) = \frac{p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(j_{k}\right)}{\sum_{k=1}^{N} p\left(y_{1:K}|j_{k},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(j_{k}\right)}" /></a>
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" title="p\left(j_{k}|y_{1:K}\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y_{1:K},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{M}_{\text{S}\rightarrow i}|y_{1:K}\right)" /></a>
 </p>
 
 This can be marginalized over models by using Bayesian Model Averaging:
 
 <p align="center">
-  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y,\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y,\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y\right)" title="p\left(j_{k}|y\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y,\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{M}_{\text{S}\rightarrow i}|y\right)" /></a>
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{H}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{H}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(j_{k}|y_{1:K}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(j_{k}|y_{1:K},\mathcal{H}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{H}_{\text{S}\rightarrow&space;i}|y_{1:K}\right)" title="p\left(j_{k}|y_{1:K}\right) = \sum_{i \in \{\text{P,D}\}} p\left(j_{k}|y_{1:K},\mathcal{H}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{H}_{\text{S}\rightarrow i}|y_{1:K}\right)" /></a>
 </p>
 
 The third group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over change point's position (and related metrics).
@@ -125,7 +128,7 @@ In the case of the deterministic hypothesis, the expectation is obtained by marg
 Expectations can also be marginalized over models by using Bayesian Model Averaging:
 
 <p align="center">
-
+  <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{K}=\mathrm{A}|y_{1:K-1}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K-1}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{K}=\mathrm{A}|y_{1:K-1}\right)&space;=&space;\sum_{i&space;\in&space;\{\text{P,D}\}}&space;p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\text{S}\rightarrow&space;i}\right)&space;\cdot&space;p\left(\mathcal{M}_{\text{S}\rightarrow&space;i}|y_{1:K-1}\right)" title="p\left(y_{K}=\mathrm{A}|y_{1:K-1}\right) = \sum_{i \in \{\text{P,D}\}} p\left(y_{K}=\mathrm{A}|y_{1:K-1},\mathcal{M}_{\text{S}\rightarrow i}\right) \cdot p\left(\mathcal{M}_{\text{S}\rightarrow i}|y_{1:K-1}\right)" /></a>
 </p>
 
 The surprise can then be computed by comparing expectations and actually received observations:
