@@ -4,3 +4,6 @@
 [submodule "Dependencies/matlab"]
 	path = Dependencies/matlab
 	url = https://maheump@github.com/maheump/matlab
+[submodule "Dependencies/VBA-toolbox"]
+	path = Dependencies/VBA-toolbox
+	url = https://github.com/MBB-team/VBA-toolbox.git
