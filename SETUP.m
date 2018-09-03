@@ -38,49 +38,22 @@ fprintf('Done!\n\n');
 % Check if the dependencies have are available
 fprintf('Checking that the dependencies are available... ');
 depenfolder = fullfile(folderpath, 'Dependencies');
-availdep = exist(fullfile(depenfolder, 'cbrewer', 'cbrewer2.m'), 'file') & ...
-           exist(fullfile(depenfolder, 'matlab', 'sequences', 'pat2str.m'), 'file');
+availdep = exist('cbrewer2.m', 'file') & ... % toolbox with colormaps
+           exist('pat2str.m', 'file') & ...  % toolbox with home-made functions
+           exist('VBA_setup.m', 'file');     % toolbox for variational inference
 fprintf('Done! ');
 if availdep
     fprintf('All dependencies are available.\n\n');
 elseif ~availdep
-    fprintf('There are missing dependencies. Getting them...\n');
-    system('git submodule init', '-echo');
-    system('git submodule update', '-echo');
-    fprintf('Done!\n\n');
-end
-
-% Add the VBA toolbox to the path
-fprintf('The VBA toolbox is required for some analysis scripts to run.\n');
-fprintf('Checking that the VBA toolbox is available... ');
-VBAsetupscript = 'VBA_setup';
-addpath(genpath(fullfile(folderpath, 'Dependencies', 'VBA-toolbox')));
-VBAfolder = fileparts(which(VBAsetupscript));
-if ~isempty(VBAfolder)
-    fprintf('Done! The VBA toolbox is located in %s.\n', VBAfolder);
-    try
-        infos = VBA_version;
-        fprintf('We assume it has been correctly installed.\n');
-    catch
-        fprintf(['It has not been correctly installed. Please run the %s ', ...
-            'command from the root of %s after.\n'], VBAsetupscript, VBAfolder);
-    end
-    fprintf('Also make sure you have the version 1.9.1 of that toolbox ');
-    fprintf('(if it has been installed by the SETUP script, it is the case).\n\n')
-elseif isempty(VBAfolder)
-    fprintf('The VBA toolbox has not been found.\n');
-    install = logical(input(sprintf(['Do you want us to download and ', ...
-        'install the VBA toolbox for you? (0 for no, 1 for yes) '])));
-    if install
-        fprintf('Installing the VBA toolbox from Github...\n');
-        cd('Dependencies'); % go to the dependencies directory
-        system('git clone --branch v1.9.1 https://github.com/MBB-team/VBA-toolbox');
-        cd('..'); % come back to the root directory
-        fprintf('The VBA toolbox has been installed.\n\n');
-    elseif ~install
-        fprintf(['The scripts "Emergence_FTA_QuantitativeDeviations1" ', ...
-            'and "Emergence_FTA_Dynamics1" will not run properly without ', ...
-            'that toolbox. Everything else should work properly.\n\n']);
+    fprintf('It appears that at least one dependency is missing.\n');
+    instaldep = logical(input('Do you wish to install the dependencies? (0 for no, 1 for yes)'));
+    if instaldep
+        fprintf('Installing dependencies.\n');
+        system('git submodule init', '-echo');
+        system('git submodule update', '-echo');
+        fprintf('Done!\n\n');
+    elseif ~instaldep
+        fprintf('Note that some, if not all, scripts will not run because of missing dependencies.\n');
     end
 end
 
@@ -88,6 +61,8 @@ end
 fprintf('Adding the toolbox functions to the MATLAB path... ');
 addpath(genpath(folderpath));
 fprintf('Done!\n\n');
+
+% Remove git folders from the path
 
 % Set default properties for the figures
 fprintf('Changing the default figures'' options... ');
