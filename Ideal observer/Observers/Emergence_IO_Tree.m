@@ -234,22 +234,22 @@ elseif                ~idealinteg && islog, pRiogY = exp(pYgRio  + p_pRio);
 end
 
 % Sum of posterior probabilities
-% p(Ro|y) = sum(i=1:min([K,nu])) p(y|Rio) * p(Ri)
-pRogY = sum(pRiogY); 
+% p(y|Ro) = sum(i=1:min([K,nu])) p(y|Rio) * p(Ri)
+pYgRo = sum(pRiogY); 
 
 % Partially observed patterns
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Posterior probability of each partially observed pattern
-% p(Rio|y) propto (1/2) * p(Ri)
+% p(y|Riu) = (1/2) * p(Ri)
 if     idealinteg || ~idealinteg && islin, pRiugY =   (1/2) .* p_pRiu;
 elseif               ~idealinteg && islog, pRiugY = -log(2)  + p_pRiu;
 end
 
 % Sum of posterior probabilities
-% p(Ru|y) = sum(i=1:{Ru}) (1/2) * p(Ri) = sum(i=1:(nu-K)}) 2^i * (1/2) * p(Ri)
-if     idealinteg || ~idealinteg && islin, pRugY = sum(2.^(1:nlRu) .* pRiugY);
-elseif               ~idealinteg && islog, pRugY = sum(exp((1:nlRu).*log(2) + pRiugY));
+% p(y|Ru) = sum(i=1:{Ru}) (1/2) * p(Ri) = sum(i=1:(nu-K)}) 2^i * (1/2) * p(Ri)
+if     idealinteg || ~idealinteg && islin, pYgRu = sum(2.^(1:nlRu) .* pRiugY);
+elseif               ~idealinteg && islog, pYgRu = sum(exp((1:nlRu).*log(2) + pRiugY));
 end
 
 % All patterns together
@@ -258,7 +258,7 @@ end
 % Compute the probability of observing the sequence under a deterministic
 % model
 % p(y|Md) = p(y|Ro) * p(Ro) + p(y|Ru) * p(Ru)
-pY = pRogY + pRugY;
+pY = pYgRo + pYgRu;
 if islog, pY = log(pY); end
 
 % If none of the observed patterns can explain the sequence and the
@@ -283,7 +283,7 @@ if nargout > 1
     
     % Marginalize predictions over all observed patterns
     % p(A|y,Ro) = sum_(i=1:{Ro}) p(A|y,Rio) * p(Rio|y)
-    pAgYRo = sum(pAgYRio .* pRiogY) / pRogY;
+    pAgYRo = sum(pAgYRio .* pRiogY) / pYgRo;
     
     % Conditionaly on partialy observed patterns
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -299,13 +299,13 @@ if nargout > 1
     % Compute the likelihood that the next observation will be a A by means of
     % Bayesian Model Averaging
     % p(A|y) = (p(A|y,Ro)*p(Ro|y) + p(A|y,Ru)*p(Ru|y)) / (p(Ro|y) + p(Ru|y))
-    pAgY = (pAgYRo*pRogY + pAgYRu*pRugY) / (pRogY + pRugY);
+    pAgY = (pAgYRo*pYgRo + pAgYRu*pYgRu) / (pYgRo + pYgRu);
     
     % If none of the observed patterns can explain the sequence and the
     % sequence is longer than the depth of the tree (i.e. the longest possible
     % pattern that is considered), we return chance level for the expectancy of
     % the next observation.
-    if corout && (pRogY + pRugY) == 0, pAgY = 1/2; end
+    if corout && (pYgRo + pYgRu) == 0, pAgY = 1/2; end
 end
 
 %% ENTROPY OF THE POSTERIOR DISTRIBUTION
@@ -316,12 +316,12 @@ if nargout > 2
     
     % Combine both the posterior distributions over entirely and partially
     % observed patterns
-    if     idealinteg || ~idealinteg && islin, pRigY = [pRiogY,     pRiugY ];
-    elseif               ~idealinteg && islog, pRigY = [pRiogY, exp(pRiugY)];
+    if     idealinteg || ~idealinteg && islin, ppRigY = [pRiogY,     pRiugY ];
+    elseif               ~idealinteg && islog, ppRigY = [pRiogY, exp(pRiugY)];
     end
     
     % Normalize the posterior distribution
-    pRigY = pRigY(:) ./ sum(pRigY);
+    pRigY = ppRigY(:) ./ sum(ppRigY);
     
     % If the sequence is longer than the longest allowed pattern (i.e. the
     % depth of the tree) and that no patterns can reproduce the sequence,
