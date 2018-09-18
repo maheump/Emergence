@@ -185,20 +185,92 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Get confidence levels
-if     xp == 1, conf = cellfun(@(x) x.Questions(4), D);
-elseif xp == 2, conf = cellfun(@(x) x.Questions(6), D);
+if     xp == 1, conf = cellfun(@(x) x.Questions(4), D) ./ 100;
+elseif xp == 2, conf = cellfun(@(x) x.Questions(6), D) ./ 100;
 end
 
 % Average over regularities for each condition (proba. & deter.)
 avgConf = NaN(nSub,2);
 for iHyp = 1:2, avgConf(:,iHyp) = mean(conf(cidx{iHyp},:), 1, 'OmitNaN')'; end
-if any(avgConf(:) > 1), avgConf = avgConf ./ 100; end
+
+% Display the entire distribution (over subjects and sequences) of
+% confidence ratings in the two types of regularities
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Prepare the window
+figure('Position', [804 906 120 200]);
+
+prc = 1000;
+f = NaN(2,prc);
+
+for iHyp = 1:2
+    
+    %
+    y = conf(cidx{iHyp},:);
+    [f(iHyp,:), u] = ksdensity(y(:), linspace(0,1,prc), 'BandWidth', 0.05);
+    
+    % Normalize the distribution such that it can be directly compared
+    % between both conditions (because there are not necessarily the same
+    % number of accurately detected regularities in both conditions).
+    f(iHyp,:) = f(iHyp,:) ./ sum(f(iHyp,:));
+    
+    % Measure average confidence rating
+    avg = mean(y(:), 'OmitNaN');
+    [~,i] = min(abs(avg - u));
+    
+    % Mirror the second distribution
+    if iHyp == 1, f(iHyp,:) = -f(iHyp,:); end
+    
+    % Make sure the distribution does not exceeds the limits of the scale
+    f(iHyp, u >= 1) = 0;
+    f(iHyp, u <= 0) = 0;
+    
+    % Display the kernel distribution
+    plot(f(iHyp,:), u, 'Color', tricol(iHyp,:)); hold('on');
+    
+    % Display the average confidence rating
+    plot([f(iHyp,i),0], repmat(u(i),1,2), '-', 'Color', tricol(iHyp,:), 'LineWidth', 2)
+end
+
+% Compute the difference between the two kernel distributions
+kd = f(1,:) + f(2,:);
+
+% Detect parts of the scale that are more used in one condition or another
+kdidx = {kd < 0, kd > 0};
+
+% For each type of regularity
+for iHyp = 1:2
+    
+    % Get windows containing confidence ratings that are more used in that
+    % condition
+    on = find(diff(kdidx{iHyp}) == 1) + 1;
+    off = find(diff(kdidx{iHyp}) == -1);
+    
+    % Fill the area under the difference curve with the appropriate color
+    for i = 1:numel(on)
+        idx = on(i):off(i);
+        fill([0,kd(idx),0], [u(idx(1)-1),u(idx),u(idx(end))], ...
+            'k', 'FaceColor', tricol(iHyp,:), 'EdgeColor', 'None');
+    end
+end
+
+% Plot the difference curve 
+plot(kd, u, 'k-', 'LineWidth', 1);
+
+% Customize the axes
+axis([-max(abs(xlim)), max(abs(xlim)), 0, 1]);
+set(gca, 'YAxisLocation', 'Origin', 'Box', 'Off');
+
+% Save the figure
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfDistS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfDistIO.pdf'));
+end
 
 % Display reported confidence in the estimation for the two types of regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%  Prepare the window
-figure('Position', [804 906 120 200]);
+% Prepare the window
+figure('Position', [925 905 120 200]);
 
 % Display difference in confidence ratings between the two types of regularity
 Emergence_PlotSubGp(avgConf, tricol(1:2,:));
@@ -218,6 +290,6 @@ Emergence_DispStatTest(avgConf);
 ylabel('Confidence in the estimate');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfIO.pdf'));
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfAvgS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfAvgIO.pdf'));
 end
