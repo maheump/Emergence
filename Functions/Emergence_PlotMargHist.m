@@ -96,7 +96,7 @@ for iDim = 1:3
         y3 = y1 + bins;
         
     % For the two tilted dimensions (to the left and to the right)
-    %   => tilted histogram obtaines thanks to trigonometry
+    %   => tilted histogram obtained thanks to trigonometry
     else
         
         % Coordinates of point #2

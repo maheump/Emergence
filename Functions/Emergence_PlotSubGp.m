@@ -45,7 +45,7 @@ o = (1:nCond) + xon;
 x = o + xshift;
 
 % Average over subjects
-m = mean(y, 1);
+m = mean(y, 1, 'OmitNaN');
 s = sem(y, 1);
 
 % Do not erase what is already displayed on the plot
