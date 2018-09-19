@@ -202,11 +202,11 @@ if ~usegrid
     
     % If asked, return the posterior distribution
     if returnpost
-        pTgAgY = Emergence_IO_BetaPDF(theta, nXgA(2), nXgA(1), nt); % p(X|A), x-axis
-        pTgBgY = Emergence_IO_BetaPDF(theta, nXgB(1), nXgB(2), nt); % p(X|B), y-axis
-        pTgAgY = pTgAgY ./ sum(pTgAgY); % normalize the marginal distribution
+        pTgBgY = Emergence_IO_BetaPDF(theta, nXgB(1), nXgB(2), nt); % p(A|B), x-axis
+        pTgAgY = Emergence_IO_BetaPDF(theta, nXgA(2), nXgA(1), nt); % p(B|A), y-axis
         pTgBgY = pTgBgY ./ sum(pTgBgY); % normalize the marginal distribution
-        mpTgY = [pTgAgY', pTgBgY']; % concatenate marginal distributions
+        pTgAgY = pTgAgY ./ sum(pTgAgY); % normalize the marginal distribution
+        mpTgY = [pTgBgY', pTgAgY']; % concatenate marginal distributions
     end
     
     % Compute the expected value of each transition
@@ -257,9 +257,9 @@ elseif usegrid
     end
     
     % Return (independent) marginal distributions
-    pTgAgY = sum(pTgY, 2)'; % marginal distribution (vector over theta values)
     pTgBgY = sum(pTgY, 1);  % marginal distribution (vector over theta values)
-    if returnpost, mpTgY = [pTgAgY; pTgBgY]'; end % concatenate marginal distributions
+    pTgAgY = sum(pTgY, 2)'; % marginal distribution (vector over theta values)
+    if returnpost, mpTgY = [pTgBgY; pTgAgY]'; end % concatenate marginal distributions
     
 	% Compute the expected value of each transition
     pAgB = (pTgBgY / sum(pTgBgY)) * theta'; % expected value of theta(X|B)
