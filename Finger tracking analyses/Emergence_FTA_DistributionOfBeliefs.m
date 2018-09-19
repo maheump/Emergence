@@ -112,10 +112,14 @@ trajmap{1} = (trajmap{3} ./ max(trajmap{3}(:))) ...
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare the window
-figure('Position', [1 805 800 300]);
+figure('Position', [1 600 1920 500]);
 
 % Number of bins for the marginal histrograms
 nBin = 30;
+
+% Create colormaps
+cmaps = {[flipud(cbrewer2('YlGnBu', 2000)); (cbrewer2('YlOrRd', 2000))], ...
+         cbrewer2('Blues', 2000), cbrewer2('Reds', 2000), cbrewer2('Greens', 2000)};
 
 % For each density map
 for iMap = 1:nMap+1
@@ -129,18 +133,8 @@ for iMap = 1:nMap+1
     % Display an empty triangle
     tr = Emergence_PlotTriInfo(tcn, tricol);
     
-    % Customize the colormap
-    if iMap == 1
-        colormap(sp, [flipud(cbrewer2('YlGnBu', 2000)); ...
-                            (cbrewer2('YlOrRd', 2000))]);
-        caxis([-abs(max(caxis)), abs(max(caxis))]);
-    else, colormap(sp, parula); caxis([0, max(caxis)]);
-    end
-    cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
-    cbr.Label.String = {'Normalized density map', '(in log scale)'};
-    
     % Draw marginal histograms on the limits of the triangle
-    % if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
+	if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
     
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
@@ -149,6 +143,16 @@ for iMap = 1:nMap+1
     % Customize the axes
     set(gca, 'LineWidth', 1, 'FontSize', 15);
     axis('xy'); axis('off'); axis('equal');
+    
+    % Customize the colormap
+    colormap(sp, cmaps{iMap});
+    if iMap == 1, caxis([-abs(max(caxis)), abs(max(caxis))]);
+    else, caxis([0, max(caxis)]);
+    end
+    ax = get(gca, 'Position');
+    cbrpos = [ax(1)+ax(3)*3/4 ax(2) 0.01 ax(4)*1/3];
+    cbr = colorbar('Position', cbrpos, 'LineWidth', 1);
+    cbr.Label.String = {'Normalized density map', '(in log scale)'};
 end
 
 % Use the same zoom level for all the maps
@@ -188,7 +192,7 @@ sembins = sem(bins, 3);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [802 805 200 300]); lgd = NaN(1,2);
+figure('Position', [1 225 200 300]); lgd = NaN(1,2);
 
 % Useful variables
 x = pg+1/(nBin-1)/2; % x-axis
