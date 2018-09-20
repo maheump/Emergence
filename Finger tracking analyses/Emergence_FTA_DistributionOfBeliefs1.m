@@ -49,7 +49,7 @@ ygrid = tcn(3,2):j:tcn(1,2);
 
 % Create a mask that specifies which cells of the matrices computed below
 % are outside the triangle
-ng = numel(xgrid);
+ng = 1/j+1;
 T = tril(ones(ng));
 T = [flip(T,2),T];
 mask = round(imresize(T, [round(ng/2*tan(pi/3)), ng]));
@@ -138,7 +138,7 @@ for iMap = 1:nMap+1
     
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
-    Emergence_PlotGridOnTri(nBin/2);
+    Emergence_PlotGridOnTri(10);
     
     % Customize the axes
     set(gca, 'LineWidth', 1, 'FontSize', 15);
