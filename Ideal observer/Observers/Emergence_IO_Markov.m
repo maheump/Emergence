@@ -1,13 +1,13 @@
 function [ pY, pAgY, mpTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid, prior, decw, dt )
-% EMERGENCE_IO_MARKOV implements an observer learning parameters (i.e.
+% EMERGENCE_IO_MARKOV implements an observer learning the parameters (i.e.
 % frequency of transitions) of a first-order binary Markov chain from a
 % sequence of binary observations.
 %   - "y": a 1xN array specifying the sequence of binary observations (1s
 %       and 2s).
 %   - "scaleme": a string ('lin' or 'log') specifying whether the model
 %       evidence sould be computed on a linear or logarithmic scale.
-%   - "usegrid": a boolean specifing whether use grid-based or analytical
-%       solutions.
+%   - "usegrid": a boolean specifying whether grid-based or analytical
+%       solutions are used.
 %   - "prior": can be a string ('Bayes-Laplace' or 'Jeffreys') or a 2x2
 %       matrix specifying the prior knowledge regarding the frequency of
 %       transitions (expressed in pseudo-counts).

@@ -1,4 +1,4 @@
-% A script showing the effect of the memory leak onto different variables
+% Script showing the effect of the memory leak onto different variables
 % reflecting the inference scenario of ideal observers learning either
 % probabilistic or deterministic regularities.
 %

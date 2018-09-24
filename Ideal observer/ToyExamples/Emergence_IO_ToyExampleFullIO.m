@@ -1,16 +1,20 @@
-% Toy-example for the full ideal observer of the task. It generates an
-% example sequence that can be either (1) fully-stochastic, (2) with a
+% Toy-example script for the full ideal observer (IO) of the task. It generates 
+% an example sequence that can be either (1) fully-stochastic, (2) with a
 % first fully-stochastic part followed by a second part charcaterized by
-% probabilistic bias, or (3) with a first fully-stochastic part followed by
+% a probability bias, or (3) with a first fully-stochastic part followed by
 % a second part characterized by the repetition of a given pattern. The
 % full IO is presented with that sequence and assigns credence to each of
 % these 3 possible generative processes (marginalizing over all possible
 % change point's positions in the two latter cases). Those posterior
-% beliefs are updated as observations from the sequence are received. In
+% beliefs are updated as new observations are received. In
 % addition, the full IO also returns posterior beliefs over change point's
 % positions, models' parameters, and identity of the future observation.
 % 
 % Copyright (c) 2018 Maxime Maheu
+
+% NOTE POUR MAXIME !!!
+% le texte est illisible chez moi : beaucoup trop petit! (fs=6!)
+% -> peut être faire fs = max(8, fs) ou même 10 pour que ce soit lisible
 
 %% INITIALIZATION
 %  ==============
@@ -59,17 +63,17 @@ sequence = sequence(1:N);
 %  ===============================
 
 % Define options for the ideal observer
-pEd   = 0; % probability of making a memory error at each observation
-pEp   = 0; % probability of making a memory error at each observation
-treed = 20; % depth of the rules' tree to explore
-stat  = 'Transition'; % statistic to be learned by the probabilistic model
-p_pR  = 'Size-principle'; % the prior probability of each rule depends on its length
-p_pT  = 'Bayes-Laplace'; % the prior over statistics to be learnt
-p_pJ  = 'Uniform'; % prior over change point's position
-comp  = 'all'; % update beliefs after each observation
-scale = 'log'; % scale of the model evidence
-pgrid = 2e-2; % precision of the posterior over theta
-verb  = 1; % output some messages in the command window
+pEd   = 0;                  % probability of making a memory error at each observation (deterministic rule)
+pEp   = 0;                  % probability of making a memory error at each observation (probability bias)
+treed = 20;                 % depth of the rules' tree to explore
+stat  = 'Transition';       % statistic to be learned by the probabilistic model
+p_pR  = 'Size-principle';   % the prior probability of each rule depends on its length
+p_pT  = 'Bayes-Laplace';    % the prior over statistics to be learned
+p_pJ  = 'Uniform';          % prior over change point's position
+comp  = 'all';              % update beliefs after each observation
+scale = 'log';              % scale of the model evidence
+pgrid = 2e-2;               % precision of the posterior over theta
+verb  = 1;                  % output some messages in the command window
 
 % Run the observer with these options
 io = Emergence_IO_FullIO(sequence, ... % binary input sequence
@@ -88,7 +92,7 @@ magfac = [res(screen,3) / res(1,3), res(screen,4) / res(1,4)]; % ratio size comp
 mrg = [1/20, 1/10] .* magfac; % left/right and upper/lower margins (in percent)
 fw  = [0.55, 0.40] .* magfac(1); % [upper, lower] leftward* figures' width
 fh  = [0.50, 0.50] .* magfac(2); % [left, right] lower* figures' height
-% *: The other dimension is not a degree of freedom : 1-2*margin*x
+% *: The other dimension has no degree of freedom : 1-2*margin*x
 
 % Compute positions of the figures
 fpos = [sc0(1)+mrg(1)       sc0(2)+mrg(2)+fh(1) fw(1)                    magfac(2)-2*mrg(2)-fh(1); ... % upper left
