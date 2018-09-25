@@ -55,7 +55,7 @@ for iHyp = 1:2
     
     % Subject-specific regression
     coef(:,iHyp) = cellfun(@(toexplain,explainingvar) ...
-        Emergence_Regress(toexplain, explainingvar, 'OLS', 'R2'), ...
+        Emergence_Regress(toexplain, explainingvar, 'OLS', 'beta1'), ...
         mat2cell(sp, nR, ones(nSub,1)), ... % inferred change point's position
         mat2cell(op, nR, ones(nSub,1)));    % true change point's position
     
@@ -66,8 +66,8 @@ for iHyp = 1:2
         idx = op > pct(iBin) & op <= pct(iBin+1);
         
         % Average over sequences
-        dotsm(iBin,1,iHyp) = mean(op(idx), 'omitnan');
-        dotsm(iBin,2,iHyp) = mean(sp(idx), 'omitnan');
+        dotsm(iBin,1,iHyp) = mean(op(idx), 'OmitNaN');
+        dotsm(iBin,2,iHyp) = mean(sp(idx), 'OmitNaN');
         
         % Compute the SEM over sequences
         dotss(iBin,1,iHyp) = sem(op(idx));

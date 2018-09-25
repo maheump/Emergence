@@ -9,7 +9,7 @@
 %  ===================================
 
 % Choose the size of the window to look into
-winwidth = 50;
+winwidth = 40;
 
 % Get the beliefs from the IO regarding the position of the change point
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,3 +114,8 @@ ylabel('1/std');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_CP_PredConf.pdf'));
+
+% Compute a paired t-test on the precision of posterior distributions
+% between the 2 types of regularities
+[~,pval,tci,stats] = ttest(diff(varcppost, 1, 2));
+disptstats(pval, tci, stats);
