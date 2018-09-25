@@ -16,7 +16,8 @@ Emergence_DefaultFigureProperties;
 
 % Make sure there is a folder to receive figure files
 ftapath = fullfile(folderpath, 'Finger tracking analyses');
-mkdir(fullfile(ftapath, 'figs'));
+figdir = fullfile(ftapath, 'figs');
+if ~exist(figdir, 'dir'), mkdir(figdir); end
 
 % Load the data
 load('Emergence_Behaviour_GroupData.mat');
