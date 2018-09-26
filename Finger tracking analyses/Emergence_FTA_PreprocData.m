@@ -4,7 +4,7 @@
 % sequences that were presented to the subjects and save all the required
 % information (to run the analysis scripts) in a dedicated group-level
 % MATLAB file.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
@@ -12,9 +12,9 @@
 
 % Add functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-ind = strfind(scriptpath,'Emergence'); % !!! my folder for your project is named... Emergence (causing a crash). This should be more robust
+ind = strfind(scriptpath,'Emergence');
 folderpath = scriptpath(1:ind(end-1)+8);
-addpath(genpath(folderpath)); % !!! really need this? looks dirty
+addpath(genpath(folderpath));
 
 % Define the location of the data
 datadir = fullfile(folderpath, 'Stimulation', 'data');
@@ -29,8 +29,8 @@ det = {[1 1 2 2], ...             % AABB       => [An,Bn] (n = 2)
        [1 1 1 2 2 2], ...         % AAABBB     => [An,Bn] (n = 3)
        [1 1 2 1 2 2], ...         % AABABB     => [A2,BAn,B2] (n = 1)
        [1 1 1 2 1 2], ...         % AAABAB     => not compressible (n = 6)
-       [1 1 1 1 2 2 2 2], ...     % AAAABBBB   => [An,Bn] (n = 4)       
-       [1 1 2 1 2 1 2 2], ...     % AABABABB   => [A2,BAn,B2] (n = 2)       
+       [1 1 1 1 2 2 2 2], ...     % AAAABBBB   => [An,Bn] (n = 4)
+       [1 1 2 1 2 1 2 2], ...     % AABABABB   => [A2,BAn,B2] (n = 2)
        [1 1 1 2 2 1 2 2], ...     % AAABBABB   => not compressible (n = 8)
        [1 1 1 1 1 2 2 2 2 2], ... % AAAAABBBBB => [An,Bn] (n = 5)
        [1 1 2 1 2 1 2 1 2 2], ... % AABABABABB => [A2,BAn,B2] (n = 3)
@@ -115,8 +115,8 @@ for iSub = 1:nSub
     stochidx = find(strcmpi(rules, 'Stochastic'))';
     
     % Probabilistic conditions sorted per entropy level and bias type
-    tmp = find(strcmpi(rules, 'Probabilistic'));
-	transproba = cellfun(@(x) x.Rule, subfile.D(tmp), 'UniformOutput', 0);
+    probar = find(strcmpi(rules, 'Probabilistic'));
+    transproba = cellfun(@(x) x.Rule, subfile.D(probar), 'UniformOutput', 0);
     probaidx = NaN(1,numel(prob));
     for k = 1:numel(prob)
         dif = NaN(1,numel(transproba));
@@ -124,12 +124,12 @@ for iSub = 1:nSub
             dif(j) = sum(abs(transproba{j} - prob{k}));
         end
         [~,l] = min(dif);
-        probaidx(k) = tmp(l);
+        probaidx(k) = probar(l);
     end
     
     % Deterministic conditions sorted by patterns' length
-    tmp = find(strcmpi(rules, 'Deterministic'));
-    pattern = cellfun(@(x) x.Rule, subfile.D(tmp), 'UniformOutput', 0);
+    deterr = find(strcmpi(rules, 'Deterministic'));
+    pattern = cellfun(@(x) x.Rule, subfile.D(deterr), 'UniformOutput', 0);
     deteridx = NaN(1,numel(det));
     for k = 1:numel(det)
         dif = NaN(1,numel(pattern));
@@ -139,7 +139,7 @@ for iSub = 1:nSub
             end
         end
         [~,l] = min(dif);
-        deteridx(k) = tmp(l);
+        deteridx(k) = deterr(l);
     end
     
     % Get ordered trials' list
@@ -213,17 +213,17 @@ end
 IO = cell(size(G)); % conditions x subjects cell matrix with IO's inference
 
 % Define options for the observer
-pEd    = 0; % probability of making a memory error at each observation
-pEp    = 0; % probability of making a memory error at each observation
-patlen = 10; % depth of the rules' tree to explore
-stat   = 'Transitions'; % statistic to be learned by the probabilistic model
-pR     = 'Size-principle'; % the prior probability of each rule depends on its length
-pT     = 'Bayes-Laplace'; % the prior over statistics to be learnt
-pJ     = 'Uniform'; % prior over change point's position
-comp   = 'all'; % compute after each observation
-scale  = 'log'; % scale of the model evidence
-pgrid  = []; % precision of the posterior over theta
-verb   = 0; % do not output messages in the command window
+pEd    = 0;                 % probability of making a memory error at each observation
+pEp    = 0;                 % probability of making a memory error at each observation
+patlen = 10;                % depth of the rules' tree to explore
+stat   = 'Transitions';     % statistic to be learned by the probabilistic model
+pR     = 'Size-principle';  % the prior probability of each rule depends on its length
+pT     = 'Bayes-Laplace';   % the prior over statistics to be learnt
+pJ     = 'Uniform';         % prior over change point's position
+comp   = 'all';             % compute after each observation
+scale  = 'log';             % scale of the model evidence
+pgrid  = [];                % precision of the posterior over theta
+verb   = 0;                 % do not output messages in the command window
 
 % For each subject
 for iSub = 1:nSub

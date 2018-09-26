@@ -11,7 +11,8 @@ close('all');
 
 % Add functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+ind = strfind(scriptpath,'Emergence');
+folderpath = scriptpath(1:ind(end-1)+8);
 addpath(genpath(folderpath));
 
 % Set default properties for the figures
@@ -72,7 +73,7 @@ for iLoop = 1:2
     if     iLoop == 1, D = G;
     elseif iLoop == 2, D = IO;
     end
-    
+
     Emergence_FTA_Detection1;
     Emergence_FTA_Detection2;
     Emergence_FTA_DistributionOfBeliefs;

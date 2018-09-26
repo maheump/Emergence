@@ -12,10 +12,6 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-% NOTE POUR MAXIME !!!
-% le texte est illisible chez moi : beaucoup trop petit! (fs=6!)
-% -> peut être faire fs = max(8, fs) ou même 10 pour que ce soit lisible
-
 %% INITIALIZATION
 %  ==============
 
@@ -25,7 +21,8 @@ close('all');
 
 % Add ideal observer functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+ind = strfind(scriptpath,'Emergence');
+folderpath = scriptpath(1:ind(end-1)+8);
 addpath(genpath(folderpath));
 
 %% GENERATE A SEQUENCE
@@ -118,6 +115,7 @@ if    ~ismac, scfac = 1/180; % !!! on Retina displays the resolution looks
 elseif ismac, scfac = 1/120; % actually smaller than what it truly is
 end
 fs = (res(screen,4) - res(screen,2) + 1) * scfac * max(magfac);
+fs = max(8, fs); % make sure the font size is not smaller than 8 points
 
 % Define tickness of lines
 wid1 = 1/2; % for boxes, axes, help lines

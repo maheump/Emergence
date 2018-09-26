@@ -1,7 +1,7 @@
 % This script shows the different types of regularities that have been used
 % (both the probabilistic and the deterministic ones) as well as the
 % different types of stimuli.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
@@ -13,7 +13,8 @@ close('all');
 
 % Add functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+ind = strfind(scriptpath,'Emergence');
+folderpath = scriptpath(1:ind(end-1)+8);
 addpath(genpath(folderpath));
 
 % Set default figure properties
@@ -79,13 +80,13 @@ figure('Position', [257 939 630 166]); j = 1;
 
 % For each deterministic regularity
 for i = 1:numel(det)
-    
+
     % Create a subplot
     subplot(nrows, ncols, j);
     if i == 1, j = j + 3;
     else, j = j + 1;
     end
-    
+
     % Display the deterministic regularity
     d = abs(10 - numel(det{i})) / 2;
     x = find(det{i} == 1) + d;
@@ -96,7 +97,7 @@ for i = 1:numel(det)
     plot(x, 1, 'ko', 'MarkerFaceColor', 'w', 'MarkerSize', 15, 'LineWidth', 1);
     text(x, ones(1,numel(x)), 'B', 'Color', 'k', 'FontWeight', 'Bold', ...
         'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Middle');
-    
+
     % Customize the axes
     axis([1,max(cellfun(@numel, det)),0,2]);
     axis('off');

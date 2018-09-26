@@ -1,7 +1,7 @@
 % This simulation script compares the posterior beliefs of the
 % deterministic Bayesian observer learning repeating rules using different
 % tree depth (i.e. the longest possible rule that is considered).
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
@@ -13,7 +13,8 @@ close('all');
 
 % Add ideal observer functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+ind = strfind(scriptpath,'Emergence');
+folderpath = scriptpath(1:ind(end-1)+8);
 addpath(genpath(folderpath));
 
 % Set default figure properties
@@ -68,23 +69,23 @@ pMdgY = NaN(N,nSeq,nRule,nNu);
 
 % For each repeating rule
 for iRule = 1:nRule
-    
+
     % For each simulated sequence
     for iSeq = 1:nSeq
-        
+
         % Generate a sequence
         nrepet = ceil((N-cp)/numel(Rules{iRule}));
         seq = [GenRandSeq(cp, 1/2), ...                     % first part
                repmat(str2pat(Rules{iRule}), [1,nrepet])];  % second part
-        
+
         % For each depth of the tree
         for iNu = 1:nNu
-            
+
             % Display the status of the loop in the command window
             fprintf(['- Rule %2.0f/%2.0f (%s), Sequence %2.0f/%2.0f, ', ...
                 'Depth %1.0f/%1.0f (nu = %3.0f)... '], ...
                 iRule, nRule, Rules{iRule}, iSeq, nSeq, iNu, nNu, Nu(iNu));
-            
+
             % Run the ideal observer
             io = Emergence_IO_FullIO(seq(1:N), pEd, pEp, Nu(iNu), ...
                 stat, p_pR, p_pT, p_pJ, comp, scale, pgrid, verb);
@@ -105,18 +106,18 @@ MseMat = CorMat;
 
 % For each simulated sequence
 for iSimu = 1:nSeq*nRule
-    
+
     % For each pair of tree depth
     for iNu1 = 1:nNu
         for iNu2 = 1:nNu
-            
+
             % Get posterior beliefs of observers using different tree depth
             x = rs_pMdgY(2:end,iSimu,iNu1);
             y = rs_pMdgY(2:end,iSimu,iNu2);
-            
+
             % Measure the correlation between the two
             CorMat(iNu1,iNu2,iSimu) = corr(x, y);
-            
+
             % Measure the mean squared difference between the two
             MseMat(iNu1,iNu2,iSimu) = -log(mean((x - y) .^ 2));
         end
@@ -142,10 +143,10 @@ cbrlab = {sprintf('$\\rho(%s,%s)$', labfun(1), labfun(2)), ...
 % For each matrix
 for iSp = 1:2
     sp = subplot(1,2,iSp);
-    
+
     % Display the correlation matrix
     imagesc(1:nNu, 1:nNu, AvgMat(:,:,iSp)); hold('on');
-    
+
     % Overlap coefficients
     text(repmat(1:nNu, 1, nNu), sort(repmat(1:nNu, 1, nNu)), cellfun(@(x) ...
         sprintf('%1.2f', x), num2cell(AvgMat(:,:,iSp)), ...
@@ -155,18 +156,18 @@ for iSp = 1:2
         sprintf('%1.2f', x), num2cell(SemMat(:,:,iSp)), ...
         'UniformOutput', 0), 'HorizontalAlignment', 'Center', ...
         'VerticalAlignment', 'Top', 'FontSize', 6);
-    
+
     % Customize the colormap
     cbr = colorbar('Location', 'SouthOutside');
     colormap(sp, flipud(cmap(:,:,iSp)));
     if iSp == 1, caxis([-1,1]); end
-    
+
     % Customize the axes
     axis('square'); axis('xy'); set(gca, 'TickLabelInterpreter', 'LaTeX');
     set(gca, 'XTick', 1:nNu, 'XTickLabel', cellfun(@(x) sprintf('%1.0f', x), ...
         num2cell(Nu), 'UniformOutput', 0));
-    set(gca, 'YTick', 1:nNu, 'YTickLabel', get(gca, 'XTickLabel')); 
-    
+    set(gca, 'YTick', 1:nNu, 'YTickLabel', get(gca, 'XTickLabel'));
+
     % Add some text labels
     cbr.Label.String = cbrlab{iSp};
     cbr.Label.Interpreter = 'LaTeX';

@@ -1,7 +1,7 @@
 % Compare the performance of the Bayesian deterministic pattern learner to
 % a Bayesian observer using a n-order Markov chain at detecting a repeating
 % pattern from noise.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
@@ -13,14 +13,15 @@ close('all');
 
 % Add ideal observer functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
+ind = strfind(scriptpath,'Emergence');
+folderpath = scriptpath(1:ind(end-1)+8);
 addpath(genpath(folderpath));
 
 % Set default figure properties
 Emergence_DefaultFigureProperties;
 
 %% CREATE A SEQUENCE
-%  ================= 
+%  =================
 
 % Define the repeating rule
 rule = 'AABABABB';
@@ -61,10 +62,10 @@ io = cell(nOrd,1);
 
 % Run the observer with these options
 for iOrd = 1:nOrd
-    
+
     % Define the statistics to be learned by the probabilistic model
     stat  = sprintf('Chain%1.0f', orders(iOrd));
-    
+
     % Run the full ideal observer
     io{iOrd} = Emergence_IO_FullIO(seq, ... % binary sequence
         pEd, pEp, treed, stat, p_pR, p_pT, p_pJ, comp, scale, pgrid, verb); % options
@@ -91,13 +92,13 @@ figure('Units', 'Normalized', 'Position', [0.4 0.2 0.2 0.8]);
 % For each order of the Markov chain
 for iOrd = 1:nOrd
     subplot(nOrd, 1, iOrd); lgd = NaN(1,3);
-    
+
     % Display chance level
     plot([1,N], ones(1,2)./2, '--', 'Color', ones(1,3)./2); hold('on');
-    
+
     % Display change point's position
     plot(repmat(cp,1,2), [0,1], 'k-');
-    
+
     % Display posterior beliefs post change point
     plot(1:N, pMdvssgY(iOrd,:), '-', 'Color', [239 059 033]./255, 'LineWidth', 1);
     plot(1:N, pMpvssgY(iOrd,:), '-', 'Color', [066 146 198]./255, 'LineWidth', 3);

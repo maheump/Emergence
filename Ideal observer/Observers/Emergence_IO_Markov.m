@@ -227,6 +227,12 @@ elseif usegrid
     dBgA = decw(BgA) *    theta  + (1 - decw(BgA)) * (1-theta);
     dAgB = decw(AgB) *    theta  + (1 - decw(AgB)) * (1-theta);
     dBgB = decw(BgB) * (1-theta) + (1 - decw(BgB)) *    theta ;
+    % Note that this is a different, but mathematicaly equivalent, way of
+    % implementing the leaky integration we propose in Meyniel, Maheu &
+    % Dehaene, PCB (2016). In that case, we formalize it using substitution
+    % probability instead of an exponential leak. The free parameter is
+    % thus the probability of making a memory substitution (at each
+    % observation) and not the slope of the exponential leak.
 	
     % Compute a distribution that is proportional to the joint posterior
     % distribution over theta 

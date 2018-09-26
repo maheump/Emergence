@@ -69,7 +69,7 @@ fprintf('Done!\n\n');
 
 % Display some warning messages
 fprintf('!!! Nothing that has been done here will survive the restart of MATLAB !!!\n');
-fprintf('!!! Do not forget to rerun this script if you want to use the toolbox again!!!\n\n');
+fprintf('!!! Do not forget to rerun this script if you want to use the toolbox again !!!\n\n');
 
 % Try to run a script in order to check that everything is working well
 runtestscript = input(['Do you wish to try running an example script in ', ...

@@ -166,12 +166,14 @@ elseif usegrid
     % value of theta that is considered (depending on the grid)
     % e.g. p(observing A at position #10 with the corresponding weight
     % of position #10 if estimated p(A) = 1/10)
-    % !!!! Maxime: ce n'est pas vraiment comme ça qu'on avait définit
-    % "decay" dans le PCB 2016. je n'ai pas l'impression que ce soit
-    % équivalent... ce "decay" ressemble plus à une proba de sustitution.
-    % NB: la même remarque vaut pour les autres modèles, Marko, chain
     dA = decw(A) *    theta  + (1 - decw(A)) * (1-theta);
     dB = decw(B) * (1-theta) + (1 - decw(B)) *    theta ;
+    % Note that this is a different, but mathematicaly equivalent, way of
+    % implementing the leaky integration we propose in Meyniel, Maheu &
+    % Dehaene, PCB (2016). In that case, we formalize it using substitution
+    % probability instead of an exponential leak. The free parameter is
+    % thus the probability of making a memory substitution (at each
+    % observation) and not the slope of the exponential leak.
     
     % Compute the sequence's likelihood
     if     islin, pYgT = prod(   dA,  1) .* prod(    dB,  1);
