@@ -6,13 +6,13 @@ function [ pY, pAgY, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, use
 %   - "nu": a scalar specifying the depth of the tree to explore.
 %   - "scaleme": a string ('lin' or 'log') specifying whether the model
 %       evidence sould be computed on a linear or logarithmic scale.
-%   - "usegrid": a boolean specifing whether use grid-based or analytical
+%   - "usegrid": a boolean specifying whether to use grid-based or analytical
 %       solutions.
 %   - "prior": the name of the prior distribution over patterns to use,
 %       either 'Bayes-Laplace' or based on the 'Size-principle'.
 %   - "decw": a Nx1 or 1xN array of (decaying) weights that will weight
 %       past observations of the sequence.
-%   - "corout": a boolean specofying whether to correct the output
+%   - "corout": a boolean specifying whether to correct the output
 %       variables when the result of the inference is singular.
 % 
 % Copyright (c) 2018 Maxime Maheu
@@ -121,20 +121,20 @@ for i = ilRo
     Ri = y(1:i); % pattern Ri
     if nargout > 3, R{i} = Ri; end % return the pattern
     
-    % Check whether the observed sequence could be a fixe (integer) number
+    % Check whether the observed sequence could be a fixed (integer) number
     % of repetition(s) of that pattern. This allows to use the following
     % conditionals which speed up the computations.
     ncol = ceil(K/i);
     ismult = (mod(K/i, 1) == 0);
     
     % Get the observed sequence...
-    % - If the length of the sequence is not a fixe number of the pattern's
+    % - If the length of the sequence is not a fixed number of the pattern's
     % length, add zeros such that it becomes the case
     if ~ismult
         j = (ncol*i)-K;
         ymat = zeros(K+j,1);
         ymat(1:K) = y;
-    % - If the length of the sequence is a fixe number of the repetition
+    % - If the length of the sequence is a fixed number of the repetition
     % of the pattern, simply get the sequence
     elseif ismult
         ymat = y;

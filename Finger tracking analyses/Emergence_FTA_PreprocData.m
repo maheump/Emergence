@@ -1,5 +1,5 @@
-% This script preprocess data of each subject (e.g. organise conditions in
-% the sale order for each subject, project the finger's position inside the
+% This script preprocesses data of each subject (e.g. organize conditions in
+% the same order for each subject, project the finger's position inside the
 % triangle when it is slightly outside, ...), run the ideal observer on the
 % sequences that were presented to the subjects and save all the required
 % information (to run the analysis scripts) in a dedicated group-level
@@ -12,8 +12,9 @@
 
 % Add functions to the MATLAB path
 scriptpath = mfilename('fullpath');
-folderpath = scriptpath(1:strfind(scriptpath,'Emergence')+8);
-addpath(genpath(folderpath));
+ind = strfind(scriptpath,'Emergence'); % !!! my folder for your project is named... Emergence (causing a crash). This should be more robust
+folderpath = scriptpath(1:ind(end-1)+8);
+addpath(genpath(folderpath)); % !!! really need this? looks dirty
 
 % Define the location of the data
 datadir = fullfile(folderpath, 'Stimulation', 'data');

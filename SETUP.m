@@ -41,7 +41,7 @@ depenfolder = fullfile(folderpath, 'Dependencies');
 availdep = exist('cbrewer2.m', 'file') & ... % toolbox with colormaps
            exist('pat2str.m', 'file') & ...  % toolbox with home-made functions
            exist('VBA_setup.m', 'file');     % toolbox for variational inference
-fprintf('Done! ');
+fprintf('Done! \n');
 if availdep
     fprintf('All dependencies are available.\n\n');
 elseif ~availdep
@@ -73,7 +73,7 @@ fprintf('!!! Do not forget to rerun this script if you want to use the toolbox a
 
 % Try to run a script in order to check that everything is working well
 runtestscript = input(['Do you wish to try running an example script in ', ...
-    'order to test that everythink works fine? (0 for no, 1 for yes) ']);
+    'order to test that everything works fine? (0 for no, 1 for yes) ']);
 fprintf('\n\n');
 if runtestscript
     Emergence_IO_ToyExampleFullIO;

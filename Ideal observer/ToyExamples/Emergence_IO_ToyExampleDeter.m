@@ -1,6 +1,6 @@
-% This script compares the learning dynamic of a deterministic (supposing
-% repetitions of the same pattern) ideal (Bayesian) observer presented with
-% sequences made of the repetition of different patterns.
+% This script shows the learning dynamic of a deterministic (i.e. assuming
+% repetitions of the same pattern) ideal Bayesian observer presented with
+% various sequences made of the repetition of different patterns.
 % 
 % Copyright (c) 2018 Maxime Maheu
 

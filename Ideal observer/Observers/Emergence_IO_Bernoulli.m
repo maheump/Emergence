@@ -5,9 +5,9 @@ function [ pY, pAgY, pTgY, H_pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegri
 %       and 2s).
 %   - "scaleme": a string ('lin' or 'log') specifying whether the model
 %       evidence sould be computed on a linear or logarithmic scale.
-%   - "usegrid": a boolean specifing whether use grid-based or analytical
-%       solutions.
-%   - "prior": can ba a string ('Bayes-Laplace' or 'Jeffreys') or a 1x2
+%   - "usegrid": boolean value specifing whether to use grid-based or 
+%       analytical solutions.
+%   - "prior": can be a string ('Bayes-Laplace' or 'Jeffreys') or a 1x2
 %       array specifying the prior knowledge regarding the frequency of
 %       transitions (expressed in pseudo-counts).
 %   - "decw": a  Nx1 or 1xN array of (decaying) weights that will weight
@@ -51,7 +51,7 @@ if nargin < 3, usegrid = false; end
 % grid-based approximations instead
 if any(decw(1:end-1) ~= 1), usegrid = true; end
 
-% By default, use a small grid precision to speed-up the computation
+% By default, use a coarse grid precision to speed-up the computation
 if nargin < 6, dt = 0.1; end
 
 % This requires to create a grid for theta
@@ -73,7 +73,7 @@ end
 %% PRIOR PROBABILITIES
 %  ===================
 
-% In case of a perfect integration, we can resort on analytical solutions
+% In case of a perfect integration, we can resort to analytical solutions
 % that require to define prior probabilities in terms of transitions'
 % pseudo-counts (and not probabilities per se) such that a conjugate prior
 % can be used.
@@ -166,6 +166,10 @@ elseif usegrid
     % value of theta that is considered (depending on the grid)
     % e.g. p(observing A at position #10 with the corresponding weight
     % of position #10 if estimated p(A) = 1/10)
+    % !!!! Maxime: ce n'est pas vraiment comme ça qu'on avait définit
+    % "decay" dans le PCB 2016. je n'ai pas l'impression que ce soit
+    % équivalent... ce "decay" ressemble plus à une proba de sustitution.
+    % NB: la même remarque vaut pour les autres modèles, Marko, chain
     dA = decw(A) *    theta  + (1 - decw(A)) * (1-theta);
     dB = decw(B) * (1-theta) + (1 - decw(B)) *    theta ;
     
