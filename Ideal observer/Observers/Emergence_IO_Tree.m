@@ -208,16 +208,30 @@ if strcmpi(prior, 'Bayes-Laplace')
 % In the case of a prior distribution based on the size-principle
 elseif strcmpi(prior, 'Size-principle')
     
-    % The size principle states that, since these are binary patterns,
-    % their prior simply depends on their lengths:
-    % p(pRi) = (1/3) .^ |Ri|
-    if     idealinteg || ~idealinteg && islin, p_pRi = (1/3) .^ (1:nu);
-    elseif               ~idealinteg && islog, p_pRi = -(1:nu) .* log(3);
+    % We want to satisfy 2 constraints:
+    %   1) We want a pattern whose length equals i+1 to be 1/3 more likely
+    %      (a priori) than a pattern whose length equals i.
+    %   2) We want the sum of prior probabilities over all (entirely
+    %      observed and partialy observed) patterns equal to 1.
+    
+    % To satisfy these 2 constraints, we define the prior probability of
+    % patterns from the first level of the tree as follows
+    if     idealinteg || ~idealinteg && islin, p_pR1 = 1 / ((9/2) * (1 - (2/3)^(nu+1)) - (3/2));
+    elseif               ~idealinteg && islog, p_pR1 = -log((9/2) * (1 - (2/3)^(nu+1)) - (3/2));
     end
+    
+    % We then deduce the prior probability of patterns from levels of the
+    % tree ranging from 2 to nu (the depth of the tree)
+    if     idealinteg || ~idealinteg && islin, p_pR2tonu =  (1/3).^(1:nu-1)   .* p_pR1;
+    elseif               ~idealinteg && islog, p_pR2tonu = -(1:nu-1) .* log(3) + p_pR1;
+    end
+    
+    % Concatenate the prior probabilities of patterns from all tree levels
+    p_pRi = [p_pR1, p_pR2tonu]; 
 end
 
-% Split the prior distribution into two: for observed versus unobserved
-% patterns
+% Split the prior distribution into two: a first distribution for entirely
+% observed patterns and a second distribution for partially observed ones
 p_pRio = p_pRi(1:nlRo);
 p_pRiu = p_pRi((nlRo+1):nu);
 
