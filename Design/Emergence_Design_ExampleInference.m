@@ -168,10 +168,11 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~
 
 % For both types of regular observers
+col = {'Blues', 'Reds'};
 for iMod = 1:2
     
     % Sequence
-    subplot(6, w, (1:(w-2)) + w*(iMod+3));
+    sp = subplot(6, w, (1:(w-2)) + w*(iMod+3));
     if     iMod == 1, yt = 0:dt:1;
     elseif iMod == 2, yt = 1:nu;
     end
@@ -185,10 +186,11 @@ for iMod = 1:2
         xlabel('Observation (K)');
     end
     caxis([0,max(cellfun(@(x) max(x(:)), pTgYMr(iMod,:)))]);
+    colormap(sp, cbrewer2(col{iMod}, 100));
     
     % Ultimate observation
     for i = 1:2
-        subplot(6, w, w-2+i + w*(iMod+3));
+        sp = subplot(6, w, w-2+i + w*(iMod+3));
         imagesc(N+1, yt, pTgYMr{iMod,i}(:,N+1));
         set(gca, 'YTickLabel', {});
         if iMod == 1, set(gca, 'XTickLabel', {}); end
@@ -196,7 +198,7 @@ for iMod = 1:2
         elseif iMod == 2, set(gca, 'YTick', 1:nu);
         end
         caxis([0,max(cellfun(@(x) max(x(:)), pTgYMr(iMod,:)))]);
+        colormap(sp, cbrewer2(col{iMod}, 100));
     end
 end
-colormap(parula);
 colorbar('Position', [3/4,1/20,1/6,1/50], 'Orientation', 'Horizontal');
