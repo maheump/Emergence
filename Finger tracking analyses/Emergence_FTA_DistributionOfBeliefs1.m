@@ -118,7 +118,7 @@ figure('Position', [1 600 1920 500]);
 nBin = 30;
 
 % Create colormaps
-cmaps = {[flipud(cbrewer2('YlGnBu', 2000)); (cbrewer2('YlOrRd', 2000))], ...
+cmaps = {[flipud(cbrewer2('Blues', 2000)); (cbrewer2('Reds', 2000))], ...
          cbrewer2('Blues', 2000), cbrewer2('Reds', 2000), cbrewer2('Greens', 2000)};
 
 % For each density map
