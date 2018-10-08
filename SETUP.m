@@ -4,7 +4,7 @@
 % Copyright (c) 2018 Maxime Maheu
 
 % Welcome message
-fprintf('\n\n');
+fprintf('\n');
 fprintf('#######################################################\n');
 fprintf('# This is the setup routine for the Emergence toolbox #\n');
 fprintf('#######################################################\n\n');
@@ -74,10 +74,10 @@ fprintf('!!! Do not forget to rerun this script if you want to use the toolbox a
 % Try to run a script in order to check that everything is working well
 runtestscript = input(['Do you wish to try running an example script in ', ...
     'order to test that everything works fine? (0 for no, 1 for yes) ']);
-fprintf('\n\n');
+fprintf('\n');
 if runtestscript
     Emergence_IO_ToyExampleFullIO;
-    fprintf('\n\nEverything works perfectly fine!\n\n');
+    fprintf('\n\nEverything works perfectly fine!\n');
 end
 
 % Say goodbye
