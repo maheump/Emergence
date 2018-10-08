@@ -1,6 +1,6 @@
 % This script setups the MATLAB environment and figures' preferences
 % required to run Emergence_FTA_* analysis scripts.
-%
+% 
 % Copyright (c) 2018 Maxime Maheu
 
 % Display info
