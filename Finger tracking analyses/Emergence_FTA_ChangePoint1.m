@@ -54,8 +54,8 @@ for iHyp = 1:2
     
     % Measure the (inverse) entropy of the posterior distributions over
     % change point's position
-    inventofdist = 1 ./ cellfun(@Emergence_IO_Entropy, bel);
-    precpcppos(:,iHyp) = mean(inventofdist, 1, 'OmitNaN');
+    entofdist = cellfun(@Emergence_IO_Entropy, bel);
+    precpcppos(:,iHyp) = mean(entofdist, 1, 'OmitNaN');
     
     % Save also the averaged full posterior distribution over change
     % point's position
@@ -158,14 +158,14 @@ figure('Position', [342 906 120 200]);
 Emergence_PlotSubGp(precpcppos, tricol(1:2,:));
 
 % Customize the axes
-axis([0,3,0,1]);
-set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
+axis([0,3,1,6]);
+set(gca, 'XTick', [], 'XColor', 'None', 'YDir', 'Reverse', 'Box', 'Off');
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(precpcppos);
 
 % Add some text labels
-ylabel('Inverse entropy (bit)');
+ylabel('Entropy (bit)');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_CP_PrecPostCP.pdf'));
