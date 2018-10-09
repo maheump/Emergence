@@ -149,7 +149,7 @@ disptstats(pval,tci,stats);
 disptstats(pval,tci,stats);
 
 % Customize the axes
-xlim([0,3]);
+axis([0,3,-1,1]);
 set(gca, 'XColor', 'None', 'Box', 'Off');
 
 % Display whether the difference is significant or not
