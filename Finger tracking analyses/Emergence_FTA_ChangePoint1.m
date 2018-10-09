@@ -158,7 +158,7 @@ figure('Position', [342 906 120 200]);
 Emergence_PlotSubGp(precpcppos, tricol(1:2,:));
 
 % Customize the axes
-axis([0,3,1,6]);
+axis([0,3,0,Emergence_IO_Entropy(ones(1,N)./N)]);
 set(gca, 'XTick', [], 'XColor', 'None', 'YDir', 'Reverse', 'Box', 'Off');
 
 % Display whether the difference is significant or not
