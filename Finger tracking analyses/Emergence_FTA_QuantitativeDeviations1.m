@@ -10,7 +10,7 @@
 %  ===============================================================================
 
 % Define the number of bins to use
-nBin = 11;
+nBin = 10;
 
 % Define the type of binning method
 binmeth = 'unif';
@@ -19,17 +19,22 @@ binmeth = 'unif';
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Get probability bins
-if strcmpi(binmeth, 'unif') % bins uniformed on the probability space
-    pgrid = linspace(0, 1, nBin+1);
-elseif strcmpi(binmeth, 'equil') % bins uniformed on the probability space
-    iobel = cellfun(@(x) x.BarycCoord(:), IO, 'UniformOutput', 0);
-    iobel = cell2mat(iobel(:));
-    pgrid = prctile(iobel, linspace(0, 100, nBin));
-else, error('Please check the binnig method that is provided');
+if ~isempty(nBin) || ~isnan(nBin)
+    if strcmpi(binmeth, 'unif') % bins uniformed on the probability space
+        pgrid = linspace(0, 1, nBin+1);
+    elseif strcmpi(binmeth, 'equil') % bins uniformed on the probability space
+        iobel = cellfun(@(x) x.BarycCoord(:), IO, 'UniformOutput', 0);
+        iobel = cell2mat(iobel(:));
+        pgrid = prctile(iobel, linspace(0, 100, nBin+1));
+    else, error('Please check the binnig method that is provided');
+    end
 end
 
 % Prepare the output variable
-binbel = NaN(nBin,2,nSub);
+if isempty(nBin) || isnan(nBin)
+      binbel = cell(1,nSub);
+else, binbel = NaN(nBin,2,nSub);
+end
 
 % For each subject
 for iSub = 1:nSub
@@ -41,11 +46,19 @@ for iSub = 1:nSub
     iobel = cellfun(@(x) x.BarycCoord(:), IO(:,iSub), 'UniformOutput', 0);
     iobel = cell2mat(iobel(:));
     
-    % Average subject's and IO's beliefs in each bin
-    for iBin = 1:nBin
-        idx = iobel >= pgrid(iBin) & iobel < pgrid(iBin+1);
-        binbel(iBin,1,iSub) = mean(iobel(idx));
-        binbel(iBin,2,iSub) = mean(subbel(idx));
+    % Get subjects' and IO's beliefs without averaging
+    if isempty(nBin) || isnan(nBin)
+        binbel{iSub} = [subbel, iobel];
+    
+    % Average subjects' and IO's beliefs in each bin
+    else
+        for iBin = 1:nBin
+            idx = find(iobel >= pgrid(iBin) & iobel < pgrid(iBin+1));
+            if ~isempty(idx)
+                binbel(iBin,1,iSub) = mean(iobel(idx));
+                binbel(iBin,2,iSub) = mean(subbel(idx));
+            end
+        end
     end
 end
 
@@ -73,11 +86,17 @@ optiongp            = [];
 optiongp.DisplayWin = 0;
 optiongp.verbose    = 0;
 
-% Explaining variable: IO's binned beliefs
-for iSub = 1:nSub, options{iSub}.inG.p = binbel(:,1,iSub); end
+% Explaining variable: IO's beliefs
+if isempty(nBin) || isnan(nBin)
+    for iSub = 1:nSub, options{iSub}.inG.p = binbel{iSub}(:,1)'; end
+    y = cellfun(@(x) x(:,2), binbel, 'UniformOutput', 0)';
+    dim.p = size(X{1},1); % number of obervations per time sample
 
-% Variable to explain
-y = mat2cell(squeeze(binbel(:,2,:)), nBin, ones(nSub,1))';
+% Explaining variable: IO's binned beliefs
+else
+    for iSub = 1:nSub, options{iSub}.inG.p = binbel(:,1,iSub); end
+    y = mat2cell(squeeze(binbel(:,2,:)), nBin, ones(nSub,1))';
+end
 
 % Prepare output variables
 p_sub = cell(2,nSub); p_gp = cell(2,1); % posterior over parameters
