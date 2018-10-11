@@ -26,11 +26,19 @@ for iHyp = 1:3 % generative process
     avgcordet(iHyp,:,:) = cell2mat(cellfun(@(x) histc(x, 1:3) ...
         ./ numel(x), data, 'UniformOutput', 0));
 end
+data = squeeze(cat(1, avgcordet(1,1,:), avgcordet(2,2,:), avgcordet(3,3,:)))';
+
+% Check that labeling is significantly better than chance
+[~,pval,tci,stats] = ttest(data - 1/3);
+disptstats(pval,tci,stats);
 
 % Run a 1-way ANOVA on correct labeling between conditions
-data = squeeze(cat(1, avgcordet(1,1,:), avgcordet(2,2,:), avgcordet(3,3,:)))';
 RMtbl = rmANOVA(data, 'SeqType');
 disp(RMtbl);
+
+% Compare accurate labeling between the two regular processes
+[~,pval,tci,stats] = ttest(diff(data(:,1:2), 1, 2));
+disptstats(pval,tci,stats);
 
 % Display results using a home-made stacked barplot
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,7 +145,7 @@ crit   = NaN(nSub,3);
 pad = N/(2*N);
 
 % For each subject
-for sub = 1:nSub
+for iSub = 1:nSub
     
     % 1) Fully-stochastic versus one of the regularity
     
@@ -145,8 +153,8 @@ for sub = 1:nSub
     for iHyp = 1:2
         
         % Get data
-        signal = regornot(cidx{iHyp},sub); % sequences with a regularity
-        noise  = regornot(cidx{3},sub);    % fully-stochastic sequences
+        signal = regornot(cidx{iHyp},iSub); % sequences with a regularity
+        noise  = regornot(cidx{3},iSub);    % fully-stochastic sequences
         
         % Get frequencies for each possible answer
         H  = sum(signal == 1); % hit
@@ -163,19 +171,19 @@ for sub = 1:nSub
         pFA = t(2,1) / sum(t(2,:));
         
         % Compute sensitivity and bias measures
-        dprime(sub,iHyp) = (norminv(pH) - norminv(pFA));
-        crit(sub,iHyp) = (1/2) * (norminv(pH) + norminv(pFA));
+        dprime(iSub,iHyp) = (norminv(pH) - norminv(pFA));
+        crit(iSub,iHyp) = (1/2) * (norminv(pH) + norminv(pFA));
         % N.B. In that case we compare presence versus absence of
         % regularities. It is therefore equivalent to a yes/no type of
-        % paradigme: no 1/sqrt(2) downward scaling factor is thus required
+        % paradigm: no 1/sqrt(2) downward scaling factor is thus required
         % in the computation of the d' sensitivity measure.
     end 
     
     % 2) Probabilistic versus deterministic regularity
     
     % Get data
-    proba = estgenproc(cidx{1},sub); % proba
-    deter = estgenproc(cidx{2},sub); % deter
+    proba = estgenproc(cidx{1},iSub); % proba
+    deter = estgenproc(cidx{2},iSub); % deter
     
     % Get frequencies for each possible answer
     H  = sum(proba == 1); % hit
@@ -192,13 +200,17 @@ for sub = 1:nSub
     pFA = t(2,1) / sum(t(2,:));
     
     % Compute sensitivity and bias measures
-    dprime(sub,end) = (1/sqrt(2)) * (norminv(pH) - norminv(pFA));
-    crit(sub,end) = (1/2) * (norminv(pH) + norminv(pFA));
+    dprime(iSub,end) = (1/sqrt(2)) * (norminv(pH) - norminv(pFA));
+    crit(iSub,end) = (1/2) * (norminv(pH) + norminv(pFA));
     % N.B. In that case we compare probabilistic versus deterministic
     % regularities. It is therefore equivalent to a 2AFC type of
     % paradigme: a 1/sqrt(2) downward scaling factor is thus required
     % in the computation of the d' sensitivity measure.
 end
+
+% Compare detection d' of the two types of regularity
+[~,pval,tci,stats] = ttest(diff(dprime(:,1:2), 1, 2));
+disptstats(pval,tci,stats);
 
 % Average over subjects
 gavgdprime = mean(dprime,1); % average d'
