@@ -14,7 +14,7 @@ function [ pY, pAgY, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, use
 %       past observations of the sequence.
 %   - "corout": a boolean specifying whether to correct the output
 %       variables when the result of the inference is singular.
-% 
+%
 % Copyright (c) 2018 Maxime Maheu
 
 % In order to understand the nomenclature used troughout the function,
@@ -33,7 +33,7 @@ function [ pY, pAgY, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, use
 % |                   |   |   |   |                                  | patterns: {Ru} = 2^3
 % |                  (X) (Y) (X) (Y)                                 |
 % ===================================================================|==> nu = 5
-    
+
 %% INITIALIZATION
 %  ==============
 
@@ -154,7 +154,7 @@ for i = ilRo
     
     % In case of a perfect integration
     if idealinteg
-    
+        
         % Check if the repetition of that current pattern entirely matches
         % the observed sequence
         isruletrue = sum(seqcheck(:)) == K;
@@ -183,7 +183,7 @@ for i = ilRo
         if     islin, pYgRio(i) = (1/2) * prod(pYkgRi);
         elseif islog, pYgRio(i) = -log(2) + sum(log(pYkgRi));
         end
-   end
+    end
     
     % Derive the expected identity of the next observation based on that
     % pattern (be it correct or not)
@@ -220,14 +220,10 @@ elseif strcmpi(prior, 'Size-principle')
     elseif               ~idealinteg && islog, p_pR1 = -log((9/2) * (1 - (2/3)^(nu+1)) - (3/2));
     end
     
-    % We then deduce the prior probability of patterns from levels of the
-    % tree ranging from 2 to nu (the depth of the tree)
-    if     idealinteg || ~idealinteg && islin, p_pR2tonu =  (1/3).^(1:nu-1)   .* p_pR1;
-    elseif               ~idealinteg && islog, p_pR2tonu = -(1:nu-1) .* log(3) + p_pR1;
+    % We then deduce the prior probability of all patterns
+    if     idealinteg || ~idealinteg && islin, p_pRi =  (1/3).^(0:nu-1)   .* p_pR1;
+    elseif               ~idealinteg && islog, p_pRi = -(0:nu-1) .* log(3) + p_pR1;
     end
-    
-    % Concatenate the prior probabilities of patterns from all tree levels
-    p_pRi = [p_pR1, p_pR2tonu]; 
 end
 
 % Split the prior distribution into two: a first distribution for entirely
@@ -249,7 +245,7 @@ end
 
 % Sum of posterior probabilities
 % p(y|Ro) = sum(i=1:min([K,nu])) p(y|Rio) * p(Ri)
-pYgRo = sum(pRiogY); 
+pYgRo = sum(pRiogY);
 
 % Partially observed patterns
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -285,7 +281,7 @@ if corout && islog && isinf(pY), pY = log(realmin); end
 %% PREDICTION
 %  ==========
 
-% If the expectation has to be returned 
+% If the expectation has to be returned
 if nargout > 1
     
     % Conditionaly on entirely observed patterns
@@ -325,7 +321,7 @@ end
 %% ENTROPY OF THE POSTERIOR DISTRIBUTION
 %  =====================================
 
-% If the posterior distribution over patterns has to be returned 
+% If the posterior distribution over patterns has to be returned
 if nargout > 2
     
     % Combine both the posterior distributions over entirely and partially
@@ -340,7 +336,7 @@ if nargout > 2
     % If the sequence is longer than the longest allowed pattern (i.e. the
     % depth of the tree) and that no patterns can reproduce the sequence,
     % (i.e. we cannot normalize the posterior because it would mean divide
-    % it by zero), return an array of zero 
+    % it by zero), return an array of zero
     if all(isnan(pRigY)), pRigY = zeros(nlRo,1); end
 end
 
