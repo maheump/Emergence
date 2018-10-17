@@ -40,18 +40,8 @@ fingerposwrtp = cell(2,3); % trajectories locked on different point
 % For each type of regularity
 for iHyp = 1:2
     
-    % Sample (in the entire sequence) around which the change happened
+    % Get the change point
     cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:)) - 1/2;
-    
-    % Order according to change point's position and detected/undetected
-    CP = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'UniformOutput', 1);
-    detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
-    [sortedCP, idx] = sortrows([cp{iHyp}(:), detecmask(:)], [2,1], 'descend');
-    
-    % Get the beliefs in the corresponding (correct) hypothesis ordered
-    % according to the position the change point
-    bel = cellfun(@(x) x.BarycCoord(:,iHyp)', D(cidx{iHyp},:), 'UniformOutput', 0);
-    belincorhyp{iHyp} = cell2mat(bel(idx));
     
     % Get the detection point 
     % (note that we go back in time from the end of the sequence in order
