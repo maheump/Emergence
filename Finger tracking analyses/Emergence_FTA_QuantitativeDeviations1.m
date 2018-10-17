@@ -66,7 +66,7 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % The observation functions to use (see at the end of this script)
-g_fname = {@g_PW, ... % Model 1: probabilistic weighting function
+g_fname = {@g_PW, ... % Model 1: probability weighting function
            @g_LM};    % Model 2: linear regression
 
 % Specify the dimensions of the problem
@@ -256,7 +256,7 @@ end
 gamma = P(1);
 p0 = P(2);
 
-% Compute predictions of the probabilistic weighting function
+% Compute predictions of the probability weighting function
 g = logitinv(gamma .* logit(in.p) + (1 - gamma) * logit(p0));
 
 % Rely on numerical derivatives
