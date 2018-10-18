@@ -36,7 +36,7 @@ figure('Position', [1 765 255 340]);
 
 % Display entropy map
 imagesc(p, p, entmap); hold('on');
-colormap(hot(2000)); caxis([0,2]);
+colormap(flipud(cbrewer2('Blues', 2000))); caxis([0,2]);
 cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
 cbr.Label.String = 'Entropy';
 
