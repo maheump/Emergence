@@ -10,8 +10,8 @@
 %  ===================
 
 % Select example sequences to look at
-sublist  = [22 25 28];
-condlist = [10 16 22];
+sublist  = [22 27 28];
+condlist = [10 19 22];
 nSeq  = numel(sublist);
 
 % Prepare the window
