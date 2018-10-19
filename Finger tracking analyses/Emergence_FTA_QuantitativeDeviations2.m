@@ -133,7 +133,12 @@ axis([0, 2, -5, 20]);
 set(gca, 'Box', 'Off', 'XColor', 'None');
 
 % Display whether the difference is significant or not
-Emergence_DispStatTest(paramlist(submaxidxavgR2));
+inddelay = paramlist(submaxidxavgR2);
+Emergence_DispStatTest(inddelay);
+
+% Perform a t-test on integration delay against zero
+[~,pval,tci,stats] = ttest(inddelay');
+disptstats(pval,tci,stats);
 
 % Add some text labels
 ylabel('Estimated delay (# obs.)');
@@ -174,6 +179,9 @@ set(gca, 'Box', 'Off');
 
 % Add some text labels
 xlabel('Estimated delay (# obs.)'); ylabel('Correlation with the IO');
+
+% Test the correlation
+[rho,pval] = corr(x', y');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_QD_Corr.pdf'));
