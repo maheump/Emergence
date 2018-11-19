@@ -76,7 +76,7 @@ for iLoop = 1:2
 
     Emergence_FTA_Detection1;
     Emergence_FTA_Detection2;
-    Emergence_FTA_DistributionOfBeliefs;
+    Emergence_FTA_DistributionOfBeliefs1;
     Emergence_FTA_Dynamics1;
     Emergence_FTA_HypothesisWeighting1;
     Emergence_FTA_ChangePoint2;
@@ -85,7 +85,9 @@ end
 % Correlation between subjects and ideal observer
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Emergence_FTA_DistributionOfBeliefs2;
 Emergence_FTA_Dynamics2;
 Emergence_FTA_HypothesisWeighting2;
+Emergence_FTA_HypothesisWeighting3;
 Emergence_FTA_QuantitativeDeviations1;
 Emergence_FTA_QuantitativeDeviations2;
