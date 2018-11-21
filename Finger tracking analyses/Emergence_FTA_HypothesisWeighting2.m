@@ -58,7 +58,7 @@ xval = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confintx');
 plot([0,1]./2, [0,1]./2, '-', 'Color', g, 'LineWidth', 1); hold('on');
 text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
 
-% Display the regression line
+% Display regression line
 fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
        'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2);
 plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
@@ -75,7 +75,7 @@ end
 % Customize the axes
 set(gca, 'Box', 'Off');
 axis('equal');
-axis([0,0.3,0,0.5]);
+axis([0,0.3,0,0.6]);
 
 % Add some text labels
 xlabel('Ideal observer');
