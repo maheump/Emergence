@@ -193,8 +193,8 @@ axis([0, 1, 0, sqrt(3)/2]);
 axis('xy'); axis('off'); axis('equal');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_Tri.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_Tri.pdf'));
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriIO.pdf'));
 end
 
 % Display the P/D ratio locked on the detection of deterministic regularities
@@ -234,8 +234,8 @@ xlabel('Observation w.r.t. detection point');
 ylabel('Ratio P versus D');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratio.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratio.pdf'));
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratioS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratioIO.pdf'));
 end
 
 %% SHOW THAT THE TRANSIENT TENSION DEPENDS UPON THE ENTROPY OF THE RULES
