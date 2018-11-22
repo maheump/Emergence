@@ -201,10 +201,10 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Copute the P/D ratio
-ratioPD = cell2mat(cellfun(@(x) reshape(x(:,1) ./ sum(x(:,1:2), 2), ...
+ratioPD = cell2mat(cellfun(@(x) reshape(x(:,2) ./ sum(x(:,1:2), 2), ...
     [1 1 nsp]), subtraj, 'UniformOutput', 0));
 
-% Transform it such that it evolves between -1 (Deter) and 1 (Proba)
+% Transform it such that it evolves between -1 (Proba) and 1 (Deter)
 ratioPD = 2 .* (ratioPD - 1/2);
 
 % Average over sequences for each subject
@@ -226,7 +226,7 @@ plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
 
 % Customize the axes
 caxis([-1,1]);
-axis([xval(1), xval(end), -1, 0.5]);
+axis([xval(1), xval(end), -1, 1]);
 set(gca, 'Box', 'Off');
 
 % Add text labels
