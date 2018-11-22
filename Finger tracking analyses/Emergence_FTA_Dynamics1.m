@@ -43,14 +43,14 @@ for iHyp = 1:2
     % Get the change point
     cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:)) - 1/2;
     
-    % Get the detection point 
+    % Get the detection point's position
     % (note that we go back in time from the end of the sequence in order
     % to avoid as much as possible the false alarms that might exist at the
     % time of the change point)
-    dp{iHyp} = cell2mat(cellfun(@(x,y) nanmin([NaN, ...
+    dp{iHyp} = cell2mat(cellfun(@(x) min([NaN, ...
         N - find(flipud(x.BarycCoord( x.Jump + 1/2: end, iHyp)) ...
-        >= detecthr, 1, 'last')]), ... % in # of observations
-        D(cidx{iHyp},:), G(cidx{iHyp},:), 'UniformOutput', 0));
+        >= detecthr, 1, 'last')], [], 'OmitNaN'), ... % in # of observations
+        D(cidx{iHyp},:), 'UniformOutput', 0));
     lag{iHyp} = dp{iHyp} - cp{iHyp};
     
     % Do not look at sequences in which the beliefs were aleardy above
