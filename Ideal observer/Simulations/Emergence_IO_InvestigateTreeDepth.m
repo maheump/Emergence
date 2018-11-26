@@ -23,29 +23,50 @@ Emergence_DefaultFigureProperties;
 %% DEFINE SEQUENCES' PROPERTIES
 %  ============================
 
-% Define the rules to use in the simulations
-Rules = {'AABB', ...
-         'AAABBB', 'AABABB', 'AAABAB'...
-         'AAAABBBB', 'AABABABB', 'AAABBABB', ...
-         'AAAAABBBBB', 'AABABABABB', 'AAABAABBAB'};
-nRule = numel(Rules);
+% Whether to run simulations on simulated sequences (opt = 1) or on
+% sequences that were presented to subjects (opt = 2)
+opt = 2;
 
-% Define the number of sequences to simulate for each rule
-% N.B. The results can be interpreted as soon as with nSeq = 2 but the
-% asymptotical results are reached for nSeq = 50
-nSeq = 50;
+% Newly simulated sequences
+% ~~~~~~~~~~~~~~~~~~~~~~~~~
+if opt == 1
+    
+    % Define the rules to use in the simulations
+    dr = {'AABB', ...
+          'AAABBB', 'AABABB', 'AAABAB'...
+          'AAAABBBB', 'AABABABB', 'AAABBABB', ...
+          'AAAAABBBBB', 'AABABABABB', 'AAABAABBAB'};
+    
+    % Define the number of sequences to simulate for each rule
+    % N.B. The results can be interpreted as soon as with nSeq = 2 but the
+    % asymptotical results are reached for nSeq = 50
+    nSeq = 50;
+    
+    % Define the position of the change point (it is always the same)
+    cp = 100;
+    
+    % Define the length of the sequences
+    N = 200;
 
-% Define the position of the change point (it is always the same)
-cp = 100;
+% Sequences presented to subjects
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elseif opt == 2
+    
+    % Load data
+    Emergence_FTA_LoadData;
+    
+    % The number of simulations equal the number of subjects
+    nSeq = nSub;
+end
 
-% Define the length of the sequences
-N = 200;
+% Get the number of deterministic regularities
+nReg = numel(dr);
 
 %% DEFINE PROPERTIES OF THE IDEAL OBSERVER
 %  =======================================
 
 % Define the depth of the trees to investigate
-Nu = [unique(cellfun(@numel, Rules)) 20 50 N];
+Nu = [unique(cellfun(@numel, dr)') 20 50 N];
 nNu = numel(Nu);
 
 % Define options of the ideal observer
@@ -65,18 +86,22 @@ pgrid = []; % do not ask for the posterior distributions
 %  ===============
 
 % Prepare the output variable
-pMdgY = NaN(N,nSeq,nRule,nNu);
+pMdgY = NaN(N,nSeq,nReg,nNu);
 
 % For each repeating rule
-for iRule = 1:nRule
+for iReg = 1:nReg
 
     % For each simulated sequence
     for iSeq = 1:nSeq
 
-        % Generate a sequence
-        nrepet = ceil((N-cp)/numel(Rules{iRule}));
-        seq = [GenRandSeq(cp, 1/2), ...                     % first part
-               repmat(str2pat(Rules{iRule}), [1,nrepet])];  % second part
+        % Get the sequence
+        if opt == 1 % generate
+            nrepet = ceil((N-cp)/numel(dr{iReg}));
+            seq = [GenRandSeq(cp, 1/2), ...                 % first part
+                   repmat(str2pat(dr{iReg}), [1,nrepet])];  % second part
+        elseif opt == 2 % retrieve
+            seq = G{cidx{2}(iReg),iSeq}.Seq;
+        end
 
         % For each depth of the tree
         for iNu = 1:nNu
@@ -84,12 +109,12 @@ for iRule = 1:nRule
             % Display the status of the loop in the command window
             fprintf(['- Rule %2.0f/%2.0f (%s), Sequence %2.0f/%2.0f, ', ...
                 'Depth %1.0f/%1.0f (nu = %3.0f)... '], ...
-                iRule, nRule, Rules{iRule}, iSeq, nSeq, iNu, nNu, Nu(iNu));
+                iReg, nReg, dr{iReg}, iSeq, nSeq, iNu, nNu, Nu(iNu));
 
             % Run the ideal observer
             io = Emergence_IO_FullIO(seq(1:N), pEd, pEp, Nu(iNu), ...
                 stat, p_pR, p_pT, p_pJ, comp, scale, pgrid, verb);
-            pMdgY(:,iSeq,iRule,iNu) = io.pMsdgY;
+            pMdgY(:,iSeq,iReg,iNu) = io.pMsdgY;
         end
     end
 end
@@ -98,14 +123,14 @@ end
 %  ========================
 
 % Merge rules and sequences dimensions
-rs_pMdgY = reshape(pMdgY, [N, nSeq*nRule, nNu]);
+rs_pMdgY = reshape(pMdgY, [N, nSeq*nReg, nNu]);
 
 % Prepare the output variables
-CorMat = NaN(nNu, nNu, nSeq*nRule);
+CorMat = NaN(nNu, nNu, nSeq*nReg);
 MseMat = CorMat;
 
 % For each simulated sequence
-for iSimu = 1:nSeq*nRule
+for iSimu = 1:nSeq*nReg
 
     % For each pair of tree depth
     for iNu1 = 1:nNu
