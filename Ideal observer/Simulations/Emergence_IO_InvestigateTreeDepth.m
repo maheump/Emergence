@@ -40,7 +40,7 @@ if opt == 1
     % Define the number of sequences to simulate for each rule
     % N.B. The results can be interpreted as soon as with nSeq = 2 but the
     % asymptotical results are reached for nSeq = 50
-    nSeq = 50;
+    nSub = 50;
     
     % Define the position of the change point (it is always the same)
     cp = 100;
@@ -54,9 +54,6 @@ elseif opt == 2
     
     % Load data
     Emergence_FTA_LoadData;
-    
-    % The number of simulations equal the number of subjects
-    nSeq = nSub;
 end
 
 % Get the number of deterministic regularities
@@ -86,72 +83,79 @@ pgrid = []; % do not ask for the posterior distributions
 %  ===============
 
 % Prepare the output variable
-pMdgY = NaN(N,nSeq,nReg,nNu);
+pMdgY = NaN(N,nSub,nReg,nNu);
 
 % For each repeating rule
 for iReg = 1:nReg
-
+    
     % For each simulated sequence
-    for iSeq = 1:nSeq
-
+    for iSub = 1:nSub
+        
         % Get the sequence
         if opt == 1 % generate
             nrepet = ceil((N-cp)/numel(dr{iReg}));
             seq = [GenRandSeq(cp, 1/2), ...                 % first part
                    repmat(str2pat(dr{iReg}), [1,nrepet])];  % second part
         elseif opt == 2 % retrieve
-            seq = G{cidx{2}(iReg),iSeq}.Seq;
+            seq = G{cidx{2}(iReg),iSub}.Seq;
         end
-
+        
         % For each depth of the tree
         for iNu = 1:nNu
-
+            
             % Display the status of the loop in the command window
             fprintf(['- Rule %2.0f/%2.0f (%s), Sequence %2.0f/%2.0f, ', ...
                 'Depth %1.0f/%1.0f (nu = %3.0f)... '], ...
-                iReg, nReg, dr{iReg}, iSeq, nSeq, iNu, nNu, Nu(iNu));
-
+                iReg, nReg, dr{iReg}, iSub, nSub, iNu, nNu, Nu(iNu));
+            
             % Run the ideal observer
             io = Emergence_IO_FullIO(seq(1:N), pEd, pEp, Nu(iNu), ...
                 stat, p_pR, p_pT, p_pJ, comp, scale, pgrid, verb);
-            pMdgY(:,iSeq,iReg,iNu) = io.pMsdgY;
+            pMdgY(:,iSub,iReg,iNu) = io.pMsdgY;
         end
     end
 end
+
+% Save simulations
+save('Emergence_IO_InvestigateTreeDepth.mat', 'pMdgY');
 
 %% COMPUTE CONFUSION MATRIX
 %  ========================
 
-% Merge rules and sequences dimensions
-rs_pMdgY = reshape(pMdgY, [N, nSeq*nReg, nNu]);
-
 % Prepare the output variables
-CorMat = NaN(nNu, nNu, nSeq*nReg);
+CorMat = NaN(nNu,nNu,nSub,nReg);
 MseMat = CorMat;
 
-% For each simulated sequence
-for iSimu = 1:nSeq*nReg
-
-    % For each pair of tree depth
-    for iNu1 = 1:nNu
-        for iNu2 = 1:nNu
-
-            % Get posterior beliefs of observers using different tree depth
-            x = rs_pMdgY(2:end,iSimu,iNu1);
-            y = rs_pMdgY(2:end,iSimu,iNu2);
-
-            % Measure the correlation between the two
-            CorMat(iNu1,iNu2,iSimu) = corr(x, y);
-
-            % Measure the mean squared difference between the two
-            MseMat(iNu1,iNu2,iSimu) = -log(mean((x - y) .^ 2));
+% For each repeating rule
+for iReg = 1:nReg
+    
+    % For each simulated sequence
+    for iSub = 1:nSub
+    
+        % For each pair of tree depth
+        for iNu1 = 1:nNu
+            for iNu2 = 1:nNu
+                
+                % Get posterior beliefs of observers using different tree depth
+                x = pMdgY(2:end,iSub,iReg,iNu1);
+                y = pMdgY(2:end,iSub,iReg,iNu2);
+                
+                % Measure the correlation between the two
+                CorMat(iNu1,iNu2,iSub,iReg) = corr(x, y);
+                
+                % Measure the mean squared difference between the two
+                MseMat(iNu1,iNu2,iSub,iReg) = -log(mean((x - y) .^ 2));
+            end
         end
     end
 end
 
-% Average over simulations
-AvgMat = cat(3, mean(CorMat, 3), mean(MseMat, 3));
-SemMat = cat(3, sem(CorMat, 3), sem(MseMat, 3));
+% Average over sequences
+AvgMat = cat(4, mean(CorMat, 4), mean(MseMat, 4));
+
+% Average over (pseudo-)subjects
+SemMat = squeeze(sem( AvgMat, 3));
+AvgMat = squeeze(mean(AvgMat, 3));
 
 %% DISPLAY SIMULATION RESULTS
 %  ==========================
@@ -168,34 +172,34 @@ cbrlab = {sprintf('$\\rho(%s,%s)$', labfun(1), labfun(2)), ...
 % For each matrix
 for iSp = 1:2
     sp = subplot(1,2,iSp);
-
+    
     % Display the correlation matrix
     imagesc(1:nNu, 1:nNu, AvgMat(:,:,iSp)); hold('on');
-
+    
     % Overlap coefficients
     text(repmat(1:nNu, 1, nNu), sort(repmat(1:nNu, 1, nNu)), cellfun(@(x) ...
         sprintf('%1.2f', x), num2cell(AvgMat(:,:,iSp)), ...
         'UniformOutput', 0), 'HorizontalAlignment', 'Center', ...
         'VerticalAlignment', 'Bottom', 'FontSize', 8);
     text(repmat(1:nNu, 1, nNu), sort(repmat(1:nNu, 1, nNu)), cellfun(@(x) ...
-        sprintf('%1.2f', x), num2cell(SemMat(:,:,iSp)), ...
+        sprintf('(%1.3f)', x), num2cell(SemMat(:,:,iSp)), ...
         'UniformOutput', 0), 'HorizontalAlignment', 'Center', ...
         'VerticalAlignment', 'Top', 'FontSize', 6);
-
+    
     % Customize the colormap
     cbr = colorbar('Location', 'SouthOutside');
     colormap(sp, flipud(cmap(:,:,iSp)));
     if iSp == 1, caxis([-1,1]); end
-
+    
     % Customize the axes
     axis('square'); axis('xy'); set(gca, 'TickLabelInterpreter', 'LaTeX');
     set(gca, 'XTick', 1:nNu, 'XTickLabel', cellfun(@(x) sprintf('%1.0f', x), ...
         num2cell(Nu), 'UniformOutput', 0));
     set(gca, 'YTick', 1:nNu, 'YTickLabel', get(gca, 'XTickLabel'));
-
+    
     % Add some text labels
-    cbr.Label.String = cbrlab{iSp};
     cbr.Label.Interpreter = 'LaTeX';
+    cbr.Label.String = cbrlab{iSp};
     xlabel('$\nu_{1}$', 'Interpreter', 'LaTeX');
     ylabel('$\nu_{2}$', 'Interpreter', 'LaTeX');
     if     iSp == 1, t = title('Average correlation coefficients');
