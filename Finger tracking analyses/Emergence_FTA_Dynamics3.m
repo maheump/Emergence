@@ -32,7 +32,7 @@ Var{2,2} = lag{2};
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare two new windows
-figure('Position', [1304 705 200 400]);
+figure('Position', [1304 780 400 325]);
 
 % For each regular hypothesis
 for iHyp = 1:2
@@ -47,7 +47,7 @@ for iHyp = 1:2
     % subjects
     confint  = Emergence_Regress(my, mx, 'TLS', 'confint');
     confintx = Emergence_Regress(my, mx, 'TLS', 'confintx');
-    subplot(2,1,iHyp); hold('on');
+    subplot(1,2,iHyp); hold('on');
     fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
         'k', 'EdgeColor', 'none', 'FaceColor', tricol(iHyp,:), 'FaceAlpha', 0.15);
     b = Emergence_Regress(my, mx, 'TLS', {'beta0', 'beta1'});
@@ -65,11 +65,10 @@ for iHyp = 1:2
     end
     
     % Display identity line
-    plot(xlim, xlim, '-', 'Color', g);
+    plot(xlim, xlim, '-', 'Color', g); hold('on');
     
     % Customize the axes
     set(gca, 'Box', 'Off');
-    axis('equal'); axis('square');
 	
     % Add some text labels
     xlabel('Ideal observer');
@@ -83,7 +82,7 @@ save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_Corr1.pdf'));
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [1505 705 120 400]);
+figure('Position', [1705 780 100 325]);
 
 % For each regular hypothesis
 for iHyp = 1:2

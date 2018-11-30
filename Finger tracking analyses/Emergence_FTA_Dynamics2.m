@@ -28,9 +28,8 @@ mrkr = {'s', 'o', '^', 'd'};
 PpXgY = cell2mat(prob')';
 PpAgB = PpXgY(1,:);
 PpBgA = PpXgY(2,:);
-TPent = arrayfun(@Emergence_IO_Entropy, PpAgB) + ...
-        arrayfun(@Emergence_IO_Entropy, PpBgA);
-
+TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), PpAgB, PpBgA)';
+    
 % Define the type of biases that have been used
 biases = NaN(1, numel(prob));
 biases(PpXgY(1,:) < 1/2 & PpXgY(2,:) > 1/2) = 1; % frequency biases
@@ -44,7 +43,7 @@ biases(isnan(biases)) = 4;                       % outside diagonals
 avggperstrength = cell2mat(cellfun(@(i) mean(speed{1}(idx == i,:), 1, ...
     'OmitNaN')', num2cell(1:numel(unique(TPent))), 'UniformOutput', 0));
 avggperstrength = mat2cell(avggperstrength, ones(nSub,1), numel(unique(TPent)));
-slope = cellfun(@(x) Emergence_Regress(x, unique(TPent), 'OLS', 'beta1'), avggperstrength);
+slope = cellfun(@(x) Emergence_Regress(x, unique(TPent)', 'OLS', 'beta1'), avggperstrength);
 [~,pval,tci,stats] = ttest(slope);
 disptstats(pval,tci,stats);
 
@@ -59,16 +58,29 @@ disp(T);
 avg = mean(speed{1}, 2, 'OmitNaN');
 err = sem(speed{1}, 2);
 
+% Create the colormap
+prec = 1001;
+decal = round(prec*(max(TPent) - 1)); %500;
+pmap = flipud([flipud(cbrewer2('Blues', decal)); cbrewer2('Greys', prec)]);
+prec = size(pmap,1);
+
 % Get dedicated color for each condition that is indexed on the entropy of
 % the rule
-prec = 100;
-pmap = flipud(cbrewer2('Blues', prec));
-[~,idx] = min(abs(linspace(1, 2, prec) - TPent'), [], 2);
+[~,idx] = min(abs(linspace(0, Emergence_MarkovEntropy(1/2,1/2), prec) - TPent), [], 2);
 condmap{1} = pmap(idx,:);
 
 % Prepare a new window
-figure('Position', [702 755 200 350]);
-lgd = NaN(1,3);
+figure('Position', [702 780 200 325]);
+lgd = NaN(1,3); hold('on');
+
+% Display the regression line between Shannon entropy and detection speed
+confint  = Emergence_Regress(avg, TPent, 'OLS', 'confint');
+confintx = Emergence_Regress(avg, TPent, 'OLS', 'confintx');
+fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
+    tricol(1,:), 'EdgeColor', 'none', 'FaceColor', 'k', 'FaceAlpha', 0.15);
+b = Emergence_Regress(avg, TPent, 'OLS', {'beta0', 'beta1'});
+plot(confintx([1,end]), confintx([1,end]).*b(2)+b(1), '-', ...
+    'Color', tricol(1,:), 'LineWidth', 3);
 
 % For each type of bias
 for iGp = 1:4
@@ -77,7 +89,7 @@ for iGp = 1:4
 	
     % Conenct individual dots with a line
     if iGp ~= 4
-        plot(TPent(idx), avg(idx), '-', 'Color', 'k', 'LineWidth', 3); hold('on'); 
+        plot(TPent(idx), avg(idx), '-', 'Color', 'k', 'LineWidth', 1);
     end
     
     % For each level (strength) of that bias
@@ -89,7 +101,7 @@ for iGp = 1:4
         
         % Display the average detection speed
         lgd(iGp) = plot(TPent(k), avg(k), 'k-', 'MarkerEdgeColor', 'k', ...
-            'MarkerFaceColor', condmap{1}(k,:), 'Marker', mrkr{iGp}, 'MarkerSize', 8);
+            'MarkerFaceColor', condmap{1}(k,:), 'Marker', mrkr{iGp}, 'MarkerSize', 10);
     end
 end
 
@@ -98,7 +110,7 @@ caxis([0,1]);
 colormap(pmap);
 
 % Customize the axes
-set(gca, 'Box', 'Off');
+set(gca, 'Box', 'Off', 'XLim', [0.95, Emergence_MarkovEntropy(1/2,1/2)]);
 
 % Add some text labels
 legend(lgd, cellfun(@(x) sprintf('%s diag.', x), {'Repetition', ...
@@ -140,7 +152,8 @@ idx = round(1 + (len - 3) ./ (11 - 3) .* (prec-1));
 condmap{2} = condmap{2}(idx,:);
 
 % Prepare a new window
-figure('Position', [702 381 200 300]); lgd = NaN(1,3);
+figure('Position', [702 381 200 325]);
+lgd = NaN(1,3);
 
 % Display a grid that expresses the detection delays in terms of the number
 % of repetition of pattern length, and not simply the number of
@@ -150,13 +163,22 @@ for iRep = 1:30
     plot(x, x*iRep, '-', 'Color', g, 'LineWidth', 1/2); hold('on');
 end
 
+% Display the regression line between Shannon entropy and detection speed
+confint  = Emergence_Regress(avg, len, 'OLS', 'confint');
+confintx = Emergence_Regress(avg, len, 'OLS', 'confintx');
+fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
+    tricol(2,:), 'EdgeColor', 'none', 'FaceColor', 'k', 'FaceAlpha', 0.15);
+b = Emergence_Regress(avg, len, 'OLS', {'beta0', 'beta1'});
+plot(confintx([1,end]), confintx([1,end]).*b(2)+b(1), '-', ...
+    'Color', tricol(2,:), 'LineWidth', 3);
+
 % For each group of conditions (based on pattern length)
 for iGp = 1:max(group)
     idx = find(iGp == group);
     condmkr{2}(idx) = mrkr{iGp};
     
     % Display the change in detection delay as a function of pattern length
-    plot(len(idx), avg(idx), '-', 'Color', 'k', 'LineWidth', 3);
+    plot(len(idx), avg(idx), '-', 'Color', 'k', 'LineWidth', 1);
     
     % For each condition, i.e. each repeating pattern
     for iCond = 1:numel(idx)
@@ -217,7 +239,7 @@ disptstats(pval,tci,stats);
 
 % Perform a t-test on the effect of entropy on detection speed in
 % probabilistic versus deterministic versions of regularities
-h = TPent(IDX{1}(1:3))'; % 3 entropy levels
+h = TPent(IDX{1}(1:3)); % 3 entropy levels
 probaver = fliplr(nanmean(cat(3, spd{1}(1:3,:)', flipud(spd{1}(4:6,:))'), 3));
 deterver = fliplr(nanmean(cat(3, spd{2}(1:3,:)', flipud(spd{2}(4:6,:))'), 3));
 probaslope = cellfun(@(x) Emergence_Regress(x', h, 'OLS', 'beta1'), mat2cell(probaver, ones(nSub,1), 3));
@@ -238,6 +260,13 @@ prec = 200;
 cmap = cbrewer2('PuOr', prec+1);
 hgrid = [linspace(-2, -1, prec/2), linspace(1, 2, prec/2)];
 [~,idx] = min(abs(hgrid - [-sort(h, 'Descend'); sort(h, 'Ascend')]), [], 2);
+cmap = cmap(idx,:);
+
+
+prec = 1001;
+cmap = cbrewer2('BuPu', prec);
+hgrid = linspace(1, Emergence_MarkovEntropy(1/2,1/2), prec);
+[~,idx] = min(abs(hgrid - [sort(h, 'Descend'); sort(h, 'Ascend')]), [], 2);
 cmap = cmap(idx,:);
 
 % Display a distance map

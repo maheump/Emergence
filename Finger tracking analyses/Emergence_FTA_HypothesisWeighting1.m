@@ -15,8 +15,22 @@
 %% SHOW THAT DETERMINISTIC REGULARITIES ARE (ALSO) CHARACTERIZED BY DIFFERENT ENTROPY LEVELS
 %  =========================================================================================
 
-% Compute entropy of the transition probabilities from the rules
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Create a 2D entropy map
+% ~~~~~~~~~~~~~~~~~~~~~~~
+
+% Get colormap for the entropy
+maxH = Emergence_MarkovEntropy(1/2, 1/2);
+prec = 1001;
+offset = round(prec*(max(TPent) - 1));
+EntCMap = flipud([flipud(cbrewer2('BuPu', offset)); cbrewer2('Greys', prec)]);
+prec = size(EntCMap,1);
+
+% Compute 2D entropy map
+ProbaGrid = linspace(0, 1, prec);
+EntMap = Emergence_MarkovEntropy(ProbaGrid, ProbaGrid');
+
+% Compute entropy of transition probabilities from the patterns
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Get the number of deterministic regularities
 nR = numel(cidx{2});
@@ -28,13 +42,26 @@ strpat = cellfun(@(xval) pat2str(xval), numpat, 'UniformOutput', 0);   % strings
 % Get theoretical probabilities associated with those patterns
 [pA, pAlt, pAgB, pBgA] = cellfun(@(xval) pat2proba(xval, [1 2], true), numpat);
 
+% Shannon entropy is not defined for discrete probability values
+pAgB(pAgB == 0) =   eps;
+pAgB(pAgB == 1) = 1-eps;
+pBgA(pBgA == 0) =   eps;
+pBgA(pBgA == 1) = 1-eps;
+
 % Get corresponding entropy levels
-TPent = arrayfun(@Emergence_IO_Entropy, pAgB) + ...
-        arrayfun(@Emergence_IO_Entropy, pBgA);
+TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), pAgB, pBgA);
+
+% Get colors corresponding to each entropy level
+EntGrid = linspace(0, max(EntMap(:)), prec);
+[~,colidx] = min(abs(TPent - EntGrid), [], 2);
+EntCol = EntCMap(colidx,:);
+
+% Define bins
+% ~~~~~~~~~~~
 
 % Define limits of the entropy bins
-EntLab = {'Low', 'Med', 'High'};
-EntBin = [1, 1.53, 1.73, 2]';
+EntBin = [0, 1.20, 1.26, 1.5]';
+EntLab = arrayfun(@(x) sprintf('%1.0f', x), 1:numel(EntBin), 'UniformOutput', 0);
 nEnt = numel(EntBin)-1;
 
 % Group deterministic regularities together according to the entropy bins
@@ -43,32 +70,10 @@ for iEnt = 1:nEnt
     EntIdx{iEnt} = find(TPent >= EntBin(iEnt) & TPent <= EntBin(iEnt+1));
 end
 
-% Get colormap for the entropy
-EntGrid = linspace(0, 1, 111);
-EntCMap = flipud(cbrewer2('RdPu', numel(EntGrid)));
-EntCMap = EntCMap(1:101,:);
-EntGrid = linspace(0, 1, 101);
-
-% Compute 2D entropy map
-EntMap = arrayfun(@Emergence_IO_Entropy, EntGrid);
-EntMap = EntMap' + EntMap;
-EntMap(EntMap < 1) = NaN;
-
-% Deduce colors corresponding to each entropy level
-[~,colidx] = min(abs(TPent - 1 - EntGrid), [], 2);
-EntCol = EntCMap(colidx,:);
-
 % Deduce colors corresponding to the different entropy bins
-EntVal = mean([EntBin(1:end-1), EntBin(2:end)], 2);
-[~,colidx] = min(abs(EntVal - 1 - EntGrid), [], 2);
+EntVal = cellfun(@(x) mean(TPent(x)), EntIdx, 'UniformOutput', 1)';
+[~,colidx] = min(abs(EntVal - EntGrid), [], 2);
 EntGpCol = EntCMap(colidx,:);
-
-% Colorbar for group of entropies
-EntGpColBar = NaN(numel(EntGrid),3);
-for iEnt = 1:nEnt
-    idx = EntGrid > EntBin(iEnt)-1 & EntGrid <= EntBin(iEnt+1)-1;
-    EntGpColBar(idx,:) = repmat(EntGpCol(iEnt,:), [sum(idx), 1]);
-end
 
 % Display the entropy map and the position of rules on that map
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,44 +81,30 @@ end
 % Prepare a new window
 figure('Position', [1 905 290 200]);
 
-% Display bi-column colorbar
-subplot(1,3,1);
-image(1:2, 1+EntGrid, [reshape(EntCMap, [numel(EntGrid), 1, 3]), ...
-                       reshape(EntGpColBar, [numel(EntGrid), 1, 3])]); hold('on');
-plot(1/2+ones(1,2), [1,2], 'k-');
-plot([0,1.5], repmat(EntBin(2:end-1), 1, 2)', 'k:');
-plot([1.5,3], repmat(EntBin(2:end-1), 1, 2)', 'k-');
-text(1+ones(1,nEnt), EntVal, EntLab, 'Rotation', 90, 'Color', 'w');
-axis('xy'); set(gca, 'XTick', []); ylabel('Entropy (bits)');
-
-% Display the binned 2D entropy map
-subplot(1,3,2:3);
-imagesc(EntGrid, EntGrid, EntMap, 'AlphaData', ~isnan(EntMap)); hold('on');
-caxis([1,2]);
+% Display the binned entropy map
+imagesc(ProbaGrid, ProbaGrid, EntMap); hold('on');
 
 % Display diagonals
-plot([0,1], [0,1], 'k-', 'LineWidth', 1/2);
+plot([0,1], [0,1], 'k-', 'LineWidth', 1/2); hold('on');
 plot([0,1], [1,0], 'k-', 'LineWidth', 1/2);
 
 % Display limits of entropy bins
-for iEnt = 1:nEnt
-    contour(EntGrid, EntGrid, EntMap >= EntBin(iEnt), 1, 'k:', 'LineWidth', 1);
-end
+[~,c] = contour(ProbaGrid, ProbaGrid, EntMap, unique(TPent), ...
+    'k-','ShowText', 'Off', 'LabelSpacing', 500, 'LineWidth', 1/4);
 
 % Display each deterministic regularity
-for iR = 1:nR
-    plot(pAgB(iR), pBgA(iR), 'ko', 'MarkerFaceColor', EntCol(iR,:), 'MarkerSize', 8);
-    text(pAgB(iR), pBgA(iR), sprintf('  %s', strpat{iR}), ...
-        'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
-end
+scatter(pAgB, pBgA, 100, EntCol, 'filled', 'MarkerEdgeColor', 'k');
+text(pAgB, pBgA, cellfun(@(x) sprintf('  %s', x), strpat, 'UniformOutput', 0), ...
+   'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
 
 % Customize the colormap
 colormap(EntCMap);
+colorbar;
+caxis([0,maxH]);
 
 % Customize the axes
 axis(repmat([0,1],1,2));
 axis('square'); axis('xy');
-set(gca, 'Layer', 'Bottom')
 set(gca, 'XTick', 0:0.2:1, 'YTick', 0:0.2:1);
 
 % Add some text labels

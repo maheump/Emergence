@@ -27,22 +27,31 @@ load('Emergence_Behaviour_GroupData.mat', 'det', 'prob');
 %  ==========================
 
 % Compute an entropy map
-p = 0:0.001:1;
-entarr = arrayfun(@Emergence_IO_Entropy, p);
-entmap = entarr' + entarr;
+prec = 1001;
+p = linspace(0, 1, prec);
+pAgB = repmat(p , [prec,1]);
+pBgA = repmat(p', [1,prec]);
+entmap = Emergence_MarkovEntropy(pAgB, pBgA);
+
+% Create the colormap
+maxH = Emergence_MarkovEntropy(1/2, 1/2);
+decal = round(prec*(max(TPent) - 1));
+EntCMap = flipud([flipud(cbrewer2('Blues', decal)); cbrewer2('Greys', prec)]);
+prec = size(EntCMap,1);
 
 % Prepare the window
 figure('Position', [1 765 255 340]);
 
 % Display entropy map
 imagesc(p, p, entmap); hold('on');
-colormap(flipud(cbrewer2('Blues', 2000))); caxis([0,2]);
+colormap(EntCMap); caxis([0,max(entmap(:))]);
 cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
 cbr.Label.String = 'Entropy';
 
 % Display the different entropy levels of the rules
-entlev = sum(arrayfun(@Emergence_IO_Entropy, cell2mat(prob')), 2);
-contour(p, p, entmap, entlev, 'k-');
+%entlev = sum(arrayfun(@Emergence_IO_Entropy, cell2mat(prob')), 2);
+entlev = cellfun(@(x) Emergence_MarkovEntropy(x(1), x(2)), prob);
+[~,c] = contour(p, p, entmap, entlev, 'k-','ShowText', 'Off', 'LabelSpacing', 500);
 
 % Display diagonals
 plot([0,1], [0,1], 'k-', 'LineWidth', 1);

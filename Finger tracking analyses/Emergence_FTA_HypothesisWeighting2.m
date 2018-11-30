@@ -37,9 +37,6 @@ io  = mat2cell(iotranspbel,  nR, ones(nSub, 1));
 coef = cellfun(@(toexplain,explainingvar) ...
     Emergence_Regress(toexplain, explainingvar, 'CC', 'r'), sub, io)';
 
-% Prepare the window
-figure('Position', [1 632 170 200]);
-
 % Display average regression line across rules
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,6 +50,9 @@ s = sem(transpbel, subdim);
 B = Emergence_Regress(m(:,2), m(:,1), 'TLS', {'beta0', 'beta1'});
 confint = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confint');
 xval = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confintx');
+
+% Prepare the window
+figure('Position', [1 632 170 200]);
 
 % Display identity line
 plot([0,1]./2, [0,1]./2, '-', 'Color', g, 'LineWidth', 1); hold('on');
