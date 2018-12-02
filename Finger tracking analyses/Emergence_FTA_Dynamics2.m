@@ -77,7 +77,7 @@ lgd = NaN(1,3); hold('on');
 confint  = Emergence_Regress(avg, TPent, 'OLS', 'confint');
 confintx = Emergence_Regress(avg, TPent, 'OLS', 'confintx');
 fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
-    tricol(1,:), 'EdgeColor', 'none', 'FaceColor', 'k', 'FaceAlpha', 0.15);
+    tricol(1,:), 'EdgeColor', 'none', 'FaceColor', tricol(1,:), 'FaceAlpha', 0.15);
 b = Emergence_Regress(avg, TPent, 'OLS', {'beta0', 'beta1'});
 plot(confintx([1,end]), confintx([1,end]).*b(2)+b(1), '-', ...
     'Color', tricol(1,:), 'LineWidth', 3);
@@ -167,7 +167,7 @@ end
 confint  = Emergence_Regress(avg, len, 'OLS', 'confint');
 confintx = Emergence_Regress(avg, len, 'OLS', 'confintx');
 fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
-    tricol(2,:), 'EdgeColor', 'none', 'FaceColor', 'k', 'FaceAlpha', 0.15);
+    tricol(2,:), 'EdgeColor', 'none', 'FaceColor', tricol(2,:), 'FaceAlpha', 0.15);
 b = Emergence_Regress(avg, len, 'OLS', {'beta0', 'beta1'});
 plot(confintx([1,end]), confintx([1,end]).*b(2)+b(1), '-', ...
     'Color', tricol(2,:), 'LineWidth', 3);
