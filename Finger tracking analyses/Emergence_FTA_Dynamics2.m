@@ -110,7 +110,7 @@ caxis([0,1]);
 colormap(pmap);
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XLim', [0.95, Emergence_MarkovEntropy(1/2,1/2)]);
+set(gca, 'Box', 'Off', 'XLim', [0.95, Emergence_MarkovEntropy(1/2,1/2)], 'YLim', [0,0.012]);
 
 % Add some text labels
 legend(lgd, cellfun(@(x) sprintf('%s diag.', x), {'Repetition', ...
@@ -194,7 +194,7 @@ for iGp = 1:max(group)
 end
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XLim', [min(len)-1, max(len)+1], 'YLim', [5,70]);
+set(gca, 'Box', 'Off', 'XLim', [min(len)-1, max(len)+1], 'YLim', [0,80]);
 
 % Add some text labels
 xlabel('Length (# obs.)');

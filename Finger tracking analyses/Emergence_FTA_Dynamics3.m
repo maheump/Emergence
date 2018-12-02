@@ -69,6 +69,9 @@ for iHyp = 1:2
     
     % Customize the axes
     set(gca, 'Box', 'Off');
+    if     iHyp == 1, ylim([0,0.012]);
+    elseif iHyp == 2, ylim([0,80]);
+    end
 	
     % Add some text labels
     xlabel('Ideal observer');
