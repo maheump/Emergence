@@ -6,14 +6,18 @@ function H = Emergence_MarkovEntropy( pAgB, pBgA )
 %
 % Copyright (c) 2018 Maxime Maheu
 
+% Compute frequency of all transitions
+pAgA = 1 - pBgA;
+pBgB = 1 - pAgB;
+
 % Compute resulting p(A) and p(B)
 pA = pAgB ./ (pAgB + pBgA);
 pB = 1 - pA;
 
 % Compute entropy
-H = -(pA.*(1-pBgA).*(log(pA) + log(1-pBgA)) ...
-    + pA.*pBgA.*(log(pA) + log(pBgA)) ...
-    + pB.*pAgB.*(log(pB) + log(pAgB)) ...
-    + pB.*(1-pAgB).*(log(pB) + log(1-pAgB)));
+H = -(pA.*pAgA.*(log2(pA) + log2(pAgA)) ...
+    + pA.*pBgA.*(log2(pA) + log2(pBgA)) ...
+    + pB.*pAgB.*(log2(pB) + log2(pAgB)) ...
+    + pB.*pBgB.*(log2(pB) + log2(pBgB)));
 
 end
