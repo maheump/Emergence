@@ -95,8 +95,8 @@ pMsdgY = exp(pYgMsd) ./ pY; % posterior probability of the deterministic hypothe
 pMssgY = exp(pYgMss) ./ pY; % posterior probability of the fully-stochastic hypothesis
 pMgY = cat(5, pMspgY, pMsdgY, pMssgY); % concatenate posterior probabilities
 
-%% DISPLAY DYNAMICS AROUND DETECTION
-%  =================================
+%% DISPLAY DYNAMICS AROUND CHANGE POINT
+%  ====================================
 
 % Whether to restrict the analysis to sequences that were correctly
 % identified by subjects (allows comparison with other analyses in which
@@ -147,6 +147,8 @@ for iReg = 1:2
         
         % For each type of deterministic hypothesis
         for iOrd = 1:nOrd+1
+            
+            % Display averaged hypothesis likelihood
             plotMSEM(ObsWin, Avg(:,iCond,iOrd), Err(:,iCond,iOrd), ...
                 0.15, ColMap(iOrd,:), ColMap(iOrd,:), 2);
         end
