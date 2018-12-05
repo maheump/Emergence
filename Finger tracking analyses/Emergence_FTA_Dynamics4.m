@@ -220,7 +220,7 @@ Emergence_PlotSubGp(avgslope, tricol(1:2,:));
 
 % Customize the axes
 set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
-axis([0,3,0,1.2]);
+axis([0,3,0,1.4]);
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(avgslope);
