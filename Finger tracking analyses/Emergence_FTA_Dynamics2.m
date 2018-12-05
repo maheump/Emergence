@@ -24,18 +24,37 @@ mrkr = {'s', 'o', '^', 'd'};
 %% FACTORS MODULATING DETECTION DELAY OF PROBABILISTIC REGULARITIES
 %  ================================================================
 
+% Get factors
+% ~~~~~~~~~~~
+
 % Compute entropy levels of theoretical transition probabilities
 PpXgY = cell2mat(prob')';
 PpAgB = PpXgY(1,:);
 PpBgA = PpXgY(2,:);
 TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), PpAgB, PpBgA)';
-    
+
+% Create colormap for the entropy
+minH = 1.4;
+maxH = Emergence_MarkovEntropy(1/2, 1/2);
+prec = 1001;
+offset = round(prec * (maxH - minH));
+EntCMap = flipud([flipud(cbrewer2('Blues', offset)); cbrewer2('Greys', prec)]);
+prec = size(EntCMap,1);
+
+% Get dedicated color for each condition that is indexed on the entropy of
+% the rule
+[~,idx] = min(abs(linspace(0, maxH, prec) - TPent), [], 2);
+condmap{1} = EntCMap(idx,:);
+
 % Define the type of biases that have been used
 biases = NaN(1, numel(prob));
 biases(PpXgY(1,:) < 1/2 & PpXgY(2,:) > 1/2) = 1; % frequency biases
 biases(sum(PpXgY < 1/2) == 2) = 2;               % repetition biases
 biases(sum(PpXgY > 1/2) == 2) = 3;               % alternation biases
 biases(isnan(biases)) = 4;                       % outside diagonals
+
+% Get detection velocity
+% ~~~~~~~~~~~~~~~~~~~~~~
 
 % Test whether there is an effect of bias strength (measured as entropy)
 % on detection dpeed
@@ -58,16 +77,8 @@ disp(T);
 avg = mean(speed{1}, 2, 'OmitNaN');
 err = sem(speed{1}, 2);
 
-% Create the colormap
-prec = 1001;
-decal = round(prec*(max(TPent) - 1)); %500;
-pmap = flipud([flipud(cbrewer2('Blues', decal)); cbrewer2('Greys', prec)]);
-prec = size(pmap,1);
-
-% Get dedicated color for each condition that is indexed on the entropy of
-% the rule
-[~,idx] = min(abs(linspace(0, Emergence_MarkovEntropy(1/2,1/2), prec) - TPent), [], 2);
-condmap{1} = pmap(idx,:);
+% Display detection velocuty as a function of entropy
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
 figure('Position', [702 780 200 325]);
@@ -110,7 +121,7 @@ caxis([0,1]);
 colormap(pmap);
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XLim', [0.95, Emergence_MarkovEntropy(1/2,1/2)], 'YLim', [0,0.012]);
+set(gca, 'Box', 'Off', 'YLim', [0,0.012]);
 
 % Add some text labels
 legend(lgd, cellfun(@(x) sprintf('%s diag.', x), {'Repetition', ...
@@ -127,9 +138,21 @@ end
 %% FACTORS MODULATING DETECTION DELAY OF DETERMINISTIC REGULARITIES
 %  ================================================================
 
+% Get factors
+% ~~~~~~~~~~~
+
 % Get variables that are manipulated
 len = cellfun(@numel, dr);
 group = [1, repmat(1:3, 1, 3)];
+
+% Get dedicated colors for each condition that is indexed on the length of
+% the corresponding pattern
+condmap{2} = flipud(cbrewer2('Reds', prec));
+idx = round(1 + (len - 3) ./ (11 - 3) .* (prec-1));
+condmap{2} = condmap{2}(idx,:);
+
+% Get detection delays
+% ~~~~~~~~~~~~~~~~~~~~
 
 % Perform an ANOVA on the effet of pattern length and pattern type on 
 % detection lag (in terms of number of repetitions one hand and number of
@@ -145,11 +168,8 @@ disp(Trelatall);
 avg = mean(lag{2}, 2, 'OmitNaN');
 err = sem(lag{2}, 2);
 
-% Get dedicated color for each condition that is indexed on the length of
-% the corresponding pattern
-condmap{2} = flipud(cbrewer2('Reds', prec));
-idx = round(1 + (len - 3) ./ (11 - 3) .* (prec-1));
-condmap{2} = condmap{2}(idx,:);
+% Display detection delay as a function of pattern length
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
 figure('Position', [702 381 200 325]);
@@ -163,7 +183,7 @@ for iRep = 1:30
     plot(x, x*iRep, '-', 'Color', g, 'LineWidth', 1/2); hold('on');
 end
 
-% Display the regression line between Shannon entropy and detection speed
+% Display the regression line between pattern length and detection delay
 confint  = Emergence_Regress(avg, len, 'OLS', 'confint');
 confintx = Emergence_Regress(avg, len, 'OLS', 'confintx');
 fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
@@ -208,6 +228,10 @@ end
 %% DISPLAY DETECTION SPEED OF MATCHED PROBABILISTIC/DETERMINISTIC REGULARITIES
 %  ===========================================================================
 
+% Get regularities that are matched across probabilistic/deterministic
+% versions
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 % Get transition probabilities from the deterministic regularities
 [~, DpAlt, DpAgB, DpBgA] = cellfun(@(x) pat2proba(x, 1:2, true), det');
 
@@ -239,11 +263,13 @@ disptstats(pval,tci,stats);
 
 % Perform a t-test on the effect of entropy on detection speed in
 % probabilistic versus deterministic versions of regularities
-h = TPent(IDX{1}(1:3)); % 3 entropy levels
+mtcH = TPent(IDX{1}(1:3)); % 3 entropy levels
 probaver = fliplr(nanmean(cat(3, spd{1}(1:3,:)', flipud(spd{1}(4:6,:))'), 3));
 deterver = fliplr(nanmean(cat(3, spd{2}(1:3,:)', flipud(spd{2}(4:6,:))'), 3));
-probaslope = cellfun(@(x) Emergence_Regress(x', h, 'OLS', 'beta1'), mat2cell(probaver, ones(nSub,1), 3));
-deterslope = cellfun(@(x) Emergence_Regress(x', h, 'OLS', 'beta1'), mat2cell(deterver, ones(nSub,1), 3));
+probaslope = cellfun(@(x) Emergence_Regress(x', mtcH, 'OLS', 'beta1'), ...
+    mat2cell(probaver, ones(nSub,1), 3));
+deterslope = cellfun(@(x) Emergence_Regress(x', mtcH, 'OLS', 'beta1'), ...
+    mat2cell(deterver, ones(nSub,1), 3));
 [~,pval,tci,stats] = ttest(probaslope-deterslope);
 disptstats(pval,tci,stats);
 
@@ -251,22 +277,17 @@ disptstats(pval,tci,stats);
 avgregspd = cell2mat(cellfun(@(x) mean(x, 2, 'OmitNaN'), spd, 'UniformOutput', 0));
 semregspd = cell2mat(cellfun(@(x) sem( x, 2           ), spd, 'UniformOutput', 0));
 
+% Display matched detection velocity
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 % Prepare a new figure
 figure('Position', [903 858 400 300]); hold('on');
 
-% Define colors indexed on entropy levels and that are different for
-% repetition/alternation biases
-prec = 200;
-cmap = cbrewer2('PuOr', prec+1);
-hgrid = [linspace(-2, -1, prec/2), linspace(1, 2, prec/2)];
-[~,idx] = min(abs(hgrid - [-sort(h, 'Descend'); sort(h, 'Ascend')]), [], 2);
-cmap = cmap(idx,:);
-
-
+% Define colors indexed on entropy levels
 prec = 1001;
 cmap = cbrewer2('BuPu', prec);
-hgrid = linspace(1, Emergence_MarkovEntropy(1/2,1/2), prec);
-[~,idx] = min(abs(hgrid - [sort(h, 'Descend'); sort(h, 'Ascend')]), [], 2);
+hgrid = linspace(minH, maxH, prec);
+[~,idx] = min(abs(hgrid - [sort(mtcH, 'Descend'); sort(mtcH, 'Ascend')]), [], 2);
 cmap = cmap(idx,:);
 
 % Display a distance map

@@ -18,10 +18,11 @@
 % Create a 2D entropy map
 % ~~~~~~~~~~~~~~~~~~~~~~~
 
-% Get colormap for the entropy
+% Create colormap for the entropy
+minH = 1.4;
 maxH = Emergence_MarkovEntropy(1/2, 1/2);
 prec = 1001;
-offset = round(prec*(max(TPent) - 1));
+offset = round(prec * (maxH - minH));
 EntCMap = flipud([flipud(cbrewer2('BuPu', offset)); cbrewer2('Greys', prec)]);
 prec = size(EntCMap,1);
 
@@ -60,7 +61,7 @@ EntCol = EntCMap(colidx,:);
 % ~~~~~~~~~~~
 
 % Define limits of the entropy bins
-EntBin = [0, 1.20, 1.26, 1.5]';
+EntBin = [1.4, 1.7665, 1.853, 2]';
 EntLab = arrayfun(@(x) sprintf('%1.0f', x), 1:numel(EntBin), 'UniformOutput', 0);
 nEnt = numel(EntBin)-1;
 

@@ -81,7 +81,7 @@ end
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_Corr1.pdf'));
 
-%% Display distribution of subject/IO correlation across subjects
+% Display distribution of subject/IO correlation across subjects
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window

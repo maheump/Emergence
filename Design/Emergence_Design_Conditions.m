@@ -34,9 +34,11 @@ pBgA = repmat(p', [1,prec]);
 entmap = Emergence_MarkovEntropy(pAgB, pBgA);
 
 % Create the colormap
+minH = 1.4;
 maxH = Emergence_MarkovEntropy(1/2, 1/2);
-decal = round(prec*(max(TPent) - 1));
-EntCMap = flipud([flipud(cbrewer2('Blues', decal)); cbrewer2('Greys', prec)]);
+prec = 1001;
+offset = round(prec * (maxH - minH));
+EntCMap = flipud([flipud(cbrewer2('Blues', offset)); cbrewer2('Greys', prec)]);
 prec = size(EntCMap,1);
 
 % Prepare the window
