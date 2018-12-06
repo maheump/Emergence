@@ -67,13 +67,13 @@ for iSub = 1:nSub
         end
 
         % Save temporary file
-        save('Emergence_IO_AlternativeDeterHypothesis.mat', 'mIO');
+        save('Emergence_IO_AlternativeDeterHypothesis_tmp.mat', 'mIO');
     end
 end
 
 % Save file containing all the simulations and delete temporary file
 save('Emergence_IO_AlternativeDeterHypothesis.mat', 'mIO');
-delete('Emergence_IO_AlternativeDeterHypothesis.mat');
+delete('Emergence_IO_AlternativeDeterHypothesis_tmp.mat');
 
 %% COMPUTE HYPOTHESES LIKELIHOOD
 %  =============================
