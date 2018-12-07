@@ -23,7 +23,7 @@ minH = 1.4;
 maxH = Emergence_MarkovEntropy(1/2, 1/2);
 prec = 1001;
 offset = round(prec * (maxH - minH));
-EntCMap = flipud([flipud(cbrewer2('BuPu', offset)); cbrewer2('Greys', prec)]);
+EntCMap = flipud([flipud(cbrewer2('Purples', offset)); cbrewer2('Greys', prec)]);
 prec = size(EntCMap,1);
 
 % Compute 2D entropy map
