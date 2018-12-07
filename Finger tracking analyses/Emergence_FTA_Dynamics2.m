@@ -118,14 +118,14 @@ end
 
 % Display the colormap
 caxis([0,1]);
-colormap(pmap);
+colormap(EntCMap);
 
 % Customize the axes
 set(gca, 'Box', 'Off', 'YLim', [0,0.012]);
 
 % Add some text labels
-legend(lgd, cellfun(@(x) sprintf('%s diag.', x), {'Repetition', ...
-    'Alternation', 'Frequency', 'Outside'}, 'UniformOutput', 0), ...
+legend(lgd, cellfun(@(x) sprintf('%s diag.', x), {'Frequency', ...
+    'Alternation', 'Repetition', 'Outside'}, 'UniformOutput', 0), ...
     'Location', 'South', 'Box', 'Off');
 xlabel('Entropy (bits)');
 ylabel('Speed');
@@ -143,7 +143,7 @@ end
 
 % Get variables that are manipulated
 len = cellfun(@numel, dr);
-group = [1, repmat(1:3, 1, 3)];
+group = [4 1 2 3 1 2 4 1 2 3];
 
 % Get dedicated colors for each condition that is indexed on the length of
 % the corresponding pattern
@@ -312,7 +312,7 @@ for i = [1,4]
 end
 
 % Display average speed
-mkr = {'s', 'o'};
+mkr = {'^', 'o'};
 for i = 1:nidx
     plot(avgregspd(i,2), avgregspd(i,1), mkr{1 + (DpAlt(i) > 1/2)}, ...
         'MarkerSize', 8, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', cmap(i,:));
