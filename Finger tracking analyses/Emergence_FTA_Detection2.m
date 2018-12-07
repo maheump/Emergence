@@ -93,14 +93,12 @@ pAgB = pXgY(:,1);
 pBgA = pXgY(:,1);
 
 % Compute entropy levels
-TPent = arrayfun(@Emergence_IO_Entropy, pAgB) + ...
-        arrayfun(@Emergence_IO_Entropy, pBgA);
+TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), pAgB, pBgA);
 
 % Define bins
-nEnt = 2;
-[~,edges] = histcounts(TPent, nEnt);
-entgpidx = {find(TPent < edges(2)), find(TPent > edges(2))};
-entgpttl = {sprintf('Low (< %1.1f)', edges(2)), sprintf('High (> %1.1f)', edges(2))};
+entlim = 1.85;
+entgpidx = {find(TPent <= entlim), find(TPent > entlim)};
+entgpttl = {sprintf('Low (< %1.2f)', entlim), sprintf('High (> %1.2f)', entlim)};
 
 % Get the average detection rate in each entropy bins
 entdetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{1}(x),:) == 1, 1)', ...
