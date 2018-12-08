@@ -21,8 +21,8 @@ condmkr = cell(1,2);
 % Define markers to use
 mrkr = {'s', 'o', '^', 'd'};
 
-%% FACTORS MODULATING DETECTION DELAY OF PROBABILISTIC REGULARITIES
-%  ================================================================
+%% FACTORS MODULATING DETECTION VELOCITY OF PROBABILISTIC REGULARITIES
+%  ===================================================================
 
 % Get factors
 % ~~~~~~~~~~~
