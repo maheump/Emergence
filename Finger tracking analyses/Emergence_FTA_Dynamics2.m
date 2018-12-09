@@ -56,28 +56,34 @@ biases(isnan(biases)) = 4;                       % outside diagonals
 % Get detection velocity
 % ~~~~~~~~~~~~~~~~~~~~~~
 
-% Test whether there is an effect of bias strength (measured as entropy)
-% on detection dpeed
-[~,~,idx] = unique(TPent);
-avggperstrength = cell2mat(cellfun(@(i) mean(speed{1}(idx == i,:), 1, ...
-    'OmitNaN')', num2cell(1:numel(unique(TPent))), 'UniformOutput', 0));
-avggperstrength = mat2cell(avggperstrength, ones(nSub,1), numel(unique(TPent)));
-slope = cellfun(@(x) Emergence_Regress(x, unique(TPent)', 'OLS', 'beta1'), avggperstrength);
+% Regress entropy against detection velocity for each subject
+var = speed{1};
+subvar = mat2cell(var', ones(nSub,1), numel(cidx{1}));
+subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
+offset = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta0'), subvar);
+slope  = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta1'), subvar);
 [~,pval,tci,stats] = ttest(slope);
 disptstats(pval,tci,stats);
 
-% Test whether there is an effect of bias type on detection dpeed
-[~,~,idx] = unique(biases);
-avggpertype = cell2mat(cellfun(@(i) mean(speed{1}(idx == i,:), 1, ...
-    'OmitNaN')', num2cell(1:numel(unique(TPent))), 'UniformOutput', 0));
-T = rmANOVA(avggpertype, 'BiasType');
+% Regress out the effect of entropy (our experimental design is not
+% fully factorial)
+yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + TPent'.*b1), subvar, ...
+    num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
+
+% Average detection velocity for each group of probabilistic biases
+avggpergp = cell2mat(arrayfun(@(i) mean(yhat(group == i,:), 1, ...
+    'OmitNaN')', unique(group), 'UniformOutput', 0));
+
+% Perform a repeated-measures 1-way ANOVA on detection velocity depending
+% on the group of probabilistic biases
+T = rmANOVA(avggpergp);
 disp(T);
 
 % Get average detection speed over subjects
 avg = mean(speed{1}, 2, 'OmitNaN');
 err = sem(speed{1}, 2);
 
-% Display detection velocuty as a function of entropy
+% Display detection velocity as a function of entropy
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
@@ -154,15 +160,28 @@ condmap{2} = condmap{2}(idx,:);
 % Get detection delays
 % ~~~~~~~~~~~~~~~~~~~~
 
-% Perform an ANOVA on the effet of pattern length and pattern type on 
-% detection lag (in terms of number of repetitions one hand and number of
-% observations on the other hand) 
-Traw   = rmANOVA(reshape(lag{2}( 2:end,:)', [nSub,3,3]), {'Type', 'Length'}); % exclude AABB
-Trelat = rmANOVA(reshape(lag2(   2:end,:)', [nSub,3,3]), {'Type', 'Length'}); % exclude AABB
-Trelatall = rmANOVA(lag2'); % keep AABB
-disp(Traw);
-disp(Trelat);
-disp(Trelatall);
+% Regress pattern length against detection delay for each subject
+var = lag{2}; % lag2 or lag{2}
+subvar = mat2cell(var', ones(nSub,1), numel(cidx{2}));
+subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
+offset = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta0'), subvar);
+slope  = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta1'), subvar);
+[~,pval,tci,stats] = ttest(slope);
+disptstats(pval,tci,stats);
+
+% Regress out the effect of pattern length (our experimental design is not
+% fully factorial)
+yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + len'.*b1), subvar, ...
+    num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
+
+% Average detection lag for each group of patterns
+avggpergp = cell2mat(arrayfun(@(i) mean(yhat(group == i,:), 1, ...
+    'OmitNaN')', unique(group), 'UniformOutput', 0));
+
+% Perform a repeated-measures 1-way ANOVA on detection lag depending on the
+% group of pattern
+T = rmANOVA(avggpergp);
+disp(T);
 
 % Compute the average detection lag across subjects
 avg = mean(lag{2}, 2, 'OmitNaN');
