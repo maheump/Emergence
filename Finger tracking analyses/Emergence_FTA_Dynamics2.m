@@ -71,8 +71,8 @@ yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + TPent'.*b1), subvar, ...
     num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
 
 % Average detection velocity for each group of probabilistic biases
-avggpergp = cell2mat(arrayfun(@(i) mean(yhat(group == i,:), 1, ...
-    'OmitNaN')', unique(group), 'UniformOutput', 0));
+avggpergp = cell2mat(arrayfun(@(i) mean(yhat(biases == i,:), 1, ...
+    'OmitNaN')', unique(biases), 'UniformOutput', 0));
 
 % Perform a repeated-measures 1-way ANOVA on detection velocity depending
 % on the group of probabilistic biases
