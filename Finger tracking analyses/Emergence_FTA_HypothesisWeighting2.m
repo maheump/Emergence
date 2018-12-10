@@ -42,14 +42,14 @@ coef = cellfun(@(toexplain,explainingvar) ...
 
 % Average beliefs over subjects
 subdim = ndims(transpbel);
-m = mean(transpbel, subdim, 'OmitNaN');
-s = sem(transpbel, subdim);
+avg = mean(transpbel, subdim, 'OmitNaN');
+err = sem(transpbel, subdim);
 
 % Regress, across the different rules, averaged beliefs in the
 % probabilistic hypotheses from the subjects and the ideal observer
-B = Emergence_Regress(m(:,2), m(:,1), 'TLS', {'beta0', 'beta1'});
-confint = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confint');
-xval = Emergence_Regress(m(:,2), m(:,1), 'TLS', 'confintx');
+B = Emergence_Regress(avg(:,2), avg(:,1), 'OLS', {'beta0', 'beta1'});
+confint = Emergence_Regress(avg(:,2), avg(:,1), 'OLS', 'confint');
+xval = Emergence_Regress(avg(:,2), avg(:,1), 'OLS', 'confintx');
 
 % Prepare the window
 figure('Position', [1 632 170 200]);
@@ -65,12 +65,10 @@ plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
 
 % Display each individual rule, with its corresponding SEM, and colored
 % according to its entropy level (computed on transition probabilities)
-for iR = 1:nR
-    plot(m(iR,1)+[-s(iR,1),s(iR,1)], repmat(m(iR,2), 1, 2), '-', 'Color', 'k');
-    plot(repmat(m(iR,1), 1, 2), m(iR,2)+[-s(iR,2),s(iR,2)], '-', 'Color', 'k');
-    plot(m(iR,1), m(iR,2), 'o', 'MarkerEdgeColor', 'k', ...
-        'MarkerFaceColor', EntCol(iR,:), 'MarkerSize', 7, 'LineWidth', 1);
-end
+plot((avg(:,1)+err(:,1).*[-1,1])', repmat(avg(:,2)', 2, 1), '-', 'Color', 'k');
+plot(repmat(avg(:,1)', 2, 1), (avg(:,2)+err(:,2).*[-1,1])', '-', 'Color', 'k');
+scatter(avg(:,1), avg(:,2), 50+zeros(1,nR), EntCol, ...
+    'filled', 'MarkerEdgeColor', 'k', 'LineWidth', 1);
 
 % Customize the axes
 set(gca, 'Box', 'Off');
@@ -110,3 +108,14 @@ disptstats(pval,tci,stats);
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_HW_SubCorr.pdf'));
+
+% Perform a mediation analysis
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Effect of Shannon entropy on subjects' estimated probabilities mediated
+% by ideal observer model estimated probabilities
+out = mediationAnalysis0(avg(:,2), TPent, avg(:,1));
+set(gcf, 'Position', [293 632 300 200])
+
+% Save the figure
+save2pdf(fullfile(ftapath, 'figs', 'F_HW_MedAnal.pdf'));
