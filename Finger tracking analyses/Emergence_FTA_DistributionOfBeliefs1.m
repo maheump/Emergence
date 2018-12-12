@@ -8,6 +8,12 @@
 %% COMPUTE HISTOGRAMS OF FINGER'S POSITIONS
 %  ========================================
 
+% Define option
+% ~~~~~~~~~~~~~
+
+% Whether to restrict to sequences that were accurately labeled
+restodet = true;
+
 % Get the different conditions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -15,26 +21,32 @@
 N = numel(G{1}.Seq);
 
 % Create indices...
-idxtrimap = cell(1,3);
+idxtrimap = cell(1,4);
+
+% First part of stochastic-to-regular sequences
+idxtrimap{1} = cellfun(@(x) find(x.Gen == 1), G, 'UniformOutput', 0);
+idxtrimap{1}(setdiff(1:size(G,1), cell2mat(cidx(1:2))),:) = {[]};
+
+% Get subjects' responses
+detecmask = cellfun(@(x) x.Questions(2), G);
+detecmask(isnan(detecmask)) = 3;
 
 % For sequences entailing regularities
-for iHyp = 1:2
+for iHyp = 1:3
     
     % Get indices of post-change-point observations
-    idxtrimap{iHyp} = cellfun(@(x) (x.Jump-1/2):N, G, 'UniformOutput', 0);
+    if iHyp < 3
+        idxtrimap{iHyp+1} = cellfun(@(x) (x.Jump-1/2):N, G, 'UniformOutput', 0);
+    elseif iHyp == 3
+        idxtrimap{iHyp+1} = repmat({1:N}, size(G));
+    end
     
     % Keep only indices for sequences with the current type of regularity
-    idxtrimap{iHyp}(setdiff(1:size(G,1), cidx{iHyp}),:) = {[]};
+    idxtrimap{iHyp+1}(setdiff(1:size(G,1), cidx{iHyp}),:) = {[]};
     
     % Keep only sequences that have been correctly identified
-    detecmask = zeros(size(G));
-    detecmask(cidx{iHyp},:) = cellfun(@(xval) xval.Questions(2) == iHyp, G(cidx{iHyp},:));
-    idxtrimap{iHyp}(~detecmask) = {[]};
+    if restodet, idxtrimap{iHyp+1}(detecmask ~= iHyp) = {[]}; end
 end
-
-% For stochastic parts (both the fully-stochastic sequences and the
-% stochastic parts at the beginning of sequences with a regularity)
-idxtrimap{end} = cellfun(@(x) find(x.Gen == 1), G, 'UniformOutput', 0);
 
 % Define properties of the triangular histogram
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,8 +117,8 @@ for iMap = 1:nMap
 end
 
 % Also add a map of the difference
-trajmap{1} = (trajmap{3} ./ max(trajmap{3}(:))) ...
-           - (trajmap{2} ./ max(trajmap{2}(:)));
+trajmap{1} = (trajmap{4} ./ max(trajmap{4}(:))) ...
+           - (trajmap{3} ./ max(trajmap{3}(:)));
        
 % Display triangular and marginal histrograms
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,12 +130,15 @@ figure('Position', [1 600 1920 500]);
 nBin = 30;
 
 % Create colormaps
-cmaps = {[flipud(cbrewer2('Blues', 2000)); (cbrewer2('Reds', 2000))], ...
-         cbrewer2('Blues', 2000), cbrewer2('Reds', 2000), cbrewer2('Greens', 2000)};
+prec = 2000;
+cmaps = {[flipud(cbrewer2('Blues', prec)); (cbrewer2('Reds', prec))], ...
+         cbrewer2('Greens', prec), ...
+         cbrewer2('Blues',  prec), cbrewer2('Reds', prec), ...
+         cbrewer2('Greens', prec)};
 
 % For each density map
 for iMap = 1:nMap+1
-    sp = subplot(1, 4, iMap);
+    sp = subplot(1, 5, iMap);
     
     % Display the density maps of finger's position
     imagesc(xgrid, ygrid, trajmap{iMap}, 'AlphaData', mask); hold('on');
