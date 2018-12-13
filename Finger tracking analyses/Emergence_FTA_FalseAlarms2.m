@@ -11,6 +11,9 @@
 %% COMPARE FALSE ALARMS TOWARD THE PROBABILISTIC HYPOTHESIS IN SUBJECTS AND IN THE IO
 %  ==================================================================================
 
+% Define options
+% ~~~~~~~~~~~~~~
+
 % Focus on false alarms toward 
 iHyp = 3;
 
@@ -20,12 +23,34 @@ nBin = 10;
 % Define the type of binning method
 binmeth = 'equil';
 
+% Select the sequences to look at
+% 1: all fully-stochastic parts
+% 2: only fully-stochastic sequences
+% 3: only fully-stochastic sequences that were correctly labeled
+% 4: only first-part of stochastic-to-regular sequences
+restopt = 3;
+
 % Average subjects' trajectories in fully-stochastic parts according to the
 % ideal observer's beliefs in the probabilistic hypothesis
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Select moment in which no regularities are hidden in the sequence
+% Select moment in which sequences do not entail any regularities
 randidx = cellfun(@(x) find(x.Gen == 1), G, 'UniformOutput', 0);
+
+% Restric to fully-stochastic sequences
+if restopt == 2 || restopt == 3
+    randidx(cell2mat(cidx(1:2)),:) = {[]};
+    
+    % Restric to those that were correctly labeled
+    if restopt == 3
+        detecmask = cellfun(@(x) isnan(x.Questions(2)), G(cidx{3},:));
+        randidx(~detecmask) = {[]};
+    end
+    
+% Restric to first part of stochastic-to-regular sequences
+elseif restopt == 4
+    randidx(cidx{3},:) = {[]};
+end
 
 % Get probability bins
 if strcmpi(binmeth, 'unif') % bins of the same amplitude
@@ -108,7 +133,7 @@ plot(cartavgcoord(:,1)' + ([-1;1] .* cartsemcoord(:,1)'), repmat(cartavgcoord(:,
 
 % Get average size of the bin
 avgbinsize = mean(binsubn, 2);
-dotsize = flipud(log(avgbinsize+1).*10);
+dotsize = 1 + flipud(log(avgbinsize+1).*10);
 
 % Display binned averages
 scatter(cartavgcoord(:,1), cartavgcoord(:,2), dotsize, ...
