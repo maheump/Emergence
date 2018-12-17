@@ -1,10 +1,8 @@
 % This script implements analyses of the false alarms that are observed in
-% fully-stochastic parts. First, we show that there are more often oriented
-% toward the probabilistic regularity. Second, we show that the strength of
-% (false) beliefs is predicted by the ideal observer, meaning that
-% subjects' false alarms reflect genuine local (probabilistic) regularities
-% occuring by chance in actually entirely stochastic parts of the
-% sequences.
+% fully-stochastic parts. We show that the strength of (false) beliefs is
+% predicted by the ideal observer, meaning that subjects' false alarms
+% reflect genuine local (probabilistic) regularities occuring by chance in
+% actually entirely stochastic parts of the sequences.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
