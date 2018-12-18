@@ -25,16 +25,6 @@ Emergence_DefaultFigureProperties;
 % that were presented to the subjects
 Emergence_FTA_PreprocData;
 
-%% DESCRIBE THE EXPERIMENTAL DESIGN
-%  ================================
-
-% Show the different conditions and the hypotheses
-Emergence_Design_Conditions;
-Emergence_Design_Hypotheses;
-
-% Show how to use the triangular arena
-Emergence_Design_Triangle;
-
 %% PERFORM SUBJECT-LEVEL ANALYSES
 %  ==============================
 
@@ -56,16 +46,6 @@ Emergence_FTA_TrajMovie;
 rmbadsub = true;
 Emergence_FTA_LoadData;
 
-% Analyse data only from the subjects
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Emergence_FTA_FalseAlarms;
-
-% Analyse data only from the ideal observer
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Emergence_FTA_ChangePoint1;
-
 % Analyse data separately from both the subjects and from the ideal observer
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -76,17 +56,26 @@ for iLoop = 1:2
 
     Emergence_FTA_Detection1;
     Emergence_FTA_Detection2;
+    Emergence_FTA_ChangePoint2;
     Emergence_FTA_DistributionOfBeliefs1;
     Emergence_FTA_Dynamics1;
+    Emergence_FTA_Dynamics2;
+    Emergence_FTA_Dynamics4;
+    Emergence_FTA_FalseAlarms1;
     Emergence_FTA_HypothesisWeighting1;
-    Emergence_FTA_ChangePoint2;
 end
+
+% Analyse data only from the ideal observer
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Emergence_FTA_ChangePoint1;
 
 % Correlation between subjects and ideal observer
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Emergence_FTA_DistributionOfBeliefs2;
-Emergence_FTA_Dynamics2;
+Emergence_FTA_Dynamics3;
+Emergence_FTA_FalseAlarms2;
 Emergence_FTA_HypothesisWeighting2;
 Emergence_FTA_HypothesisWeighting3;
 Emergence_FTA_QuantitativeDeviations1;
