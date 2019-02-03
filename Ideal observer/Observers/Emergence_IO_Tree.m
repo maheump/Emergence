@@ -52,7 +52,7 @@ if nargin < 2 || isempty(nu), nu = K; end
 % N.B. Deep trees induce longer computation time
 
 % By default, export the model evidence in log-scale
-if nargin < 3, scaleme = 'log'; end
+if nargin < 3 || isempty(scaleme), scaleme = 'log'; end
 if     strcmpi(scaleme, 'lin'), islin = true;  islog = false;
 elseif strcmpi(scaleme, 'log'), islin = false; islog = true;
 end
