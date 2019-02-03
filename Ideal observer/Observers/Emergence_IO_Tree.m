@@ -58,7 +58,7 @@ elseif strcmpi(scaleme, 'log'), islin = false; islog = true;
 end
 
 % By default, use analytical solutions to speed up the computations
-if nargin < 4, usegrid = false; end
+if nargin < 4 || isempty(usegrid), usegrid = false; end
 
 % By default, use a prior distribution based on the size principle
 if nargin < 5 || isempty(prior), prior = 'Size-principle'; end
