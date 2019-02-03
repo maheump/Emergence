@@ -48,7 +48,7 @@ K = numel(y);
 
 % By default, the depth of the tree (i.e. the maximum pattern length allowed)
 % is the length of the sequence
-if nargin < 2, nu = K; end
+if nargin < 2 || isempty(nu), nu = K; end
 % N.B. Deep trees induce longer computation time
 
 % By default, export the model evidence in log-scale
