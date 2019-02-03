@@ -46,9 +46,9 @@ y = y(:);
 K = numel(y);
 % N.B. K = K-k if the sequence is a part after a change point.
 
-% By default, the depth of the tree (i.e. the maximum pattern length allowed)
-% is the length of the sequence
-if nargin < 2 || isempty(nu), nu = K; end
+% By default, the depth of the tree (i.e. the maximum pattern length
+% allowed) is the length of the sequence plus 1 observation
+if nargin < 2 || isempty(nu), nu = K+1; end
 % N.B. Deep trees induce longer computation time
 
 % By default, export the model evidence in log-scale
@@ -148,7 +148,7 @@ for i = ilRo
     
     % Compare each observation of the sequence to each observation of a
     % sequence obtained from the repetition of the current pattern
-    seqcheck = ymat == Ri; % a 2D matrix
+    seqcheck = ymat == Ri; % a 2D logical matrix
     % N.B. This is more efficient than "repmat"ting the pattern but it
     % works only on the most recent versions of MATLAB
     
@@ -170,12 +170,10 @@ for i = ilRo
         % Get the probability (based on the memory leak) with which each
         % observation of the sequence matches the one predicted from the
         % repetition of that pattern
+        ok = seqcheck(1:K);
         pYkgRi = NaN(1,K);
-        x = seqcheck(1:K);
-        ok = (x == 1); %    match between pattern and sequence
-        er = (x == 0); % mismatch between pattern and sequence
-        pYkgRi(ok) =     decw(ok); %    match
-        pYkgRi(er) = 1 - decw(er); % mismatch
+        pYkgRi( ok) =     decw( ok); %    match between pattern and sequence
+        pYkgRi(~ok) = 1 - decw(~ok); % mismatch between pattern and sequence
         
         % Compute how much the repetition of that current pattern matches
         % the observed sequence
