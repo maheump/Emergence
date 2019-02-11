@@ -51,7 +51,6 @@ cbr = colorbar('Location', 'SouthOutside', 'LineWidth', 1);
 cbr.Label.String = 'Entropy';
 
 % Display the different entropy levels of the rules
-%entlev = sum(arrayfun(@Emergence_IO_Entropy, cell2mat(prob')), 2);
 entlev = cellfun(@(x) Emergence_MarkovEntropy(x(1), x(2)), prob);
 [~,c] = contour(p, p, entmap, entlev, 'k-','ShowText', 'Off', 'LabelSpacing', 500);
 
