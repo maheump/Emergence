@@ -17,17 +17,17 @@ if rmbadsub
 end
 
 % Save the file
-tosave = 'gif'; % can be '', 'gif' or 'avi'
+tosave = 'gif'; % can be 'gif' or 'avi'
 
 % Which trajectory to use
-seq = 28; % subject number
-sub = 22; % sequence number
+sub = 28; % subject number
+seq = 22; % sequence number
 
 % Get corresponding data
 X = cell(1,2);
-X{1} = G{sub,seq};
-X{2} = IO{sub,seq};
-X{2}.Seq = G{sub,seq}.Seq;
+X{1} = G{seq,sub};
+X{2} = IO{seq,sub};
+X{2}.Seq = G{seq,sub}.Seq;
 N = numel(X{1}.Seq);
 
 %% PREPARE THE AUDITORY STIMULI
@@ -118,7 +118,7 @@ for iObs = 1:N
         set(gca, 'FontSize', fs);
         
         % Add some labels
-        txt = condlab{sub};
+        txt = condlab{seq};
         spc = strfind(txt, ' ');
         
         % Auditory sequence
