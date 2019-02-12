@@ -80,7 +80,7 @@ colormap(cmap); caxis([0, 1]);
 
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqGpS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqGpS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqGpIO.pdf'));
 end
 
 % Display the distribution of correlation coefficients over subjects
@@ -114,7 +114,9 @@ Emergence_DispStatTest(coef);
 ylabel('Correlation coefficient');
 
 % Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqCorr.pdf'));
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqCorrS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqCorrIO.pdf'));
+end
 
 % Perform a t-test (against chance) on correlation coefficients
 [~,pval,tci,stats] = ttest(coef);
