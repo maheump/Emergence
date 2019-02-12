@@ -192,19 +192,17 @@ end
 % Display the P/D ratio locked on the detection of deterministic regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Copute the P/D ratio
-ratioPD = cell2mat(cellfun(@(x) reshape(x(:,2) ./ sum(x(:,1:2), 2), ...
-    [1 1 nsp]), subtraj, 'UniformOutput', 0));
-
-% Transform it such that it evolves between -1 (Proba) and 1 (Deter)
-ratioPD = 2 .* (ratioPD - 1/2);
+% Copute the belief difference between probabilistic and deterministic
+% hypotheses
+diffPD = cell2mat(cellfun(@(x) reshape(x(:,2) - x(:,1), [1 1 nsp]), ...
+    subtraj, 'UniformOutput', 0));
 
 % Average over sequences for each subject
-ratioPD = squeeze(mean(ratioPD, 1, 'OmitNaN'));
+diffPD = squeeze(mean(diffPD, 1, 'OmitNaN'));
 
 % Average over subjects
-avg = mean(ratioPD, 1);
-err = sem( ratioPD, 1);
+avg = mean(diffPD, 1);
+err = sem( diffPD, 1);
 
 % Create a new window
 figure('Position', [593 905 190 200]);
@@ -218,16 +216,16 @@ plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
 
 % Customize the axes
 caxis([-1,1]);
-axis([xval(1), xval(end), -1, 1]);
+axis([xval(1), xval(end), -0.25, 1]);
 set(gca, 'Box', 'Off');
 
 % Add text labels
 xlabel('Observation w.r.t. detection point');
-ylabel('Ratio P versus D');
+ylabel('Belief difference');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratioS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratioIO.pdf'));
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDdiffS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDdiffIO.pdf'));
 end
 
 %% SHOW THAT THE TRANSIENT TENSION DEPENDS UPON THE ENTROPY OF THE RULES
