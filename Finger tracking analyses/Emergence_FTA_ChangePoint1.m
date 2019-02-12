@@ -45,22 +45,26 @@ for iHyp = 1:2
     
     % Get a distibution of change point's position restricted around true
     % change point's position
-    bel = cellfun(@(b,c) b(c+xwin), bel, num2cell(cp), 'UniformOutput', 0);
+    winbel = cellfun(@(b,c) b(c+xwin), bel, num2cell(cp), 'UniformOutput', 0);
     
     % Remove posterior beliefs about change point's positions from
     % sequences that were mislabeled
-    bel(~detecmask) = {NaN(1,nwin)};
-    bel = cellfun(@(x) reshape(x,[1,1,nwin]), bel, 'UniformOutput', 0);
+    winbel(~detecmask) = {NaN(1,nwin)};
+    winbel = cellfun(@(x) reshape(x,[1,1,nwin]), winbel, 'UniformOutput', 0);
     
-    % Measure the (inverse) entropy of the posterior distributions over
-    % change point's position
-    entofdist = cellfun(@Emergence_IO_Entropy, bel);
-    precpcppos(:,iHyp) = mean(entofdist, 1, 'OmitNaN');
+    % Save the averaged full posterior distribution over change point
+    % position
+    winbel = cell2mat(winbel);
+    pcpposwrtcp(:,:,iHyp) = squeeze(mean(winbel, 1, 'OmitNaN'));
     
-    % Save also the averaged full posterior distribution over change
-    % point's position
-    bel = cell2mat(bel);
-    pcpposwrtcp(:,:,iHyp) = squeeze(mean(bel, 1, 'OmitNaN'));
+    % Measure the log-precision of the posterior distributions over change
+    % point position
+    % => log(precision) = log(1/variance) = -log(variance)
+    obsidx = 1:N;
+    mu = cellfun(@(p) sum(p.*obsidx), bel);
+    precision = cellfun(@(p,m) -log(sum(p.*((obsidx-m).^2))), bel, num2cell(mu));
+    precision(~detecmask) = NaN;
+    precpcppos(:,iHyp) = mean(precision, 1, 'OmitNaN');
 end
 
 %% DISPLAY AVERAGED POSTERIOR DISTRIBUTIONS AROUND TRUE CHANGE POINT
@@ -158,14 +162,14 @@ figure('Position', [342 906 120 200]);
 Emergence_PlotSubGp(precpcppos, tricol(1:2,:));
 
 % Customize the axes
-axis([0,3,0,Emergence_IO_Entropy(ones(1,N)./N)]);
-set(gca, 'XTick', [], 'XColor', 'None', 'YDir', 'Reverse', 'Box', 'Off');
+xlim([0,3]);
+set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(precpcppos);
 
 % Add some text labels
-ylabel('Entropy (bit)');
+ylabel('Log-precision');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_CP_PrecPostCP.pdf'));
