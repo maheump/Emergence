@@ -192,12 +192,10 @@ end
 % Display the P/D ratio locked on the detection of deterministic regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Copute the P/D ratio
-ratioPD = cell2mat(cellfun(@(x) reshape(x(:,2) ./ sum(x(:,1:2), 2), ...
+% Copute the P/D ratio as (p(Hd|y)-p(Hp|y)) / (p(Hd|y)+p(Hp|y))
+ratioPD = cell2mat(cellfun(@(pHgY) reshape(...
+    (pHgY(:,2) - pHgY(:,1)) ./ (pHgY(:,2) + pHgY(:,1)), ...
     [1 1 nsp]), subtraj, 'UniformOutput', 0));
-
-% Transform it such that it evolves between -1 (Proba) and 1 (Deter)
-ratioPD = 2 .* (ratioPD - 1/2);
 
 % Average over sequences for each subject
 ratioPD = squeeze(mean(ratioPD, 1, 'OmitNaN'));
