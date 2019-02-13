@@ -174,7 +174,7 @@ figure('Position', [292 905 300 200]);
 Emergence_PlotTriInfo; hold('on');
 l = Emergence_PlotGridOnTri(2, 2); set(l(1,2), 'LineWidth', 2);
 
-% Display no difference scenario
+% Display null ratio
 plot(ones(1,2)./2, [0, sqrt(3)/2], 'k--');
 
 % Display the average trajectory
@@ -189,8 +189,8 @@ if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriS.pdf'))
 else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriIO.pdf'));
 end
 
-% Display the P/D belief difference locked on the detection of deterministic regularities
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Display the P/D ratio locked on the detection of deterministic regularities
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Copute the P/D ratio
 ratioPD = cell2mat(cellfun(@(x) reshape(x(:,2) ./ sum(x(:,1:2), 2), ...
@@ -213,7 +213,7 @@ figure('Position', [593 905 190 200]);
 plot(xval([1,end]), zeros(1,2), 'k-'); hold('on');
 plot(zeros(1,2), [-1,1], 'k-');
 
-% Display the P/D belief difference centered on the detection point
+% Display the P/D ratio centered on the detection point
 plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
 
 % Customize the axes
