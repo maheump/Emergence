@@ -1,7 +1,7 @@
 function out = Emergence_Regress( y, x, method, outvar )
 % EMERGENCE_REGRESS performs regression/correlation between x and y
 % variables.
-%   - "y": the variable to explain.
+%	- "y": the variable to explain.
 %   - "x": the explaining variable.
 %   - "method": can be "OLS" (ordinary least squares), "TLS" (total least
 %       squares) or "CC" (correlation coefficient).
@@ -108,11 +108,13 @@ n = length(x);
 X = linspace(min(x), max(x), ng);
 Y = ones(size(X))*beta0 + beta1*X;
 
-SE_y_cond_x = sum((y - beta0*ones(size(y))-beta1*x).^2)/(n-2);
-SSX = (n-1)*var(x);
-SE_Y = SE_y_cond_x*(ones(size(X))*(1/n + (mean(x)^2)/SSX) + (X.^2 - 2*mean(x)*X)/SSX);
+yhat = beta0 * ones(size(y)) - beta1 * x;
 
-Yoff = (2*finv(1-alpha,2,n-2)*SE_Y).^0.5;
+SE_y_cond_x = sum((y-yhat).^2) / (n-2);
+SSX = (n-1) * var(x);
+SE_Y = SE_y_cond_x * (ones(size(X)) * (1/n + (mean(x)^2)/SSX) + (X.^2 - 2*mean(x)*X)/SSX);
+
+Yoff = (2 * finv(1-alpha, 2, n-2) * SE_Y) .^ 0.5;
 yval = Y + Yoff.*[-1;1];
 xval = X;
 
