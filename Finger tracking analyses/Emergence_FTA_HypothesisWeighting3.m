@@ -50,7 +50,7 @@ cmap{3} = cbrewer2('Greens', 2*prec);
 cmap{4} = cbrewer2('Purples', 2*prec);
 
 % For each predictor
-figure('Name', 'Maps of predictors', 'Position', [1 905 1000 200]);
+figure('Name', 'Maps of predictors', 'Position', [1 974 341 130]);
 for iMap = 1:nMaps
     sp = subplot(1,nMaps,iMap);
     
@@ -58,7 +58,7 @@ for iMap = 1:nMaps
     imagesc(xgrid, ygrid, Maps{iMap}', 'AlphaData', ~isnan(Maps{iMap})'); hold('on');
     
     % Display information about the triangle
-    Emergence_PlotTriInfo;
+    tr = fill(tricc(:,1), tricc(:,2), 'k', 'FaceColor', 'None', 'LineWidth', 2);
     
 	% Use corresponding colormap
     colormap(sp, cmap{iMap});
@@ -112,9 +112,10 @@ edges = prctile(dist, linspace(0, 100, nBin+1));
 binlist = num2cell(1:nBin);
 
 % Prepare output variable
-subavg = NaN(nBin,nSub, 3);
-ioavg  = NaN(nBin,nSub, 3);
-coef   = NaN(3,   nSub, 4);
+binsubn = NaN(nBin,nSub  );
+subavg  = NaN(nBin,nSub,3);
+ioavg   = NaN(nBin,nSub,3);
+regcoef = NaN(3,   nSub,4);
 
 % For each subject
 for iSub = 1:nSub
@@ -144,15 +145,16 @@ for iSub = 1:nSub
         % Regress subject's P/D ratio against several IO predictors
         selecpred = 1:(1+iMod);
         beta = regress(subratioPD, desmat(:,selecpred));
-        coef(iMod,iSub,selecpred) = beta;
+        regcoef(iMod,iSub,selecpred) = beta;
         
         % Remove variance from all the predictiors except the P/D ratio
-        pidx = setdiff(selecpred, 2);
+        regofint = 2;
+        pidx = setdiff(selecpred, regofint);
         pred = desmat(:,pidx) * beta(pidx); % predictions based on beta values
-        subratioPD2 = subratioPD - pred;  % pseudo-residuals
+        subratioPD2 = subratioPD - pred; % pseudo-residuals
         
         % Find which observations 
-        [~,~,bins] = histcounts(ioratioPD, edges);
+        [binsubn(:,iSub),~,bins] = histcounts(desmat(:,regofint), edges);
         
         % Average IO P/D ratio and subject's residual P/D ratio
         subavg(:,iSub,iMod) = cellfun(@(i) mean(subratioPD2(bins == i)), binlist);
@@ -164,19 +166,19 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Average beta coefficients over subjects
-m = mean(coef(:,:,2), 2)';
-s = sem(coef(:,:,2),  2)';
+m = mean(regcoef(:,:,2), 2)';
+s = sem(regcoef(:,:,2),  2)';
 
-% Display average regression coefficients
-figure('Position', [1 531 200 300]);
-plot(repmat(1:3, 2, 1), m+[-s;s], 'k-'); hold('on');
-plot(1:3, m, 'ko', 'MarkerFaceColor', g, 'MarkerSize', 10);
+% Display averaged regression coefficients
+figure('Position', [1 700 140 200]);
+bar(1:3, m, 'FaceColor', g, 'EdgeColor', 'k'); hold('on');
+plot(repmat(1:3, 2, 1), m+[-s;s], 'k-');
 
 % Customize the axes
 if onlystoch, axis([0,4,0,0.4]); end
 set(gca, 'Box', 'Off', 'XTick', 1:3);
 xlabel('Regression models');
-ylabel('Value of the regression coefficient for P/D ratio');
+ylabel('Regression coefficient for P/D beliefs');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_HW_BetaCoef.pdf'));
@@ -188,8 +190,8 @@ save2pdf(fullfile(ftapath, 'figs', 'F_HW_BetaCoef.pdf'));
 iMod = 3; % #3 is the full model
 
 % Test the distribution of beta values against 0
-[~,pval,tci,stats] = ttest(coef(iMod,:,2)');
-disptstats(pval, tci, stats);
+[~,pval,tci,stats] = ttest(regcoef(:,:,2)');
+Emergence_PrintTstats(pval, tci, stats);
 
 % Average over subjects
 xm = mean( ioavg(:,:,iMod), 2)';
@@ -206,10 +208,10 @@ xval = Emergence_Regress(ym, xm, 'TLS', 'confintx');
 prec = 100;
 gege = [flipud(cbrewer2('Blues', prec)); cbrewer2('Reds', prec)];
 grid = linspace(-1/2, 1/2, prec*2);
-[~,cidx] = min(abs(xm'-grid), [], 2);
+[~,colidx] = min(abs(xm'-grid), [], 2);
 
 % Create a new window
-figure('Position', [202 531 300 300]);
+figure('Position', [142 700 200 200]);
 
 % Display origin (because variables are centered)
 plot(zeros(1,2), [-1,1], '-', 'Color', g); hold('on');
@@ -223,19 +225,23 @@ fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
        'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2);
 plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
 
+% Get average size of the bin
+avgbinsize = mean(binsubn, 2);
+dotsize = 1 + flipud(log(avgbinsize+1).*10);
+
 % Show correlation between subjects' P/D residual ratio and IO P/D ratio
 plot(xm+[-xs;xs], repmat(ym,2,1), 'k-'); % horizontal error bars
 plot(repmat(xm,2,1), ym+[-ys;ys], 'k-'); % vertical   error bars
 plot(xm, ym, 'k-', 'LineWidth', 1);
-scatter(xm, ym, ones(1,nBin).*100, gege(cidx,:), 'filled', 'MarkerEdgeColor', 'k');
+scatter(xm, ym, dotsize, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
 
 % Customize the axes
 if onlystoch, axis([-0.4,0.4,-0.1,0.1]); end
 set(gca, 'Box', 'Off');
 
 % Add some text labels
-xlabel('Centered P/D ratio from IO');
-ylabel('Residual centered P/D ratio from subjects');
+xlabel('Centered beliefs from IO');
+ylabel('Residual centered beliefs from subjects');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_HW_CorrRatio.pdf'));
