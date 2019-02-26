@@ -60,19 +60,14 @@ EntCol = EntCMap(colidx,:);
 % Define bins
 % ~~~~~~~~~~~
 
-% Define limits of the entropy bins
+% Group deterministic regularities together according to the entropy bins
 EntBin = [1.4, 1.7665, 1.853, 2]';
 EntLab = arrayfun(@(x) sprintf('%1.0f', x), 1:numel(EntBin), 'UniformOutput', 0);
 nEnt = numel(EntBin)-1;
-
-% Group deterministic regularities together according to the entropy bins
-EntIdx = cell(1,nEnt);
-for iEnt = 1:nEnt
-    EntIdx{iEnt} = find(TPent >= EntBin(iEnt) & TPent <= EntBin(iEnt+1));
-end
+[~,~,idx] = histcounts(TPent, EntBin);
 
 % Deduce colors corresponding to the different entropy bins
-EntVal = cellfun(@(x) mean(TPent(x)), EntIdx, 'UniformOutput', 1)';
+EntVal = arrayfun(@(i) mean(TPent(idx == i)), 1:nEnt)';
 [~,colidx] = min(abs(EntVal - EntGrid), [], 2);
 EntGpCol = EntCMap(colidx,:);
 
@@ -208,8 +203,8 @@ err = sem( ratioPD, 1);
 figure('Position', [593 905 190 200]);
 
 % Display origin
-plot(xval([1,end]), zeros(1,2), 'k-'); hold('on');
-plot(zeros(1,2), [-1,1], 'k-');
+plot(xval([1,end]), zeros(1,2), '-', 'Color', g); hold('on');
+plot(zeros(1,2), [-1,1], '-', 'Color', g);
 
 % Display the P/D ratio centered on the detection point
 plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
@@ -336,7 +331,7 @@ end
 
 % Run an ANOVA
 RMtbl = rmANOVA(data', 'SeqType');
-disp(RMtbl);
+Emergence_PrintFstats(RMtbl);
 
 % Display group-averaged beliefs in the probabilistic hypothesis
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
