@@ -30,15 +30,15 @@ data = squeeze(cat(1, avgcordet(1,1,:), avgcordet(2,2,:), avgcordet(3,3,:)))';
 
 % Check that labeling is significantly better than chance
 [~,pval,tci,stats] = ttest(data - 1/3);
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Run a 1-way ANOVA on correct labeling between conditions
 RMtbl = rmANOVA(data, 'SeqType');
-disp(RMtbl);
+Emergence_PrintFstats(RMtbl);
 
 % Compare accurate labeling between the two regular processes
 [~,pval,tci,stats] = ttest(diff(data(:,1:2), 1, 2));
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Display results using a home-made stacked barplot
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -208,10 +208,6 @@ for iSub = 1:nSub
     % in the computation of the d' sensitivity measure.
 end
 
-% Compare detection d' of the two types of regularity
-[~,pval,tci,stats] = ttest(diff(dprime(:,1:2), 1, 2));
-disptstats(pval,tci,stats);
-
 % Average over subjects
 gavgdprime = mean(dprime,1); % average d'
 gavgcrit = mean(crit,1); % average criterion
@@ -373,7 +369,7 @@ end
 % Compute a paired t-test between values of d' between fully-stochastic
 % sequences and, respetiveley, probabilistic versus deterministic regularities
 [~,pval,tci,stats] = ttest(diff(dprime(:,1:2), 1, 2));
-disptstats(pval, tci, stats);
+Emergence_PrintTstats(pval, tci, stats);
 
 % Prepare a new window
 figure('Position', [714 806 120 200]);

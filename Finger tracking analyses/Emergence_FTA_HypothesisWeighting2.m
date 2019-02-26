@@ -104,7 +104,7 @@ ylabel('Correlation coefficients');
 
 % Compare the distribution of correlation coefficients against zero
 [~,pval,tci,stats] = ttest(coef);
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_HW_SubCorr.pdf'));

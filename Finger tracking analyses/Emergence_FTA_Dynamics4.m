@@ -209,7 +209,7 @@ avgslope = cell2mat(cellfun(@(x) mean(x, 1, 'OmitNaN')', slope, 'UniformOutput',
 
 % Paired t-test on the slope parameter of sigmoids
 [~,pval,tci,stats] = ttest(diff(avgslope, 1, 2));
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Prepare a new window
 figure('Position', [1154 905 120 200]);

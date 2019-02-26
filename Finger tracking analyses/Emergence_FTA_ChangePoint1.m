@@ -177,4 +177,4 @@ save2pdf(fullfile(ftapath, 'figs', 'F_CP_PrecPostCP.pdf'));
 % Compute a paired t-test on the precision of posterior distributions
 % between the 2 types of regularities
 [~,pval,tci,stats] = ttest(diff(precpcppos, 1, 2));
-disptstats(pval, tci, stats);
+Emergence_PrintTstats(pval, tci, stats);

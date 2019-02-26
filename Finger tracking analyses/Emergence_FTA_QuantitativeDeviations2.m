@@ -138,7 +138,7 @@ Emergence_DispStatTest(inddelay);
 
 % Perform a t-test on integration delay against zero
 [~,pval,tci,stats] = ttest(inddelay');
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Add some text labels
 ylabel('Estimated delay (# obs.)');

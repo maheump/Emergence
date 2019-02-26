@@ -47,7 +47,7 @@ avgbel = cat(2, cellfun(@(x,y) mean(x(y == 0)), ultibel, corest)', ...
 
 % Perform a paired t-test
 [~,pval,tci,stats] = ttest(diff(avgbel, 1, 2));
-disptstats(pval, tci, stats);
+Emergence_PrintTstats(pval, tci, stats);
 
 % Display average IO's beliefs following sequences entailing a
 % probabilistic regularity that was either detected or missed by subjects
