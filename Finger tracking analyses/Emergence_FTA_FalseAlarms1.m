@@ -6,9 +6,6 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% SHOW THAT FINGER POSITION DEPENDS UPON POSITION WITHIN THE SEQUENCE
-%  ===================================================================
-
 % Define options
 % ~~~~~~~~~~~~~~
 
@@ -18,7 +15,7 @@ nBin = 10;
 % Select the sequences to look at: fully-stochastic sequences from the
 % beginning to the end that are (restodet = true) or not (restodet = false)
 % necessarily correctly labeled
-restodet = false;
+restodet = true;
 
 % Average hypotheses likelihood in different parts of the sequences
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +52,7 @@ semcc = flipud(errbc*tcn);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Define plot options
-cmap = parula(nBin);
+cmap = flipud(parula(nBin));
 dotsize = 50;
 
 % Prepare a new window
@@ -71,7 +68,7 @@ plot(avgcc(:,1)' + ([-1;1] .* semcc(:,1)'), repmat(avgcc(:,2), 1, 2)', 'k-', 'Li
 
 % Display averaged positions 
 scatter(flipud(avgcc(:,1)), flipud(avgcc(:,2)), ...
-    dotsize, flipud(cmap), 'Filled', 'MarkerEdgeColor', 'k');
+    dotsize, cmap, 'Filled', 'MarkerEdgeColor', 'k');
 
 % Add a colorbar
 cbr = colorbar('Location', 'SouthOutside');
@@ -120,4 +117,4 @@ end
 
 % Perform a t-test (against chance) on correlation coefficients
 [~,pval,tci,stats] = ttest(coef);
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
