@@ -10,7 +10,7 @@
 %  ==============================================================
 
 % Define the number of bins to use for the correlation at the group-level
-nBin = 8;
+nBin = 7;
 
 % Correlate real and inferred positions of the change point
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,19 +46,19 @@ for iHyp = 1:2
         mat2cell(sp, nR, ones(nSub,1)), ... % inferred change point's position
         mat2cell(cp, nR, ones(nSub,1)));    % true change point's position
     
+    % Find the data points that correspond to each bin
+    [~,~,idx] = histcounts(cp, pct);
+    
     % For each bin
     for iBin = 1:nBin
         
-        % Find the data points that are in the range of the current bin
-        idx = cp > pct(iBin) & cp <= pct(iBin+1);
-        
         % Average over sequences
-        cpbinsm(iBin,1,iHyp) = mean(cp(idx), 'OmitNaN');
-        cpbinsm(iBin,2,iHyp) = mean(sp(idx), 'OmitNaN');
+        cpbinsm(iBin,1,iHyp) = mean(cp(idx == iBin), 'OmitNaN');
+        cpbinsm(iBin,2,iHyp) = mean(sp(idx == iBin), 'OmitNaN');
         
         % Compute the SEM over sequences
-        cpbinss(iBin,1,iHyp) = sem(cp(idx));
-        cpbinss(iBin,2,iHyp) = sem(sp(idx));
+        cpbinss(iBin,1,iHyp) = sem(cp(idx == iBin));
+        cpbinss(iBin,2,iHyp) = sem(sp(idx == iBin));
     end
 end
 
@@ -142,11 +142,11 @@ Emergence_PlotSubGp(corrcoef, tricol(1:2,:));
 
 % Perform a paired t-test between correlation coefficients
 [~,pval,tci,stats] = ttest(diff(corrcoef, 1, 2)); % between regularities
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 [~,pval,tci,stats] = ttest(corrcoef - 1); % against ideal scenario
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 [~,pval,tci,stats] = ttest(corrcoef); % against an absence of correlation
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Customize the axes
 axis([0,3,-1,1]);
@@ -260,7 +260,7 @@ Emergence_PlotSubGp(avgConf, tricol(1:2,:));
 
 % Perform a paired t-test between confidence ratings
 [h,pval,ci,stats] = ttest(diff(avgConf,1,2));
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Customize the axes
 axis([0,3,0,1]);
