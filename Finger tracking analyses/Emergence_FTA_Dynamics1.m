@@ -33,7 +33,7 @@ detecthr = 1/2;
 
 % Prepare the output variables
 cp = cell(1,2); dp = cell(1,2); % change and detection points
-lag = cell(1,2); integ = cell(1,2); speed = cell(1,2); % measures of the trajectories
+lag = cell(1,2); integ = cell(1,2); update = cell(1,2); % measures of the trajectories
 belincorhyp = cell(1,2); % single-trials trajectories of the relevant hypothesis
 fingerposwrtp = cell(2,3); % trajectories locked on different point
 
@@ -58,20 +58,16 @@ for iHyp = 1:2
     dp{iHyp}( lag{iHyp} <= 0) = NaN;
     lag{iHyp}(lag{iHyp} <= 0) = NaN;
     
-    % Measure the speed of the trajectory and the build-up of beliefs along
-    % the relevant dimension
-    speed{iHyp} = cellfun(@(x,c) mean(diff(x.BarycCoord(c:end,iHyp))), ...
+    % Measure the build-up of beliefs along the relevant dimension
+    update{iHyp} = cellfun(@(x,c) mean(diff(x.BarycCoord(c:end,iHyp))), ...
         D(cidx{iHyp},:), num2cell(cp{iHyp}));
-    integ{iHyp} = cellfun(@(x,c) trapz(x.BarycCoord(c:end,iHyp) - ...
-        x.BarycCoord(c,iHyp)) / (N-c), D(cidx{iHyp},:), num2cell(cp{iHyp}));
     
     % Keel only sequences for which regularities were correctly identified
     detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
     cp{iHyp}(~detecmask) = NaN;
     dp{iHyp}(~detecmask) = NaN;
     lag{iHyp}(~detecmask) = NaN;
-    speed{iHyp}(~detecmask) = NaN;
-    integ{iHyp}(~detecmask) = NaN;
+    update{iHyp}(~detecmask) = NaN;
     
     % For the important points we want to lock onto
     for lock = 1:3
