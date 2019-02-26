@@ -11,7 +11,7 @@
 %  ==============
 
 % Make sure data from bad subjects is available
-if rmbadsub
+if ~exist('rmbadsub', 'var') || rmbadsub
     rmbadsub = false;
     Emergence_FTA_LoadData;
 end
