@@ -2,12 +2,14 @@
 % fully-stochastic parts. We show that the strength of (false) beliefs is
 % predicted by the ideal observer, meaning that subjects' false alarms
 % reflect genuine local (probabilistic) regularities occuring by chance in
-% actually entirely stochastic parts of the sequences.
+% actually entirely stochastic parts of the sequences. We show that is true
+% after controling for the effect of time elapsed since the beginning od
+% the sequence on the increase of false alarms.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% COMPARE FALSE ALARMS TOWARD THE PROBABILISTIC HYPOTHESIS IN SUBJECTS AND IN THE IO
-%  ==================================================================================
+%% COMPARE FALSE ALARMS IN SUBJECTS AND IN THE IO
+%  ==============================================
 
 % Define options
 % ~~~~~~~~~~~~~~
@@ -33,7 +35,7 @@ restopt = 3;
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Select moment in which sequences do not entail any regularities
-randidx = cellfun(@(x) find(x.Gen == 1), G, 'UniformOutput', 0);
+randidx = cellfun(@(x) find(x.Gen == 1)', G, 'UniformOutput', 0);
 
 % Restric to fully-stochastic sequences
 if restopt == 2 || restopt == 3
@@ -61,10 +63,9 @@ else, error('Please check the binnig method that is provided');
 end
 
 % Prepare output variables
-binsubtraj = NaN(nBin,3,nSub);
-biniotraj  = NaN(nBin,3,nSub);
-coef       = NaN(nSub,1);
-binsubn    = NaN(nBin,nSub);
+binsubn      = NaN(nBin,nSub);
+binsubtraj   = NaN(nBin,3,nSub);
+biniotraj    = NaN(nBin,3,nSub);
 
 % For each subject
 for iSub = 1:nSub
@@ -76,29 +77,19 @@ for iSub = 1:nSub
     iobel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
         IO(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
     
-    % Correlate subject's and ideal observer's beliefs in the probabilistic
-    % hypothesis
-    coef(iSub) = Emergence_Regress(subbel(:,iHyp), iobel(:,iHyp), 'CC', 'r');
+    % Get in which bin falls each observation
+    [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
     
-    % Get indices of moments at which the ideal observer's beliefs in the
-    % probabilistic hypothesis fell into some binned probability values
-    condidx = cellfun(@(i,j) iobel(:,iHyp) >= i & iobel(:,iHyp) < j, ...
-        num2cell(pgrid(1:end-1)), num2cell(pgrid(2:end)), 'UniformOutput', 0)';
-    
-    % Average both subject's and ideal observer's beliefs over those
-    % moments for each bin
-    binsubn(:,iSub) = cellfun(@(i) size(iobel(i,:), 1), condidx, 'UniformOutput', 1);
-    binsubtraj(:,:,iSub) = cell2mat(cellfun(@(i) mean(subbel(i,:), 1), ...
-        condidx, 'UniformOutput', 0));
-    biniotraj(:,:,iSub)  = cell2mat(cellfun(@(i) mean(iobel(i,:), 1), ...
-        condidx, 'UniformOutput', 0));
+    % Average likelihoods in each bin
+    binsubtraj(:,:,iSub) = cell2mat(arrayfun(@(i) mean(subbel(bins == i,:)), 1:nBin, 'UniformOutput', 0)');
+    biniotraj(:,:,iSub)  = cell2mat(arrayfun(@(i) mean(iobel( bins == i,:)), 1:nBin, 'UniformOutput', 0)');
 end
 
 % Average over subjects
-avgsubtraj = mean(binsubtraj, ndims(binsubtraj), 'OmitNaN');
-avgiotraj  = mean(biniotraj,  ndims(binsubtraj), 'OmitNaN');
-semsubtraj = sem( binsubtraj, ndims(biniotraj));
-semiotraj  = sem( biniotraj,  ndims(biniotraj));
+avgsubtraj = mean(binsubtraj, 3, 'OmitNaN');
+avgiotraj  = mean(biniotraj,  3, 'OmitNaN');
+semsubtraj = sem( binsubtraj, 3);
+semiotraj  = sem( biniotraj,  3);
 
 % Display the position of different false alarms in the triangle depending
 % on the corresponding ideal observer's beliefs in that false alarm
@@ -140,30 +131,105 @@ scatter(cartavgcoord(:,1), cartavgcoord(:,2), dotsize, ...
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_FA_Tri.pdf'));
 
+%% CONTROL FOR TIME ELAPSED SINCE THE BEGINNING OF THE SEQUENCE
+%  ============================================================
+
+% Prepare output variables
+regcoef      = NaN(2,3,nSub);
+resbinsubFAL = NaN(nBin,2,nSub);
+resbinioFAL  = NaN(nBin,2,nSub);
+
+% For each subject
+for iSub = 1:nSub
+    
+    % Get beliefs of both subject and ideal observer in the
+    % fully-stochastic parts of the sequence
+    subbel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
+        G(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
+    iobel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
+        IO(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
+    
+    % Get in which bin falls each observation
+    [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
+    
+    % Build the design matrix
+    obsidx = cell2mat(randidx(:,iSub));
+    desmat = [ones(numel(obsidx),1), iobel(:,iHyp), obsidx];
+    
+    % Center predictors
+    desmat = desmat - [0, mean(desmat(:,2:end), 1, 'OmitNaN')];
+    
+    % Regress subjects' and ideal observer's beliefs in the
+    % fully-stochastic hypothesis by taking, or not, into account the
+    % effect of the number of observations received since the beginning of
+    % the sequence (that was shown to induce false alarms)
+    for iMod = 1:2
+        selecpred = 1:(1+iMod);
+        beta = regress(subbel(:,iHyp), desmat(:,selecpred));
+        regcoef(iMod,selecpred,iSub) = beta;
+        
+        % Remove variance from all the predictors except the IO's false
+        % alarm likelihood
+        pidx = setdiff(selecpred, 2);
+        pred = desmat(:,pidx) * beta(pidx); % predictions based on beta values
+        ressubbel = subbel(:,iHyp) - pred; % pseudo-residuals
+        
+        % Average IO's false alarm likelihood and subject's residual false
+        % alarms
+        resbinsubFAL(:,iMod,iSub) = arrayfun(@(i) mean(ressubbel(bins == i  )), 1:nBin);
+        resbinioFAL(:,iMod,iSub)  = arrayfun(@(i) mean(desmat(   bins == i,2)), 1:nBin);
+    end
+end
+
+% Average over subjects
+avgresbinsubFAL = mean(resbinsubFAL, 3, 'OmitNaN');
+avgresbinioFAL  = mean(resbinioFAL,  3, 'OmitNaN');
+semresbinsubFAL = sem( resbinsubFAL, 3);
+semresbinioFAL  = sem( resbinioFAL,  3);
+
 % Display the correlation between subjects' and ideal observer's beliefs
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Residuals from which regression to plot
+iMod = 2;
+xm = avgresbinioFAL(:,iMod);
+ym = avgresbinsubFAL(:,iMod);
+xs = semresbinioFAL(:,iMod);
+ys = semresbinsubFAL(:,iMod);
 
 % Prepare a new window
 figure('Position', [202 905 200 200]);
 
+% Display the regression line
+B = Emergence_Regress(ym, xm, 'TLS', {'beta0', 'beta1'});
+confint = Emergence_Regress(ym, xm, 'TLS', 'confint');
+xval = Emergence_Regress(ym, xm, 'TLS', 'confintx');
+fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
+       'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2); hold('on');
+plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
+
+% Display origin (because variables are centered)
+ax = [-0.4,0.2,-0.15,0.1];
+plot(ax(1:2), zeros(1,2), '-', 'Color', g);
+plot(zeros(1,2), ax(3:4), '-', 'Color', g);
+
 % Display the identity line
-plot([0,1], [0,1], '-', 'Color', g); hold('on');
-text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
+[~,i] = min(diff((reshape(ax, [2,2]))));
+idx = 2*(i-1)+[1,2];
+plot(ax(idx), ax(idx), '-', 'Color', g);
 
 % Display averaged beliefs in each probability bin with its error bars
-plot(avgiotraj(:,iHyp), avgsubtraj(:,iHyp), 'k-', 'LineWidth', 2);
-plot(repmat(avgiotraj(:,iHyp)', [2,1]), avgsubtraj(:,iHyp)'+semsubtraj(:,iHyp)'.*[-1;1], 'k-');
-plot(avgiotraj(:,iHyp)'+semiotraj(:,iHyp)'.*[-1;1], repmat(avgsubtraj(:,iHyp)', [2,1]), 'k-');
-scatter(avgiotraj(:,iHyp), avgsubtraj(:,iHyp), dotsize, cmap, 'filled', 'MarkerEdgeColor', 'k');
+plot(xm, ym, 'k-', 'LineWidth', 1/2); 
+plot(xm' + xs'.*[-1;1], repmat(ym',2,1), 'k-');
+plot(repmat(xm',2,1), ym' + ys'.*[-1;1], 'k-');
+scatter(xm, ym, dotsize, cmap, 'filled', 'MarkerEdgeColor', 'k')
 
 % Customize the axes
-axis('square'); set(gca, 'Box', 'Off');
-axis([0,1,0,1]);
-set(gca, 'XTick', get(gca, 'YTick'));
+axis(ax); axis('square'); set(gca, 'Box', 'Off');
 
 % Add some text labels
-xlabel('Posterior beliefs from the IO');
-ylabel('Posterior beliefs from the subjects');
+xlabel('Centerd beliefs from the IO');
+ylabel('Residual centered beliefs from subjects');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_FA_Corr.pdf'));
@@ -171,28 +237,34 @@ save2pdf(fullfile(ftapath, 'figs', 'F_FA_Corr.pdf'));
 % Display the distribution of correlation coefficients over subjects
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% Which regression coefficients to analyse
+coefofint = squeeze(regcoef(:,2,:))';
+
 % Prepare a new window
-figure('Position', [403 905 120 200]);
+figure('Position', [403 905 140 200]);
 
-% Display chance level
-plot([0,2], zeros(1,2), '-', 'Color', g); hold('on');
+% Average regression coefficients over subjects
+m = mean(coefofint);
+s = sem(coefofint);
 
-% Display distribution of correlation coefficients
-Emergence_PlotSubGp(coef, tricol(iHyp,:));
+% Display averaged regression coefficients
+bar(1:2, m, 'FaceColor', g, 'EdgeColor', 'k'); hold('on');
+plot(repmat(1:2, 2, 1), m+[-s;s], 'k-');
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XTick', [], 'XColor', 'None');
-axis([0,2,-1,1]);
+set(gca, 'Box', 'Off', 'XTick', 1:2, 'XTickLabel', {'M_{1}', 'M_{2}'});
+axis([0,3,0,0.7]);
 
 % Display whether the difference is significant or not
-Emergence_DispStatTest(coef);
+Emergence_DispStatTest(coefofint);
 
 % Add some text label
-ylabel('Correlation coefficient');
+xlabel('Regression models');
+ylabel('Regression coefficient for p(H_{S}|y)');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_FA_Gp.pdf'));
 
 % Perform a t-test (against chance) on correlation coefficients
-[~,pval,tci,stats] = ttest(coef);
-disptstats(pval,tci,stats);
+[~,pval,tci,stats] = ttest(coefofint);
+Emergence_PrintTstats(pval,tci,stats);
