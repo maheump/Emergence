@@ -2,205 +2,71 @@
 % quantitative deviations that subjects exhibit compared to the ideal
 % inference scenario. In particular, we show that subjects are biased in
 % the way they report their probabilistic beliefs in a similar manner of 
-% what has been shown by economic theory.
+% what has been shown by economic theory: they overestimate small
+% probabilities and underestimate large ones.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% EXPLAIN SUBJECTS' TRAJECTORIES USING IO'S BELIEFS WITH A MIXED EFFECT APPROACH
-%  ===============================================================================
-
-% Define the number of bins to use
-nBin = 10;
-
-% Define the type of binning method
-binmeth = 'unif';
-
-% Create bins of probability values
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Get probability bins
-if ~isempty(nBin) || ~isnan(nBin)
-    if strcmpi(binmeth, 'unif') % bins uniformed on the probability space
-        pgrid = linspace(0, 1, nBin+1);
-    elseif strcmpi(binmeth, 'equil') % bins uniformed on the probability space
-        iobel = cellfun(@(x) x.BarycCoord(:), IO, 'UniformOutput', 0);
-        iobel = cell2mat(iobel(:));
-        pgrid = prctile(iobel, linspace(0, 100, nBin+1));
-    else, error('Please check the binnig method that is provided');
-    end
-end
-
-% Prepare the output variable
-if isempty(nBin) || isnan(nBin)
-      binbel = cell(1,nSub);
-else, binbel = NaN(nBin,2,nSub);
-end
-
-% For each subject
-for iSub = 1:nSub
-    
-    % Get beliefs of the subject and those of the ideal observer in all the
-    % sequences
-    subbel = cellfun(@(x) x.BarycCoord(:), G(:,iSub), 'UniformOutput', 0);
-    subbel = cell2mat(subbel(:));
-    iobel = cellfun(@(x) x.BarycCoord(:), IO(:,iSub), 'UniformOutput', 0);
-    iobel = cell2mat(iobel(:));
-    
-    % Get subjects' and IO's beliefs without averaging
-    if isempty(nBin) || isnan(nBin)
-        binbel{iSub} = [subbel, iobel];
-    
-    % Average subjects' and IO's beliefs in each bin
-    else
-        for iBin = 1:nBin
-            idx = find(iobel >= pgrid(iBin) & iobel < pgrid(iBin+1));
-            if ~isempty(idx)
-                binbel(iBin,1,iSub) = mean(iobel(idx));
-                binbel(iBin,2,iSub) = mean(subbel(idx));
-            end
-        end
-    end
-end
-
-% Fit subjects' trajectories against IO's
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% The observation functions to use (see at the end of this script)
-g_fname = {@g_PW, ... % Model 1: probability weighting function
-           @g_LM};    % Model 2: linear regression
-
-% Specify the dimensions of the problem
-dim         = [];   % empty variable
-dim.n_phi   = 2;    % number of observation parameters
-dim.n       = 0;    % number of hidden states
-dim.n_theta = 0;    % number of evolution parameters
-dim.p       = nBin; % number of obervations per time sample
-dim.n_t     = 1;    % number of time samples
-
-% Define minimal options
-options             = [];
-options.DisplayWin  = 0;
-options.verbose     = 0;
-options             = repmat({options}, [nSub,1]);
-optiongp            = [];
-optiongp.DisplayWin = 0;
-optiongp.verbose    = 0;
-
-% Explaining variable: IO's beliefs
-if isempty(nBin) || isnan(nBin)
-    for iSub = 1:nSub, options{iSub}.inG.p = binbel{iSub}(:,1)'; end
-    y = cellfun(@(x) x(:,2), binbel, 'UniformOutput', 0)';
-    dim.p = size(X{1},1); % number of obervations per time sample
-
-% Explaining variable: IO's binned beliefs
-else
-    for iSub = 1:nSub, options{iSub}.inG.p = binbel(:,1,iSub); end
-    y = mat2cell(squeeze(binbel(:,2,:)), nBin, ones(nSub,1))';
-end
-
-% Prepare output variables
-p_sub = cell(2,nSub); p_gp = cell(2,1); % posterior over parameters
-o_sub = cell(2,nSub); o_gp = cell(2,1); % quality of fit
-
-% Run the mixed-effect fitting scheme (it deduces priors through empirical
-% Bayes) using a variational procedure (it uses Laplace approximation) in
-% order to estimate the best parameters for each model and each subject
-for m = 1:2
-    [p_sub(m,:), o_sub(m,:), p_gp{m}, o_gp{m}] = ...
-        VBA_MFX(y, [], [], g_fname{m}, dim, options, [], optiongp);
-end
-
-% Perform model comparison
-% ~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Perform Bayesian model selection
-L = cellfun(@(x) x.F, o_sub);
-options = [];
-options.DisplayWin = 0;
-[posterior,out] = VBA_groupBMC(L, options);
-
-% Get individual model frequencies
-pmf = posterior.r';
-
-% Get labels of the models that have been fitted
-funlab = cellfun(@func2str, g_fname, 'UniformOutput', 0);
-funlab = cellfun(@(x) x(3:end), funlab, 'UniformOutput', 0);
-
-% Prepare a new window
-figure('Position', [1 906 120 200]);
-
-% Display chance level
-plot([0,3], ones(1,2)/2, '-', 'Color', g); hold('on');
-
-% Display estimated model frequencies
-avgpmf = mean(pmf);
-bar(1:2, avgpmf, 'EdgeColor', 'k', 'FaceColor', repmat(1/2,1,3));
-
-% Display estimated model frequencies
-sempmf = sem(pmf);
-plot(repmat(1:2, 2, 1), avgpmf + sempmf' .* [-1;1], 'k-');
-
-% Customize the axes
-axis([0,3,0,1]);
-set(gca, 'XTick', 1:2, 'XTickLabel', funlab);
-set(gca, 'Box', 'Off');
-
-% Add some text labels
-ylabel('Model frequencies');
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_QD_BMS.pdf'));
-
-% Display the fit at the group level
+% Compute error over parameters grid
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Prepare window
-figure('Position', [122 906 220 200]);
+% Define parameters grid
+GammaGrid = 0.4:0.01:1;
+P0Grid = 0.2:0.01:0.6;
 
-% Display identity line and help lines
-plot([0,1], [0,1], '-', 'Color', g); hold('on');
-text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
+% Get size of grids
+nGamma = numel(GammaGrid);
+nP0 = numel(P0Grid);
+
+% Prepare output variables
+MSE = NaN(nGamma, nP0, nSub);
+
+% For each subjects
+for iSub = 1:nSub
+    fprintf('Fitting parameter for subject #%2.0f/%2.0f.\n', iSub, nSub);
+	
+    % Get posterior probabilities from the ideal observer
+    trueproba = cell2mat(cellfun(@(x) x.BarycCoord, IO(:,iSub), 'UniformOutput', 0));
+    trueproba = reshape(trueproba(:), [1,1,numel(trueproba)]);
+    
+    % Apply the probability weighting
+    transfproba = probaweight(trueproba, GammaGrid', P0Grid);
+    
+    % Get posterior probabilities from the subjects
+    estproba = cell2mat(cellfun(@(x) x.BarycCoord, G(:,iSub), 'UniformOutput', 0));
+    estproba = reshape(estproba(:), [1,1,numel(estproba)]);
+    
+    % Compute the mean squared difference between transformed probabilities
+    % and reported probabilities
+    error = (estproba - transfproba) .^ 2;
+    MSE(:,:,iSub) = mean(error,3);
+end
+
+% Find the best parameters set
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Get best parameters set (i.e. the set that minimizes mean squared error)
+% independently for each subject
+[err,idx] = cellfun(@(x) min(x(:)), squeeze(mat2cell(MSE, nGamma, nP0, ones(1,1,nSub))));
+[pI,gI] = ind2sub(size(MSE), idx);
+PWparams = [GammaGrid(pI); P0Grid(gI)];
+
+% Get the error level of a non-weighted scenario
+errornonw = MSE(GammaGrid == 1, 1, :);
+
+% Test whether the error corresponding to the best parameters set is
+% significantly smaller than the one corresponding to gamma = 1 (no matter
+% of the value of p0) which corresponds to unbiased (i.e. non weighted)
+% probability matching
+[~,pval,tci,stats] = ttest(err - squeeze(errornonw));
+Emergence_PrintTstats(pval,tci,stats);
 
 % Average best parameters over subjects
-PWparams = cell2mat(cellfun(@(x) x.muPhi, p_sub(1,:), 'UniformOutput', 0));
-mP = mean(PWparams,2);
-sP = sem(PWparams,2);
-
-% Compute upper and lower positions of the probability weighting function
-P = [mP(1) + sP(1) * [-1;-1;1;1], mP(2) + sP(2) * [-1;1;-1;1]];
-P = mat2cell(P, ones(1,4), 2);
-p = linspace(0, 1, 1001);
-y = cell2mat(cellfun(@(x) g_PW([], x, [], p), P, 'UniformOutput', 0));
-fill([p, fliplr(p)], [max(y, [], 1), fliplr(min(y, [], 1))], ...
-    'k', 'FaceAlpha', 0.15, 'EdgeColor', 'none');
-
-% Display probability weighting function obtained with group-average
-% parameters
-fp = g_PW([], mP, [], p);
-plot(p, fp, 'k-', 'LineWidth', 3);
-
-% Display averaged bins and related error
-avgbinbel = mean(binbel, 3);
-sembinbel = sem(binbel, 3);
-plot(repmat(avgbinbel(:,1), 1, 2)', avgbinbel(:,2)'+sembinbel(:,2)'.*[-1,1]', 'k-')
-plot(avgbinbel(:,1), avgbinbel(:,2), 'ko', 'MarkerFaceColor', g, 'MarkerSize', 8);
-
-% Customize the axes
-axis(repmat([0,1], 1, 2)); axis('square');
-set(gca, 'XTick', 0:0.2:1, 'YTick', 0:0.2:1);
-set(gca, 'Box', 'Off');
-
-% Add some text labels
-xlabel('Beliefs from the ideal observer'); ylabel('Beliefs from subjects');
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgPWFit.pdf'));
-
-% Display best parameters
-% ~~~~~~~~~~~~~~~~~~~~~~~
+avgPWparams = mean(PWparams, 2);
+semPWparams = sem(PWparams, 2);
 
 % Prepare a new window
-figure('Position', [343 906 200 200]);
+figure('Position', [1 905 200 200]);
 
 % Define parameters' name and null values
 pwparamname = {'\gamma', 'p_{0}'};
@@ -232,36 +98,148 @@ for iParam = 1:2
     
     % Display the output of the statistical comparison against null value
     [~,pval,tci,stats] = ttest(PWparams(iParam,:)' - nullparamval(iParam));
-    disptstats(pval,tci,stats);
+    Emergence_PrintTstats(pval,tci,stats);
 end
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_QD_GpPWFit.pdf'));
+
+% Display the average error map over parameters grid
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Center the error matrices on that error level
+ctrerrmap = MSE - errornonw;
+
+% Average over subjects
+avgerrmap = mean(ctrerrmap, 3);
+
+% Prepare a new window
+figure('Position', [202 905 180 200]);
+
+% Diplay the average map of error over the parameters grid
+imagesc(P0Grid, GammaGrid, avgerrmap); hold('on');
+contour(P0Grid, GammaGrid, avgerrmap, 11, 'k-', 'LineWidth', 1/2);
+
+% Find the minipum of that averaged error map
+[~,idx] = min(avgerrmap(:));
+[pI,gI] = ind2sub(size(avgerrmap), idx);
+plot(P0Grid(gI), GammaGrid(pI), 'k.', 'MarkerSize', 10);
+
+% Display the group 
+plot(repmat(avgPWparams(2),1,2), avgPWparams(1)+[-1,1].*semPWparams(1), 'k-');
+plot(avgPWparams(2)+[-1,1].*semPWparams(2), repmat(avgPWparams(1),1,2), 'k-');
+plot(avgPWparams(2), avgPWparams(1), 'k.', 'MarkerSize', 20);
+
+% Customize the axes
+axis('xy'); caxis([-1,1] .* max(abs(caxis)));
+
+% Add a colorbar
+colorbar; colormap(flipud(cbrewer2('Spectral', 1e5)));
+
+% Add some text labels
+xlabel('p_{0} parameter');
+ylabel('\gamma parameter');
+
+% Save the figure
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgErrMap.pdf'));
+
+% Display binned probabilities from subjects versus the ideal observer
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Define the number of bins to use
+nBin = 12;
+
+% Create bins of probability values
+binmeth = 'unif'; % type of binning method
+if ~isempty(nBin) || ~isnan(nBin)
+    if strcmpi(binmeth, 'unif') % bins uniformed on the probability space
+        bingrid = linspace(0, 1, nBin+1);
+    elseif strcmpi(binmeth, 'equil') % bins uniformed on the probability space
+        iobel = cellfun(@(x) x.BarycCoord(:), IO, 'UniformOutput', 0);
+        iobel = cell2mat(iobel(:));
+        bingrid = prctile(iobel, linspace(0, 100, nBin+1));
+    else, error('Please check the binnig method that is provided');
+    end
+end
+
+% Prepare the output
+binbel = NaN(nBin,2,nSub);
+
+% For each subject
+for iSub = 1:nSub
+    
+    % Get beliefs of the subject and those of the ideal observer in all the
+    % sequences
+    subbel = cellfun(@(x) x.BarycCoord(:), G(:,iSub), 'UniformOutput', 0);
+    subbel = cell2mat(subbel(:));
+    iobel = cellfun(@(x) x.BarycCoord(:), IO(:,iSub), 'UniformOutput', 0);
+    iobel = cell2mat(iobel(:));
+    
+    % Average probabilities within each bin
+    [~,~,idx] = histcounts(iobel, bingrid);
+    for iBin = 1:nBin
+        binbel(iBin,1,iSub) = mean(iobel( idx == iBin));
+        binbel(iBin,2,iSub) = mean(subbel(idx == iBin));
+    end
+end
+
+% Prepare window
+figure('Position', [383 905 220 200]);
+
+% Display identity line and help lines
+plot([0,1], [0,1], '-', 'Color', g); hold('on');
+text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
+
+% Average over subjects
+avgbinbel = mean(binbel, 3);
+sembinbel = sem(binbel, 3);
+
+% Transform posterior probabilities from the ideal observer
+trueproba = avgbinbel(:,1);
+trueproba = reshape(trueproba, [1 1 numel(trueproba)]);
+transfproba = probaweight(trueproba, GammaGrid', P0Grid);
+
+% Get probabilities estimated by subjects
+estproba = avgbinbel(:,2);
+estproba = reshape(estproba, [1 1 numel(estproba)]);
+
+% Compute error between transformed 
+error = (estproba - transfproba) .^ 2;
+avgerror = mean(error, 3);
+
+% Find the parameters set that induce the smaller error
+[~,idx] = min(avgerror(:));
+[pI,gI] = ind2sub(size(avgerror), idx);
+P = [GammaGrid(pI); P0Grid(gI)];
+
+% Display probability weighting function obtained with group-average
+% parameters
+pgrid = linspace(0, 1, 1001);
+fp = probaweight(pgrid, P(1), P(2));
+plot(pgrid, fp, 'k-', 'LineWidth', 2);
+
+% Display averaged bins and related error
+plot(repmat(avgbinbel(:,1), 1, 2)', avgbinbel(:,2)'+sembinbel(:,2)'.*[-1,1]', 'k-')
+plot(avgbinbel(:,1), avgbinbel(:,2), 'ko', 'MarkerFaceColor', g, 'MarkerSize', 8);
+
+% Customize the axes
+axis(repmat([0,1], 1, 2)); axis('square');
+set(gca, 'XTick', 0:0.2:1, 'YTick', 0:0.2:1);
+set(gca, 'Box', 'Off');
+
+% Add some text labels
+xlabel('Beliefs from the ideal observer'); ylabel('Beliefs from subjects');
+
+% Save the figure
+save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgPWFit.pdf'));
 
 % Probability weighting function
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % See: https://en.wikipedia.org/wiki/Prospect_theory
 % See: Gonzalez, R., & Wu, G. (1999). On the shape of the probability
 %   weighting function. Cognitive psychology, 38(1), 129-166.
-function [g, dgdx, dgdP] = g_PW(x, P, u, in)
-
-% Make sure that the values at which to evaluate the function are within a structure
-if ~isstruct(in)
-    p = in;
-    in = [];
-    in.p = p;
-end
-
-% Get parameters
-gamma = P(1);
-p0 = P(2);
-
-% Compute predictions of the probability weighting function
-g = logitinv(gamma .* logit(in.p) + (1 - gamma) * logit(p0));
-
-% Rely on numerical derivatives
-dgdx = [];
-dgdP = [];
+function y = probaweight(x, gamma, p0)
+y = logitinv(gamma .* logit(x) + (1 - gamma) .* logit(p0));
 end
 
 % Inverse of the logit transformation
@@ -275,20 +253,4 @@ end
 function a = logit(b)
 a = log(b./(1-b));
 a(real(a)~=a) = NaN;
-end
-
-% General linear model
-% ~~~~~~~~~~~~~~~~~~~~
-% See: https://en.wikipedia.org/wiki/General_linear_model
-function [g,dgdx,dgdP] = g_LM(x, P, u, in)
-
-% Add an offset to the design matrix 
-X = [in.p, ones(numel(in.p),1)];
-
-% Compute predictions of the linear regression
-g = X*P;
-
-% Use analytical derivatives
-dgdx = [];
-dgdP = X';
 end
