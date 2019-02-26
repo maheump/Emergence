@@ -64,10 +64,10 @@ EntCol = EntCMap(colidx,:);
 EntBin = [1.4, 1.7665, 1.853, 2]';
 EntLab = arrayfun(@(x) sprintf('%1.0f', x), 1:numel(EntBin), 'UniformOutput', 0);
 nEnt = numel(EntBin)-1;
-[~,~,idx] = histcounts(TPent, EntBin);
+[~,~,EntIdx] = histcounts(TPent, EntBin);
 
 % Deduce colors corresponding to the different entropy bins
-EntVal = arrayfun(@(i) mean(TPent(idx == i)), 1:nEnt)';
+EntVal = arrayfun(@(i) mean(TPent(EntIdx == i)), 1:nEnt)';
 [~,colidx] = min(abs(EntVal - EntGrid), [], 2);
 EntGpCol = EntCMap(colidx,:);
 
@@ -136,6 +136,11 @@ cdp = cellfun(@(x) min([NaN, ...
 detecmask = cellfun(@(x) x.Questions(2) == 2, G(cidx{2},:));
 cdp(~detecmask) = {NaN};
 
+% Get distance from change point
+cp = cellfun(@(x) x.Jump + 1/2, D(cidx{2},:));
+cp(~detecmask) = NaN;
+distfromcp = cp - cell2mat(cdp);
+
 % Beginning and ending of the window to look into
 idx = cellfun(@(x) x+xval, cdp, 'UniformOutput', 0);
 
@@ -184,7 +189,7 @@ if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriS.pdf'))
 else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriIO.pdf'));
 end
 
-% Display the P/D ratio locked on the detection of deterministic regularities
+%% Display the P/D ratio locked on the detection of deterministic regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Copute the P/D ratio as (p(Hd|y)-p(Hp|y)) / (p(Hd|y)+p(Hp|y))
@@ -208,6 +213,10 @@ plot(zeros(1,2), [-1,1], '-', 'Color', g);
 
 % Display the P/D ratio centered on the detection point
 plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
+
+% Display distribution of change point's position
+[fout0,xout] = ksdensity(distfromcp(:), 'Bandwidth', 8);
+fill(xout, 5.*fout0-1, 'k', 'FaceColor', g, 'EdgeColor', 'k');
 
 % Customize the axes
 caxis([-1,1]);
@@ -234,8 +243,8 @@ subavgtrajent = NaN(nsp,3,nEnt,nSub);
 
 % For each entropy bin, average the trajectories across subjects
 for iEnt = 1:nEnt
-    n = numel(EntIdx{iEnt});
-    d = mat2cell(subtraj(EntIdx{iEnt},:), n, ones(nSub,1));
+    n = sum(EntIdx == iEnt);
+    d = mat2cell(subtraj(EntIdx == iEnt,:), n, ones(nSub,1));
     d = cellfun(@(x) mean(cell2mat(reshape(x, [1,1,n])), 3, 'OmitNaN'), ...
         d, 'UniformOutput', 0);
     subavgtrajent(:,:,iEnt,:) = cell2mat(reshape(d, [1,1,nSub]));
@@ -326,12 +335,19 @@ transpbel(~detecmask) = NaN;
 % For each subject, average the trajectories
 data = NaN(nSub,nEnt);
 for iEnt = 1:nEnt
-    data(:,iEnt) = squeeze(mean(transpbel(EntIdx{iEnt},:), 1, 'OmitNaN'));
+    data(:,iEnt) = squeeze(mean(transpbel(EntIdx == iEnt,:), 1, 'OmitNaN'));
 end
 
 % Run an ANOVA
 RMtbl = rmANOVA(data', 'SeqType');
 Emergence_PrintFstats(RMtbl);
+
+% Test whether there is significant correlations between beliefs in the
+% probabilistic hypothesis and Shannon entropy
+corcoef = cellfun(@(x) Emergence_Regress(x, TPent, 'CC', 'r'), ...
+    mat2cell(transpbel, numel(cidx{2}), ones(1,nSub)));
+[~,pval,tci,stats] = ttest(corcoef');
+Emergence_PrintTstats(pval,tci,stats);
 
 % Display group-averaged beliefs in the probabilistic hypothesis
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
