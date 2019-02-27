@@ -22,6 +22,9 @@ pPgrid = cell2mat(cellfun(@(x,y) repmat(x,y,1), num2cell(pgrid), ...
     num2cell(nBin+1:-1:1), 'UniformOutput', 0)');
 pDgrid = cell2mat(arrayfun(@(x) (0:1/nBin:x)', 1-pgrid, 'UniformOutput', 0)');
 
+% Triangle's specifications
+tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
+
 % Deduce vertices
 % ~~~~~~~~~~~~~~~
 
