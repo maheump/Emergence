@@ -5,9 +5,6 @@
 %
 % Copyright (c) 2018 Maxime Maheu
 
-%% COMPUTE HISTOGRAMS OF FINGER'S POSITIONS
-%  ========================================
-
 % Define option
 % ~~~~~~~~~~~~~
 
@@ -176,76 +173,4 @@ ScaleAxis('c', 1:3); ScaleAxis('x'); ScaleAxis('y');
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsS.pdf'));
 else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsIO.pdf'));
-end
-
-%% COMPARE MARGINAL HISTOGRAMS FOR PROBABILISTIC AND DETERMINISTIC REGULARITIES
-%  ============================================================================
-
-% Create bins of beliefs
-% ~~~~~~~~~~~~~~~~~~~~~~
-
-% Sample uniformaly the probability continuum
-nBin = 51;
-pg = linspace(0, 1, nBin)';
-
-% Prepare the output variable
-bins = NaN(2,nBin,nSub);
-
-% For each type of regularity, get marginal histrograms of finger's
-% position along the relevant dimension
-for iHyp = 1:2
-    y = cellfun(@(x) histc(x(:,iHyp), pg)', subpoints(:,iHyp), 'UniformOutput', 0);
-    y = cellfun(@(x) x./sum(x), y, 'UniformOutput', 0); % normalize it
-    bins(iHyp,:,:) = cell2mat(y)';
-end
-
-% Average over subjects
-avgbins = mean(bins, 3);
-sembins = sem(bins, 3);
-
-% Compare marginal histograms
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Prepare a new window
-figure('Position', [1 225 200 300]); lgd = NaN(1,2);
-
-% Useful variables
-x = pg+1/(nBin-1)/2; % x-axis
-d = [1,-1]; % to plot it symmetrically
-
-% For each type of regularity, plot the histogram in a symmetrical manner
-for iHyp = 1:2
-    lgd(iHyp) = bar(x, d(iHyp).*avgbins(iHyp,:), 0.9, 'FaceColor', ...
-        tricol(iHyp,:), 'EdgeColor', 'none'); hold('on');
-    plot(repmat(x', 2, 1), d(iHyp).*avgbins(iHyp,:) + ...
-        sembins(iHyp,:).*[-1;1], 'k-', 'LineWidth', 1/2);
-    plot([0,1], (-2*(iHyp==2)+ones(1,2))/nBin, '-', 'Color', g, 'LineWidth', 1);
-end
-
-% Overlap a line along zero 
-plot([0,1], zeros(1,2),  'k-');
-
-% Customize the axes
-ylim([-max(abs(ylim)), max(abs(ylim))]);
-set(gca, 'Box', 'Off', 'XLim', [0,1]);
-set(gca, 'YTick', get(gca, 'YTick'), 'YTickLabel', cellfun(@(x) ...
-    sprintf('%1.2f', x), num2cell(abs(get(gca, 'YTick'))), 'UniformOutput', 0));
-view([-90, 90]);
-
-% Display bins for which the difference is significant
-dif = squeeze(bins(1,:,:) - bins(2,:,:));
-h = ttest(dif');
-h(isnan(h)) = 0;
-plot(pg(logical(h)), max(ylim)-0.05*diff(ylim), 'kp', ...
-    'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'none');
-
-% Add some text labels
-xlabel('Strength of beliefs');
-ylabel('Frequency');
-legend(lgd, cellfun(@(x) x(1:5), proclab(1:2), 'UniformOutput', 0), ...
-    'Orientation', 'Horizontal', 'Location', 'NorthOutside');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_MargHistS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_MargHistIO.pdf'));
 end
