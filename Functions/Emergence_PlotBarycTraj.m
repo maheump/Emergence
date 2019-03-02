@@ -30,4 +30,7 @@ f(2) = fill([x,fliplr(x)], [cum_pMs(:,1); flipud(cum_pMs(:,2))]', ...
 f(3) = fill([x,fliplr(x)], [cum_pMs(:,1); zeros(nObs,1)]', ...
     'k', 'FaceColor', tricol(1,:), 'LineWidth', 1);
 
+% Scale the axes properly
+axis([1,nObs,0,1]);
+
 end
