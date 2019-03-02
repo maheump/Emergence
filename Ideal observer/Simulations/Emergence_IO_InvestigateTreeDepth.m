@@ -10,12 +10,6 @@
 % Clear the place
 clear; close('all');
 
-% Add ideal observer functions to the MATLAB path
-scriptpath = mfilename('fullpath');
-ind = strfind(scriptpath,'Emergence');
-folderpath = scriptpath(1:ind(end-1)+8);
-addpath(genpath(folderpath));
-
 % Set default figure properties
 Emergence_DefaultFigureProperties;
 
