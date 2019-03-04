@@ -21,7 +21,7 @@ end
 % Select example sequences to look at
 sublist  = [22 27 28];
 condlist = [10 19 22];
-nSeq  = numel(sublist);
+nExpSeq  = numel(sublist);
 
 % Prepare the window
 figure('Position', [1 805 800 300]);
@@ -30,7 +30,7 @@ figure('Position', [1 805 800 300]);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % For each sequence
-for iSeq = 1:nSeq
+for iSeq = 1:nExpSeq
     cond = condlist(iSeq);
     sub = sublist(iSeq);
     subplot(3,1,iSeq); hold('on');
@@ -77,7 +77,7 @@ save2pdf(fullfile(ftapath, 'figs', 'F_ET_ExpSeqs.pdf'));
 figure('Position', [1 431 800 300]);
 
 % For each sequence
-for iSeq = 1:nSeq
+for iSeq = 1:nExpSeq
     
     % For both the subject and the ideal observer
     for iObs = 1:2        
@@ -88,13 +88,13 @@ for iSeq = 1:nSeq
         % Plot the trajectory within the triangle
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ipos = iSeq + 3*(iObs-1) + 5*(iSeq-1);
-        subplot(nSeq, 2*(1+2), ipos);
+        subplot(nExpSeq, 2*(1+2), ipos);
         Emergence_PlotTrajOnTri(X.BarycCoord, X.Jump+1/2, tricol, 6);
         Emergence_PlotGridOnTri(3);
         
         % Plot the Barycentric coordinates
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        subplot(nSeq, 2*(1+2), (1:2) + ipos);
+        subplot(nExpSeq, 2*(1+2), (1:2) + ipos);
         Emergence_PlotBarycTraj(X.BarycCoord, tricol);
         
         % Append help lines
@@ -128,12 +128,13 @@ trajgp = {{'Discrete vs', 'continuous'}, ...
           {'Beliefs''', 'updating'}, ...
           {'Confidence', 'build-up'}, ...
           {'Levels of', 'confidence'}};
+nExpSeq  = numel(sublist);
 
 % Prepare a new window
 figure('Position', [802 658 800 447]);
 
 % For each sequence
-for iSeq = 1:numel(trajnames)
+for iSeq = 1:nExpSeq
     
     % Plot the trajectory within the triangle
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
