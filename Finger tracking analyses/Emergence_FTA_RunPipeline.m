@@ -46,6 +46,9 @@ Emergence_FTA_TrajMovie;
 rmbadsub = true;
 Emergence_FTA_LoadData;
 
+% Display which sequences are used in which analyses
+Emergence_FTA_SelectionFilters;
+
 % Analyse data separately from both the subjects and from the ideal observer
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
