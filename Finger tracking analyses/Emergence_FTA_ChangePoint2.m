@@ -36,7 +36,7 @@ for iHyp = 1:2
     sp = cellfun(@(x) x.Questions(3), D(cidx{iHyp},:));
     
     % Remove sequences in which regularities were not detected
-    detecmask = logical(cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:)));
+    detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
     cp(~detecmask) = NaN;
     sp(~detecmask) = NaN;
     

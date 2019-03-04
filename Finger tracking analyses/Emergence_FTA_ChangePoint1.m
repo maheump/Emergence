@@ -33,7 +33,7 @@ for iHyp = 1:2
     bel = cellfun(@(x) x.(lab)(:,end)', IO(cidx{iHyp},:), 'UniformOutput', 0);
     
     % Get sequences that were corretly labeled 
-    detecmask = logical(cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:)));
+    detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
     
     % Get the posterior distribution of change point's position separately
     % for (in)correctly labeled sequences
