@@ -22,10 +22,6 @@ Emergence_FTA_LoadData;
 orders = 1:9;
 nOrd = numel(orders);
 
-% Restrict to sequences with deterministic regularities only
-nCond = size(G,1);
-conds = 1:nCond;
-
 % Define options for the observer
 pEd    = 0;                 % probability of making a memory error at each observation
 pEp    = 0;                 % probability of making a memory error at each observation
@@ -39,7 +35,7 @@ pgrid  = [];                % precision of the posterior over theta
 verb   = 0;                 % do not output messages in the command window
 
 % Prepare the output variable
-mIO = cell(nOrd,nCond,nSub); % conditions x subjects cell matrix with IO's inference
+mIO = cell(nOrd,nSeq,nSub); % conditions x subjects cell matrix with IO's inference
 
 %% SIMULATIONS
 %  ===========
@@ -48,12 +44,12 @@ mIO = cell(nOrd,nCond,nSub); % conditions x subjects cell matrix with IO's infer
 for iSub = 1:nSub
 
     % For each condition
-    for iCond = 1:nCond
+    for iSeq = 1:nSeq
         fprintf('- Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f...\n', ...
-            iCond, nCond, iSub, nSub);
+            iSeq, nSeq, iSub, nSub);
 
         % Get the sequence
-        seq = G{conds(iCond),iSub}.Seq;
+        seq = G{iSeq,iSub}.Seq;
 
         % For each order of the Markov chain
         for iOrd = 1:nOrd
@@ -63,7 +59,7 @@ for iSub = 1:nSub
 
             % Run the observer with these options
             io = Emergence_IO_FullIO(seq, pEd, pEp, patlen, stat, pR, pT, pJ, comp, scale, pgrid, verb);
-            mIO{iOrd,iCond,iSub} = cat(1, io.pYgMsp, io.pYgMsd, io.pYgMss)';
+            mIO{iOrd,iSeq,iSub} = cat(1, io.pYgMsp, io.pYgMsd, io.pYgMss)';
         end
 
         % Save temporary file
@@ -83,7 +79,7 @@ pYgMsp = cell2mat(cellfun(@(x) x(:,1), mIO(1,:,:), 'UniformOutput', 0)); % 1st-o
 pYgMsd = cell2mat(cellfun(@(x) x(:,2), mIO(1,:,:), 'UniformOutput', 0)); % pattern learner
 pYgMss = cell2mat(cellfun(@(x) x(:,3), mIO(1,:,:), 'UniformOutput', 0)); % fully-stochastic
 pYgMsc = cell2mat(cellfun(@(x) x(:,1), reshape(permute(mIO, ...          % higher-order Markov chains
-    [2,3,1]), [1,nCond,nSub,nOrd]), 'UniformOutput', 0));
+    [2,3,1]), [1,nSeq,nSub,nOrd]), 'UniformOutput', 0));
 
 % Combine the together different deterministic hypothesis
 pYgMsd = cat(4, pYgMsc, pYgMsd);
@@ -130,14 +126,14 @@ for iReg = 1:2
     figure('Position', [200+760*(iReg-1) 565 760 540]);
     
     % For each sequence with a deterministic regularity
-    for iCond = 1:nRegCond
-        subplot(4,4,SpPos{iReg}(iCond));
+    for iSeq = 1:nRegCond
+        subplot(4,4,SpPos{iReg}(iSeq));
         
         % For each type of deterministic hypothesis
         for iOrd = 1:nOrd+1
             
             % Display averaged hypothesis likelihood
-            plotMSEM(ObsWin, Avg(:,iCond,iOrd), Err(:,iCond,iOrd), ...
+            plotMSEM(ObsWin, Avg(:,iSeq,iOrd), Err(:,iSeq,iOrd), ...
                 0.15, ColMap(iOrd,:), ColMap(iOrd,:), 2);
         end
         
@@ -152,9 +148,9 @@ for iReg = 1:2
         set(gca, 'Box', 'Off');
         
         % Add some text labels
-        if SpPos{iReg}(iCond) == 1, xlabel('Position w.r.t. change point'); end
-        if     iReg == 1, ylabel('p(Hp|y)'); title(pr{iCond});
-        elseif iReg == 2, ylabel('p(Hd|y)'); title(dr{iCond});
+        if SpPos{iReg}(iSeq) == 1, xlabel('Position w.r.t. change point'); end
+        if     iReg == 1, ylabel('p(Hp|y)'); title(pr{iSeq});
+        elseif iReg == 2, ylabel('p(Hd|y)'); title(dr{iSeq});
         end
     end
 end
@@ -163,13 +159,13 @@ end
 %  =====================================================================
 
 % Prepare the output variable
-rho = NaN(nSub,nOrd+1,nCond);
+rho = NaN(nSub,nOrd+1,nSeq);
 
 % For each type of deterministic hypothesis
 for iOrd = 1:nOrd+1
     
     % For each sequence
-    for iSeq = 1:nCond
+    for iSeq = 1:nSeq
         
         % For each subject
         for iSub = 1:nSub
