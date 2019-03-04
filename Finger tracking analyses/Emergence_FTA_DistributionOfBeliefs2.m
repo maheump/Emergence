@@ -54,23 +54,6 @@ tribaryccoord = cellfun(@(x) cartes2baryc(x, tcn), tricartescoord, 'UniformOutpu
 % Get limits in the 3 barycentric dimensions of each triangular bin
 barycbinlim = cellfun(@(x) [min(x,[],2)'; max(x,[],2)'], tribaryccoord, 'UniformOutput', 0);
 
-% Locate subjects' accurate labels of sequences' generative process
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Define whether to restric the analysis to sequences that have corretly
-% been labelled
-keepall = true;
-
-% Subjects' judgment of whether a regularity was observed in each sequence
-if ~keepall
-    trueproc = cellfun(@(x) find(strcmpi(x.Cond(1), {'P','D','S'})), G);
-    subreport = cellfun(@(x) x.Questions(2), G);
-    subreport(isnan(subreport)) = 3;
-    detecmask = subreport == trueproc;
-elseif keepall
-    detecmask = true(size(G));
-end
-
 % Plot the results
 % ~~~~~~~~~~~~~~~~
 
