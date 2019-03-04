@@ -112,37 +112,31 @@ save2pdf(fullfile(ftapath, 'figs', 'F_HW_DeterRegTP.pdf'));
 %% SHOW THE TRANSIENT TENSION BETWEEN REGULAR HYPOTHESES
 %  =====================================================
 
+% Find important points
+% ~~~~~~~~~~~~~~~~~~~~~
+
+% Find positions of change and detection points
+cp = cellfun(@(x) x.Jump+1/2, G(cidx{2},:));
+lag = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,2)), D(cidx{2},:), num2cell(cp));
+dp = cp + lag;
+
+% Restrict to sequences that were accurately classified by subjects and
+% with a regular detection point for the 
+detecmask = (filter{2} == 3);
+cp (~detecmask) = NaN;
+dp (~detecmask) = NaN;
+lag(~detecmask) = NaN;
+
 % Align observers' trajectories in sequences with deterministic
 % regularities to the detection points
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Theshold in beliefs that define the detection points
-detecthr = 1/2;
 
 % Window in which to look in (in # of observations)
 xval = -130:60;
 nsp = numel(xval);
 
-% Get the detection point's position
-% (note that we go back in time from the end of the sequence in order
-% to avoid as much as possible the false alarms that might exist at the
-% time of the change point)
-cdp = cellfun(@(x) min([NaN, ...
-    N - find(flipud(x.BarycCoord( x.Jump + 1/2: end, 2)) ...
-    >= detecthr, 1, 'last')], [], 'OmitNaN'), ... % in # of observations
-    D(cidx{2},:), 'UniformOutput', 0); % cells
-    
-% Only detected regularities
-detecmask = cellfun(@(x) x.Questions(2) == 2, G(cidx{2},:));
-cdp(~detecmask) = {NaN};
-
-% Get distance from change point
-cp = cellfun(@(x) x.Jump + 1/2, D(cidx{2},:));
-cp(~detecmask) = NaN;
-distfromcp = cp - cell2mat(cdp);
-
 % Beginning and ending of the window to look into
-idx = cellfun(@(x) x+xval, cdp, 'UniformOutput', 0);
+idx = arrayfun(@(x) x+xval, dp, 'UniformOutput', 0);
 
 % Create a useful logical indexing that makes sure that the window around
 % the detection point does not go beyond the observations' indices of the
@@ -214,9 +208,16 @@ plot(zeros(1,2), [-1,1], '-', 'Color', g);
 % Display the P/D ratio centered on the detection point
 plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
 
-% Display distribution of change point's position
-[fout0,xout] = ksdensity(distfromcp(:), 'Bandwidth', 8);
-fill(xout, 5.*fout0-1, 'k', 'FaceColor', g, 'EdgeColor', 'k');
+% Display distribution of change point position
+[fout0, xout] = ksdensity(  -lag(:), ...        % which distribution to plot
+    'BandWidth',            8, ...              % bandwidth of the kernel smoothing window 
+    'Support',              [-Inf,1], ...       % restrict the kernel to a certain range of values
+    'BoundaryCorrection',   'Reflection', ...   % type of correction for the boundaries
+    'NumPoints',            1e4);               % size of the grid
+idx = xout <= 0;
+fout0 = fout0(idx);
+xout = xout(idx);
+fill([xout(1),xout,xout(end)], [0,fout0.*5,0]-1, 'k', 'FaceColor', g);
 
 % Customize the axes
 caxis([-1,1]);
@@ -325,12 +326,10 @@ end
 
 % Get the average beliefs in the probabilistic hypothesis between the
 % change and the detection points
-cdp(cellfun(@isnan, cdp)) = {[]};
+celldp = num2cell(dp);
+celldp(cellfun(@isnan, celldp)) = {[]};
 transpbel = cellfun(@(x,d) mean(x.BarycCoord((x.Jump+1/2):d,1)), ...
-    D(cidx{2},:), cdp);
-
-% Remove sequences with deterministic regularities that were not detected
-transpbel(~detecmask) = NaN;
+    D(cidx{2},:), celldp);
 
 % For each subject, average the trajectories
 data = NaN(nSub,nEnt);
@@ -362,9 +361,6 @@ Emergence_PlotSubGp(data, EntCMap(colidx,:));
 xlim([0,nEnt+1]); ylim([0, max(ylim)]);
 set(gca, 'Box', 'Off');
 set(gca, 'XTick', 1:nEnt, 'XTickLabel', EntLab);
-
-% Display whether the difference is significant or not
-Emergence_DispStatTest(data);
 
 % Add some text labels
 ylabel('Posterior beliefs p(M_P|y)');
