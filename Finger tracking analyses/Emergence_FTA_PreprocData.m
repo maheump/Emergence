@@ -167,21 +167,21 @@ for iSub = 1:nSub
     % ~~~~~~~~~~~~~~~~~~~~
     
     % For each condition
-    for iCond = 1:nSeq
+    for iSeq = 1:nSeq
         
         % Get the number of observations in the sequence
-        N = numel(G{iCond,iSub}.Seq);
+        N = numel(G{iSeq,iSub}.Seq);
         
         % Correct trajectories to be sure that the finger is within the
         % triangle
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         % Get the finger's movements
-        traj = G{iCond,iSub}.DiscreteMouseCoord';
+        traj = G{iSeq,iSub}.DiscreteMouseCoord';
         
         % Correct trajectories
         traj = Emergence_ProjOnTri(traj, tripxl);
-        G{iCond,iSub}.CartesCoord = traj;
+        G{iSeq,iSub}.CartesCoord = traj;
         
         % Convert these x/y coordinates into barycentric ones
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,7 +202,7 @@ for iSub = 1:nSub
         % 1: probabilistic component
         % 2: deterministic component
         % 3: stochastic component
-        G{iCond,iSub}.BarycCoord = lambda;
+        G{iSeq,iSub}.BarycCoord = lambda;
     end
 end
 
@@ -229,58 +229,58 @@ verb   = 0;                 % do not output messages in the command window
 for iSub = 1:nSub
     
     % For each condition
-    for iCond = 1:nSeq
+    for iSeq = 1:nSeq
         fprintf('- Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f... ', ...
-            iCond, nSeq, iSub, nSub);
+            iSeq, nSeq, iSub, nSub);
         
         % Run the observer with these options
-        IO{iCond,iSub} = Emergence_IO_FullIO(G{iCond,iSub}.Seq, ... % sequence
+        IO{iSeq,iSub} = Emergence_IO_FullIO(G{iSeq,iSub}.Seq, ... % sequence
             pEd, pEp, patlen, stat, pR, pT, pJ, comp, scale, pgrid, verb);  % options
         
         % Remove unnecessary fields to light up the output MATLAB file
-        IOf = fields(IO{iCond,iSub});
+        IOf = fields(IO{iSeq,iSub});
         fieldstokeep = {'pMssgY', 'pMspgY', 'pMsdgY', 'Mhat', ... % posterior over models' likelihood
                         'pJkgYMsp', 'pJkgYMsd', 'pJkgY', ...      % posterior over change point's pos.
                         'JSpMgY', 'HpMgY'};                       % other metrics
         fieldstorem  = cellfun(@(x) ~any(strcmpi(x, fieldstokeep)), IOf);
-        IO{iCond,iSub} = rmfield(IO{iCond,iSub}, IOf(fieldstorem));
+        IO{iSeq,iSub} = rmfield(IO{iSeq,iSub}, IOf(fieldstorem));
         
         % Append the "Jump" subfield (the IO does not know its true position)
-        IO{iCond,iSub}.Jump = G{iCond,iSub}.Jump;
+        IO{iSeq,iSub}.Jump = G{iSeq,iSub}.Jump;
         
         % Create a variable with all models' posterior probability
-        IO{iCond,iSub}.BarycCoord = [IO{iCond,iSub}.pMspgY', ... % 1: probabilistic component
-                                     IO{iCond,iSub}.pMsdgY', ... % 2: deterministic component
-                                     IO{iCond,iSub}.pMssgY'];    % 3: stochastic    component
+        IO{iSeq,iSub}.BarycCoord = [IO{iSeq,iSub}.pMspgY', ... % 1: probabilistic component
+                                    IO{iSeq,iSub}.pMsdgY', ... % 2: deterministic component
+                                    IO{iSeq,iSub}.pMssgY'];    % 3: stochastic    component
         
         % Create a variable with (corrected) cartesian coordinates
-        traj = round(IO{iCond,iSub}.BarycCoord * tricoord);
-        IO{iCond,iSub}.DiscreteMouseCoord = traj;
-        IO{iCond,iSub}.CartesCoord = Emergence_ProjOnTri(traj, tripxl);
+        traj = round(IO{iSeq,iSub}.BarycCoord * tricoord);
+        IO{iSeq,iSub}.DiscreteMouseCoord = traj;
+        IO{iSeq,iSub}.CartesCoord = Emergence_ProjOnTri(traj, tripxl);
         
         % Ask the same questions to the ideal observer as those that were
         % asked to the subjects
-        IO{iCond,iSub}.Questions = NaN(1,6);
+        IO{iSeq,iSub}.Questions = NaN(1,6);
         
         % 1) Regularity?
-        if IO{iCond,iSub}.Mhat(end) == 1
-            IO{iCond,iSub}.Questions(1) = 2; % no regularity found
+        if IO{iSeq,iSub}.Mhat(end) == 1
+            IO{iSeq,iSub}.Questions(1) = 2; % no regularity found
             
         % 2) Which type?
         else
-            IO{iCond,iSub}.Questions(1) = 1; % a regularity was found
-            IO{iCond,iSub}.Questions(2) = IO{iCond,iSub}.Mhat(end) - 1;
+            IO{iSeq,iSub}.Questions(1) = 1; % a regularity was found
+            IO{iSeq,iSub}.Questions(2) = IO{iSeq,iSub}.Mhat(end) - 1;
             % 1 for probabilistic, 2 for deterministic
             
             % 3) p(Jump)?
-            if IO{iCond,iSub}.Questions(2) == 1
-                pJump = IO{iCond,iSub}.pJkgYMsp(:,end);
-            elseif IO{iCond,iSub}.Questions(2) == 2
-                pJump = IO{iCond,iSub}.pJkgYMsd(:,end);
+            if IO{iSeq,iSub}.Questions(2) == 1
+                pJump = IO{iSeq,iSub}.pJkgYMsp(:,end);
+            elseif IO{iSeq,iSub}.Questions(2) == 2
+                pJump = IO{iSeq,iSub}.pJkgYMsd(:,end);
             end
             [val,idx] = max(pJump);
-            IO{iCond,iSub}.Questions(3) = idx; % change point's position
-            IO{iCond,iSub}.Questions(4) = val; % confidence in change point's position
+            IO{iSeq,iSub}.Questions(3) = idx; % change point's position
+            IO{iSeq,iSub}.Questions(4) = val; % confidence in change point's position
         end
     end
 end
@@ -321,5 +321,5 @@ savefolder = fullfile(folderpath, 'Finger tracking analyses', 'ppdata');
 mkdir(savefolder);
 filename = fullfile(savefolder, 'Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'folderpath', ...
-    'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nCond', ...
+    'c', 'r', 'sr', 'pr', 'dr', 'proclab', 'subjects', 'nSub', 'nSeq', ...
     'tricol', 'tricc', 'letters', 'prob', 'det', 'g');
