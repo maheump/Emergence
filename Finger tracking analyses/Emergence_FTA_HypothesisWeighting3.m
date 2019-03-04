@@ -84,24 +84,29 @@ onlystoch = true;
 % Define the number of bins to use when plotting the results
 nBin = 10;
 
+% Select the sequences to look at
+% 1: all fully-stochastic parts
+% 2: only fully-stochastic sequences
+% 3: only fully-stochastic sequences that were correctly labeled
+% 4: only first-part of stochastic-to-regular sequences
+restopt = 1;
+
 % Perform subject-specific regressions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Select data (all or only fully-stochastic parts)
-if      onlystoch, obsidx = cellfun(@(x) x.Gen == 1, G, 'UniformOutput', 0);
-elseif ~onlystoch, obsidx = cellfun(@(x) true(1,N),  G, 'UniformOutput', 0);
-end
+% Select observations
+randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 
 % Get subjects' P/D ratio
 pHpgYpHdgY_sub = cellfun(@(x,i) x.BarycCoord(i,2) ./ sum(x.BarycCoord(i,1:2), 2), ...
-    G, obsidx, 'UniformOutput', 0);
+    G, randidx, 'UniformOutput', 0);
 
 % Get ideal observer's P/D ratio
 pHpgYpHdgY_IO = cellfun(@(x,i) x.BarycCoord(i,2) ./ sum(x.BarycCoord(i,1:2), 2), ...
-    IO, obsidx, 'UniformOutput', 0);
+    IO, randidx, 'UniformOutput', 0);
 
 % Get ideal observer's belief in the fully-stochastic hypothesis
-pHsgY_IO = cellfun(@(x,i) x.BarycCoord(i,3), IO, obsidx, 'UniformOutput', 0);
+pHsgY_IO = cellfun(@(x,i) x.BarycCoord(i,3), IO, randidx, 'UniformOutput', 0);
 
 % Define bins' edges based on percentiles computed from the ideal
 % observer's estimated probabilities

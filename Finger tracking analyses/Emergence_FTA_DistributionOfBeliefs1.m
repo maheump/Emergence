@@ -2,7 +2,7 @@
 % triangular arena for the different types of sequences. Moreover, the
 % marginal histograms (along the relevant dimension) for the two types of
 % regularity (probabilistic and deterministic ones) are compared.
-%
+% 
 % Copyright (c) 2018 Maxime Maheu
 
 % Define option
@@ -14,35 +14,35 @@ restodet = true;
 % Get the different conditions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Length of the sequences
-N = numel(G{1}.Seq);
-
-% Create indices...
-idxtrimap = cell(1,4);
+% Prepare the output variable
+idxtrimap = repmat({cellfun(@(x) false(N,1), G, 'UniformOutput', 0)}, 1, 4);
 
 % First part of stochastic-to-regular sequences
-idxtrimap{1} = cellfun(@(x) find(x.Gen == 1), G, 'UniformOutput', 0);
-idxtrimap{1}(setdiff(1:size(G,1), cell2mat(cidx(1:2))),:) = {[]};
+idxtrimap{1} = Emergence_SelectFullyStochSeq(G, filter, 4);
 
-% Get subjects' responses
-detecmask = cellfun(@(x) x.Questions(2), G);
-detecmask(isnan(detecmask)) = 3;
+% Fully-stochastic sequences that were correctly labelled
+if    ~restodet, idxtrimap{4} = Emergence_SelectFullyStochSeq(G, filter, 2);
+elseif restodet, idxtrimap{4} = Emergence_SelectFullyStochSeq(G, filter, 3);
+end
 
 % For sequences entailing regularities
-for iHyp = 1:3
+for iHyp = 1:2
     
-    % Get indices of post-change-point observations
-    if iHyp < 3
-        idxtrimap{iHyp+1} = cellfun(@(x) (x.Jump-1/2):N, G, 'UniformOutput', 0);
-    elseif iHyp == 3
-        idxtrimap{iHyp+1} = repmat({1:N}, size(G));
-    end
+    % Get change point position
+    cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:));
+    
+    % Get logical indices of post-change-point observations
+    idx = arrayfun(@(c) [false(c-1/2,1); true(N-c+1/2,1)], cp, 'UniformOutput', 0);
     
     % Keep only indices for sequences with the current type of regularity
-    idxtrimap{iHyp+1}(setdiff(1:size(G,1), cidx{iHyp}),:) = {[]};
+    idxtrimap{iHyp+1}(cidx{iHyp},:) = idx;
     
     % Keep only sequences that have been correctly identified
-    if restodet, idxtrimap{iHyp+1}(detecmask ~= iHyp) = {[]}; end
+    if restodet
+        detecmask = false(size(G));
+        detecmask(cidx{iHyp},:) = (filter{iHyp} == 1 | filter{iHyp} == 3);
+        idxtrimap{iHyp+1}(~detecmask) = {false(N,1)};
+    end
 end
 
 % Define properties of the triangular histogram

@@ -14,7 +14,8 @@
 % Define options
 % ~~~~~~~~~~~~~~
 
-% Focus on false alarms toward 
+% The likelihood of the fully-stochastic hypothesis also quantifies the
+% extent of false alarms
 iHyp = 3;
 
 % Define the number of bins to use
@@ -34,23 +35,8 @@ restopt = 3;
 % ideal observer's beliefs in the probabilistic hypothesis
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Select moment in which sequences do not entail any regularities
-randidx = cellfun(@(x) find(x.Gen == 1)', G, 'UniformOutput', 0);
-
-% Restric to fully-stochastic sequences
-if restopt == 2 || restopt == 3
-    randidx(cell2mat(cidx(1:2)),:) = {[]};
-    
-    % Restric to those that were correctly labeled
-    if restopt == 3
-        detecmask = cellfun(@(x) isnan(x.Questions(2)), G(cidx{3},:));
-        randidx(~detecmask) = {[]};
-    end
-    
-% Restric to first part of stochastic-to-regular sequences
-elseif restopt == 4
-    randidx(cidx{3},:) = {[]};
-end
+% Select observations
+randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 
 % Get probability bins
 if strcmpi(binmeth, 'unif') % bins of the same amplitude
@@ -63,9 +49,9 @@ else, error('Please check the binnig method that is provided');
 end
 
 % Prepare output variables
-binsubn      = NaN(nBin,nSub);
-binsubtraj   = NaN(nBin,3,nSub);
-biniotraj    = NaN(nBin,3,nSub);
+binsubn    = NaN(nBin,  nSub);
+binsubtraj = NaN(nBin,3,nSub);
+biniotraj  = NaN(nBin,3,nSub);
 
 % For each subject
 for iSub = 1:nSub

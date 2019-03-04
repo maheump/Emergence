@@ -12,25 +12,23 @@
 % Define the number of bins to use (must be a multiple of 200)
 nBin = 10;
 
-% Select the sequences to look at: fully-stochastic sequences from the
-% beginning to the end that are (restodet = true) or not (restodet = false)
-% necessarily correctly labeled
-restodet = true;
+% Select the sequences to look at
+% 1: all fully-stochastic parts
+% 2: only fully-stochastic sequences
+% 3: only fully-stochastic sequences that were correctly labeled
+% 4: only first-part of stochastic-to-regular sequences
+restopt = 3;
 
 % Average hypotheses likelihood in different parts of the sequences
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% Select observations
+randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
+
 % Get data from fully-stochastic sequences
-nSeq = numel(cidx{3});
-data = cellfun(@(x) x.BarycCoord, D(cidx{3},:), 'UniformOutput', 0);
+data = cellfun(@(x,i) [x.BarycCoord(i,:); NaN(sum(~i),3)], D, randidx, 'UniformOutput', 0);
 
-% Restrict to sequences that were correctly labeled as fully-stochastic
-if restodet
-    detecmask = cellfun(@(x) isnan(x.Questions(2)), G(cidx{3},:));
-    data(~detecmask) = {NaN(N,3)};
-end
-
-% Group positions in the triangle by consecutive bons of n trials
+% Group positions in the triangle by consecutive bins of n trials
 binavg = cell2mat(cellfun(@(x) reshape(x, [1 1 N 3]), data, 'UniformOutput', 0));
 binavg = permute(binavg, [3 4 2 1]);
 binavg = mat2cell(binavg, repmat(N/nBin,nBin,1,1,1), ...
