@@ -144,11 +144,11 @@ for iSub = 1:nSub
     
     % Get ordered trials' list
     ortrlist = [stochidx, probaidx, deteridx];
-    nCond = numel(ortrlist);
+    nSeq = numel(ortrlist);
     
     % Prepare the output variable
     if iSub == 1
-        G = cell(nCond, nSub);
+        G = cell(nSeq, nSub);
         S = cell(1, nSub);
     end
     
@@ -167,7 +167,7 @@ for iSub = 1:nSub
     % ~~~~~~~~~~~~~~~~~~~~
     
     % For each condition
-    for iCond = 1:nCond
+    for iCond = 1:nSeq
         
         % Get the number of observations in the sequence
         N = numel(G{iCond,iSub}.Seq);
@@ -229,9 +229,9 @@ verb   = 0;                 % do not output messages in the command window
 for iSub = 1:nSub
     
     % For each condition
-    for iCond = 1:nCond
+    for iCond = 1:nSeq
         fprintf('- Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f... ', ...
-            iCond, nCond, iSub, nSub);
+            iCond, nSeq, iSub, nSub);
         
         % Run the observer with these options
         IO{iCond,iSub} = Emergence_IO_FullIO(G{iCond,iSub}.Seq, ... % sequence
