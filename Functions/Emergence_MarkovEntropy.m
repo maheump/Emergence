@@ -1,6 +1,6 @@
 function H = Emergence_MarkovEntropy( pAgB, pBgA )
-%EMERGENCE_MARKOVENTROPY computes Shannon entropy of a set of transition
-%probabilities.
+% EMERGENCE_MARKOVENTROPY computes Shannon entropy of a set of transition
+% probabilities.
 %   - "pAgB": a scalar specifying the value of p(A|B).
 %   - "pBgA": a scalar specifying the value of p(B|A).
 %
