@@ -139,7 +139,7 @@ for iSub = 1:nSub
     [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
     
     % Build the design matrix
-    obsidx = cell2mat(randidx(:,iSub));
+    obsidx = cell2mat(cellfun(@find, randidx(:,iSub), 'UniformOutput', 0));
     desmat = [ones(numel(obsidx),1), iobel(:,iHyp), obsidx];
     
     % Center predictors
