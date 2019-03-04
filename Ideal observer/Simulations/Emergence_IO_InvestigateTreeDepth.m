@@ -75,17 +75,6 @@ delete('Emergence_IO_InvestigateTreeDepth_tmp.mat');
 %% COMPUTE SIMILARITY MATRICES
 %  ===========================
 
-% Whether to restrict the analysis to sequences that were correctly
-% identified by subjects (allows comparison with other analyses in which
-% data from only accurately detected regularities are shown)
-RestToIdent = true;
-
-% Get correctly labeled sequences
-TrueSeqType = cellfun(@(x) find(strcmpi(x.Cond(1), {'P', 'D', 'S'})), G);
-ReportedSeqType = cellfun(@(x) x.Questions(2), G);
-ReportedSeqType(isnan(ReportedSeqType)) = 3;
-CorrectIdent = TrueSeqType == ReportedSeqType;
-
 % Prepare the output variables
 CorMat = NaN(nNu,nNu,nSub,nSeq);
 MseMat = CorMat;
@@ -95,25 +84,20 @@ for iSeq = 1:nSeq
     
     % For each subject
     for iSub = 1:nSub
-        
-        % Remove data from sequences that were not correctly labeled by
-        % human subjects
-        if ~RestToIdent || RestToIdent && CorrectIdent(iSeq,iSub)
             
-            % For each pair of tree depth
-            for iNu1 = 1:nNu
-                for iNu2 = 1:nNu
-                    
-                    % Get posterior beliefs of observers using different tree depth
-                    x = pMdgY(2:end,iSub,iSeq,iNu1);
-                    y = pMdgY(2:end,iSub,iSeq,iNu2);
-                    
-                    % Measure the correlation between the two
-                    CorMat(iNu1,iNu2,iSub,iSeq) = corr(x, y);
-                    
-                    % Measure the mean squared difference between the two
-                    MseMat(iNu1,iNu2,iSub,iSeq) = log(mean((x - y) .^ 2));
-                end
+        % For each pair of tree depth
+        for iNu1 = 1:nNu
+            for iNu2 = 1:nNu
+                
+                % Get posterior beliefs of observers using different tree depth
+                x = [0; pMdgY(2:end,iSub,iSeq,iNu1)];
+                y = [0; pMdgY(2:end,iSub,iSeq,iNu2)];
+                
+                % Measure the correlation between the two
+                CorMat(iNu1,iNu2,iSub,iSeq) = corr(x, y);
+                
+                % Measure the mean squared difference between the two
+                MseMat(iNu1,iNu2,iSub,iSeq) = log(mean((x - y) .^ 2));
             end
         end
     end

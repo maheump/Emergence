@@ -98,11 +98,6 @@ pMgY = cat(5, pMspgY, pMsdgY, pMssgY); % concatenate posterior probabilities
 %% DISPLAY DYNAMICS AROUND CHANGE POINT
 %  ====================================
 
-% Whether to restrict the analysis to sequences that were correctly
-% identified by subjects (allows comparison with other analyses in which
-% data from only accurately detected regularities are shown)
-RestToIdent = true;
-
 % Window around change point to look into (in number of observations)
 ObsWin = -50:50;
 
@@ -122,13 +117,6 @@ for iReg = 1:2
     WinIO = mat2cell(pMgY(:,cidx{iReg},:,:,iReg), ...
         N, ones(nRegCond,1), ones(1,nSub), nOrd+1);
     
-    % Remove data from sequences that were not correctly labeled by human
-    % subjects
-    if RestToIdent
-        detecmask = cellfun(@(x) x.Questions(2) == iReg, G(cidx{iReg},:));
-        WinIO(~reshape(detecmask, [1, size(detecmask)])) = {NaN(size(WinIO{1}))};
-    end
-    
     % Select sequence likelihood around change point's position
     CP = cellfun(@(x) x.Jump - 1/2, G(cidx{iReg},:), 'UniformOutput', 0); 
     WinIO = cell2mat(cellfun(@(x,i) x(i+ObsWin,:,:,:), ...
@@ -139,7 +127,7 @@ for iReg = 1:2
     Err = squeeze(sem(WinIO, 3));
     
     % Prepare a new window
-    figure('Position', [200+760*(iReg-1) 310 760 540]);
+    figure('Position', [200+760*(iReg-1) 565 760 540]);
     
     % For each sequence with a deterministic regularity
     for iCond = 1:nRegCond
@@ -170,3 +158,60 @@ for iReg = 1:2
         end
     end
 end
+
+%% QUANTITATIVELY COMPARE THE DIFFERENT TYPE OF DETERMINISTIC HYPOTHESES
+%  =====================================================================
+
+% Prepare the output variable
+rho = NaN(nSub,nOrd+1,nCond);
+
+% For each type of deterministic hypothesis
+for iOrd = 1:nOrd+1
+    
+    % For each sequence
+    for iSeq = 1:nCond
+        
+        % For each subject
+        for iSub = 1:nSub
+            
+            % Get predictions of the ideal observer model
+            Xi = squeeze(pMgY(:,iSeq,iSub,iOrd,:));
+            Xi(1,:) = [0,0,1];
+            Xi = Xi(:);
+            
+            % Get reported probabilities by the subject
+            Yi = G{iSeq,iSub}.BarycCoord;
+            Yi = Yi(:);
+            
+            % Measure the Pearson correlation between the two
+            rho(iSub,iOrd,iSeq) = corr(Xi, Yi);
+        end
+    end
+end
+
+% Average over sequences
+avgcoef = mean(rho, 3);
+
+% Compare correlation coefficients obtained for the fully-deterministic
+% hypothesis with correlation coefficients obtained with
+% pseudo-deterministic hypotheses (high-order Markov chains)
+[~,pval,ci,stats] = ttest(avgcoef(:,end) - avgcoef(:,1:end-1));
+Emergence_PrintTstats(pval,ci,stats);
+
+% Create a new window
+figure('Position', [682 71 560 420]); hold('on');
+
+% Display group-averaged correlation coefficients
+for iOrd = 1:nOrd+1
+    m = mean(avgcoef(:,iOrd));
+    s = sem(avgcoef(:,iOrd));
+    bar(iOrd, m, 'FaceColor', ColMap(iOrd,:));
+    plot(repmat(iOrd,1,2), m+[-1,1].*s, 'k-');
+end
+
+% Customize the axes
+set(gca, 'Box', 'Off', 'XTick', [], 'Ylim', [0.6, 0.8]);
+
+% Add some text labels
+xlabel('Deterministic hypotheses');
+ylabel('Correlation coefficient');
