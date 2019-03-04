@@ -6,6 +6,15 @@
 % N.B. To be run without subject exclusion. To do so, turn the boolean
 % variable "rmbadsub" in "Emergence_FTA_LoadData" to false.
 
+%% INITIALIZATION
+%  ==============
+
+% Make sure data from bad subjects is available
+if ~exist('rmbadsub', 'var') || rmbadsub
+    rmbadsub = false;
+    Emergence_FTA_LoadData;
+end
+
 %% 3 EXAMPLE SEQUENCES
 %  ===================
 
