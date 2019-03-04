@@ -6,9 +6,6 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% COMPUTE SUBJECT-SPECIFIC AVERAGE DETECTION LAG
-%  ==============================================
-
 % Correlate subjects' with ideal observer's beliefs
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
