@@ -16,8 +16,8 @@ paramlist = -50:50;
 nParam = numel(paramlist);
 
 % Prepare output variable
-coef = NaN(nParam, nCond, nSub); % R2 of interest
-bchm = NaN(nParam, nCond, nSub); % benchmark R2
+coef = NaN(nParam,nSeq,nSub); % R2 of interest
+bchm = NaN(nParam,nSeq,nSub); % benchmark R2
 
 % For each subject
 for iSub = 1:nSub
@@ -29,11 +29,11 @@ for iSub = 1:nSub
         p = paramlist(iParam);
         
         % For each sequence
-        for iCond = 1:nCond
+        for iSeq = 1:nSeq
             
             % Get relevant trajectories
-            subbel = G{iCond,iSub}.BarycCoord; % from the subject
-            iobel  = IO{iCond,iSub}.BarycCoord; % from the ideal observer
+            subbel = G{iSeq,iSub}.BarycCoord; % from the subject
+            iobel  = IO{iSeq,iSub}.BarycCoord; % from the ideal observer
             
             % Shift the subject's trajectory with respect to the ideal
             % observer's trajectory
@@ -47,7 +47,7 @@ for iSub = 1:nSub
             
             % Measure the correlation between subject's and ideal
             % observer's trajectories
-            coef(iParam,iCond,iSub) = Emergence_Regress(...
+            coef(iParam,iSeq,iSub) = Emergence_Regress(...
                 subtraj(:), iotraj(:), 'CC', 'r');
             
             % Run a benchmark regression in which both the explained
@@ -63,7 +63,7 @@ for iSub = 1:nSub
                 iotraj1 = iobel(1:N+p,:);
                 iotraj2 = iobel(-p+1:N,:);
             end
-            bchm(iParam,iCond,iSub) = Emergence_Regress(iotraj1(:), iotraj2(:), 'CC', 'r');
+            bchm(iParam,iSeq,iSub) = Emergence_Regress(iotraj1(:), iotraj2(:), 'CC', 'r');
         end
     end
 end
