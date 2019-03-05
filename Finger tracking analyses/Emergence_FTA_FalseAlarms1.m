@@ -54,7 +54,7 @@ cmap = flipud(parula(nBin));
 dotsize = 50;
 
 % Prepare a new window
-figure('Position', [524 805 200 300]);
+figure('Position', [1 805 200 300]);
 
 % Display the triangular arena
 Emergence_PlotTrajOnTri; alpha(0);
@@ -71,7 +71,11 @@ scatter(flipud(avgcc(:,1)), flipud(avgcc(:,2)), ...
 % Add a colorbar
 cbr = colorbar('Location', 'SouthOutside');
 cbr.Label.String = 'Position within the sequence';
-colormap(cmap); caxis([0, 1]);
+colormap(cmap); caxis([0,1]);
+
+% Zoom in the bottom part of the triangle
+axis('tight');
+ylim([0,(sqrt(3)/2)/2]);
 
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_FA_SeqGpS.pdf'));
@@ -90,7 +94,7 @@ obspos = repmat((1:N)', nSeq, 1);
 coef = cellfun(@(x,i) corr(x(i,3), obspos(i)), inddata, nanidx)';
 
 % Prepare a new window
-figure('Position', [725 905 120 200]);
+figure('Position', [202 905 120 200]);
 
 % Display chance level
 plot([0,2], zeros(1,2), '-', 'Color', g); hold('on');

@@ -82,7 +82,7 @@ semiotraj  = sem( biniotraj,  3);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [1 805 200 300]);
+figure('Position', [323 805 200 300]);
 
 % Create a colormap whose length equals the number of bins
 cmap = {'Blues', 'Reds', 'Greens'};
@@ -113,6 +113,10 @@ dotsize = 1 + flipud(log(avgbinsize+1).*10);
 % Display binned averages
 scatter(cartavgcoord(:,1), cartavgcoord(:,2), dotsize, ...
     flipud(cmap), 'filled', 'MarkerEdgeColor', 'k');
+
+% Zoom in the bottom part of the triangle
+axis('tight');
+ylim([0,(sqrt(3)/2)/2]);
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_FA_Tri.pdf'));
@@ -184,7 +188,7 @@ xs = semresbinioFAL(:,iMod);
 ys = semresbinsubFAL(:,iMod);
 
 % Prepare a new window
-figure('Position', [202 905 200 200]);
+figure('Position', [524 905 200 200]);
 
 % Display the regression line
 B = Emergence_Regress(ym, xm, 'TLS', {'beta0', 'beta1'});
@@ -227,7 +231,7 @@ save2pdf(fullfile(ftapath, 'figs', 'F_FA_Corr.pdf'));
 coefofint = squeeze(regcoef(:,2,:))';
 
 % Prepare a new window
-figure('Position', [403 905 140 200]);
+figure('Position', [725 905 140 200]);
 
 % Average regression coefficients over subjects
 m = mean(coefofint);
