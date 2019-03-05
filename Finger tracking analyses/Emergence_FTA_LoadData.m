@@ -54,8 +54,8 @@ D = G;
 % Get the length of each sequence
 N = numel(G{1}.Seq);
 
-%% DEFINE SELECTION FILTERS
-%  ========================
+%% DEFINE SEQUENCE SELECTION FILTERS
+%  =================================
 %  N.B. We restrict some analyses to some of the sequences (e.g. sequences
 %  accurately classified by subjects, with a regular detection point from
 %  the subjects and the ideal observer). Define the matrix selection
@@ -71,8 +71,11 @@ for iHyp = 1:3
     if iHyp < 3
         
         % CRITERION 1: keep only sequences for which sequences were
-        % correctly labelled by subjects at the post-sequence questions
-        offlinedetecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
+        % correctly labelled by subjects and the ideal observer at the
+        % post-sequence questions
+        subrp = cellfun(@(x) x.Questions(2) == iHyp,  G(cidx{iHyp},:));
+        iorp  = cellfun(@(x) x.Questions(2) == iHyp, IO(cidx{iHyp},:));
+        offlinedetecmask = subrp & iorp;
         
         % CRITERION 2: keep only sequences for which we have a regular
         % detection point for the subjects AND the ideal observer
@@ -85,8 +88,11 @@ for iHyp = 1:3
     else
         
         % CRITERION: keep only sequences for which sequences were
-        % correctly labelled by subjects at the post-sequence questions
-        offlinedetecmask = cellfun(@(x) isnan(x.Questions(2)), G(cidx{iHyp},:));
+        % correctly labelled by subjects and the ideal observer at the
+        % post-sequence questions
+        subrp = cellfun(@(x) isnan(x.Questions(2)), G(cidx{iHyp},:));
+        iorp  = cellfun(@(x) isnan(x.Questions(2)), IO(cidx{iHyp},:));
+        offlinedetecmask = subrp & iorp;
         
         % No other criterion: we don't look for detection points in
         % fully-stochastic sequences
