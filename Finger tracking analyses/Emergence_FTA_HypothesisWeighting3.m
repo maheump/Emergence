@@ -238,7 +238,7 @@ plot(xm, ym, 'k-', 'LineWidth', 1);
 scatter(xm, ym, dotsize, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
 
 % Customize the axes
-if onlystoch, axis([-0.4,0.4,-0.1,0.1]); end
+axis([-0.4,0.4,-0.1,0.1]);
 set(gca, 'Box', 'Off');
 
 % Add some text labels
