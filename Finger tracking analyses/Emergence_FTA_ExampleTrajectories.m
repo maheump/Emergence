@@ -19,8 +19,8 @@ end
 %  ===================
 
 % Select example sequences to look at
-sublist  = [22 27 28];
-condlist = [10 19 22];
+sublist  = [28 27 28];
+condlist = [04 16 22];
 nExpSeq  = numel(sublist);
 
 % Prepare the window
@@ -81,7 +81,7 @@ for iSeq = 1:nExpSeq
     
     % For both the subject and the ideal observer
     for iObs = 1:2        
-        if     iObs == 1, X = G{condlist(iSeq),sublist(iSeq)};
+        if     iObs == 1, X = G{ condlist(iSeq),sublist(iSeq)};
         elseif iObs == 2, X = IO{condlist(iSeq),sublist(iSeq)};
         end
         
