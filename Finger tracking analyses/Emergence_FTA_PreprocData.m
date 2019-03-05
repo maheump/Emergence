@@ -285,6 +285,13 @@ for iSub = 1:nSub
     end
 end
 
+% Scale the confidence such that it evolves between 0 and 100 (as subjects)
+minc = min(cellfun(@(x) x.Questions(4), IO(:)));
+maxc = max(cellfun(@(x) x.Questions(4), IO(:)));
+for i = 1:numel(IO)
+    IO{i}.Questions(4) = round(100 * ((IO{i}.Questions(4) - minc) / (maxc - minc)));
+end
+
 %% CREATE LABELS FOR THE DIFFERENT CONDITIONS
 %  ==========================================
 
