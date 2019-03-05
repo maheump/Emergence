@@ -209,15 +209,12 @@ plot(zeros(1,2), [-1,1], '-', 'Color', g);
 plotMSEM(xval, avg, err, 1/5, 'k', 'k', 2);
 
 % Display distribution of change point position
-[fout0, xout] = ksdensity(  -lag(:), ...        % which distribution to plot
-    'BandWidth',            8, ...              % bandwidth of the kernel smoothing window 
-    'Support',              [-Inf,1], ...       % restrict the kernel to a certain range of values
-    'BoundaryCorrection',   'Reflection', ...   % type of correction for the boundaries
-    'NumPoints',            1e4);               % size of the grid
-idx = xout <= 0;
-fout0 = fout0(idx);
-xout = xout(idx);
-fill([xout(1),xout,xout(end)], [0,fout0.*5,0]-1, 'k', 'FaceColor', g);
+fout0 = ksdensity(-lag(:), ...              % which distribution to plot
+    xval, ...                               % grid of positions
+    'BandWidth',            8, ...          % bandwidth of the kernel smoothing window 
+    'Support',              [-Inf,1], ...   % restrict the kernel to a certain range of values
+    'BoundaryCorrection',   'Reflection');	% type of correction for the boundaries
+fill([xval(1),xval,xval(end)], [0,fout0.*10,0]-1, 'k', 'FaceColor', g);
 
 % Customize the axes
 caxis([-1,1]);
