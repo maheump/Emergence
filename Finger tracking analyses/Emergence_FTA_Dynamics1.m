@@ -4,7 +4,7 @@
 % generative process crosses some threshold), the dynamics does not look
 % the same even though detection dynamics look steeper in the case of
 % deterministic regularities.
-%
+% 
 % Copyright (c) 2018 Maxime Maheu
 
 %% BARYCENTRIC COORDINATES LOCKED ON DETECTION/CHANGE POINT
@@ -12,9 +12,6 @@
 
 % Define properties of windows to look into
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Get sequence's length
-N = S{1}.Nstims;
 
 % The number of observation to consider
 nSamp = 30;
@@ -25,55 +22,49 @@ xdp = -nSamp:nSamp; % ... locked on detection point
 xep = -(nSamp/2):0; % ... locked on end       point
 xXp = {xcp,xdp,xep};
 
-% Threshold for detection on the relevant dimension
-detecthr = 1/2;
-
-% Get the trajectories around the points of interest
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 % Prepare the output variables
-cp = cell(1,2); dp = cell(1,2); % change and detection points
-lag = cell(1,2); integ = cell(1,2); update = cell(1,2); % measures of the trajectories
-belincorhyp = cell(1,2); % single-trials trajectories of the relevant hypothesis
+cp = cell(1,2); dp = cell(1,2); lag = cell(1,2); % change and detection points
+update = cell(1,2); % measures of the trajectories
 fingerposwrtp = cell(2,3); % trajectories locked on different point
 
 % For each type of regularity
 for iHyp = 1:2
     
-    % Get the change point
-    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:)) - 1/2;
+    % Get change point positions
+    cp{iHyp} = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:));
     
-    % Get the detection point's position
-    % (note that we go back in time from the end of the sequence in order
-    % to avoid as much as possible the false alarms that might exist at the
-    % time of the change point)
-    dp{iHyp} = cell2mat(cellfun(@(x) min([NaN, ...
-        N - find(flipud(x.BarycCoord( x.Jump + 1/2: end, iHyp)) ...
-        >= detecthr, 1, 'last')], [], 'OmitNaN'), ... % in # of observations
-        D(cidx{iHyp},:), 'UniformOutput', 0));
-    lag{iHyp} = dp{iHyp} - cp{iHyp};
+    % Measure important quantities
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    % Do not look at sequences in which the beliefs were aleardy above
-    % threshold
-    dp{iHyp}( lag{iHyp} <= 0) = NaN;
-    lag{iHyp}(lag{iHyp} <= 0) = NaN;
+    % Get detection point position
+    lag{iHyp} = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,iHyp)), ...
+        D(cidx{iHyp},:), num2cell(cp{iHyp}));
+    dp{iHyp} = cp{iHyp} + lag{iHyp};
     
     % Measure the build-up of beliefs along the relevant dimension
     update{iHyp} = cellfun(@(x,c) mean(diff(x.BarycCoord(c:end,iHyp))), ...
         D(cidx{iHyp},:), num2cell(cp{iHyp}));
     
-    % Keel only sequences for which regularities were correctly identified
-    detecmask = cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:));
-    cp{iHyp}(~detecmask) = NaN;
-    dp{iHyp}(~detecmask) = NaN;
-    lag{iHyp}(~detecmask) = NaN;
+    % Remove sequences entailing undetected regularities
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    % N.B. this is computed on subject such that we keep the same sequences
+    % for subjects and the ideal observer
+    
+    % Apply those 2 criterions to select the sequences
+    detecmask = (filter{iHyp} == 3);
+    cp    {iHyp}(~detecmask) = NaN;
+    dp    {iHyp}(~detecmask) = NaN;
+    lag   {iHyp}(~detecmask) = NaN;
     update{iHyp}(~detecmask) = NaN;
+    
+    % Get the trajectories around the points of interest
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     % For the important points we want to lock onto
     for lock = 1:3
         
         % Beginning and ending of the window to look in (in # of samples)
-        if lock == 1 % lock on change point
+        if     lock == 1 % lock on change point
             begwin = cp{iHyp} + xcp(1);
             endwin = cp{iHyp} + xcp(end);
         elseif lock == 2 % lock on detection point
@@ -83,15 +74,14 @@ for iHyp = 1:2
             begwin = repmat(N+xep(1),   size(cp{iHyp}));
             endwin = repmat(N+xep(end), size(cp{iHyp}));
         end
-        nSamp = numel(xXp{lock});
         
-        % Make sure the window stays in between thee limits of the sequence
+        % Make sure the window stays in between the limits of the sequence
         begwin(begwin < 1) = 1;
         endwin(endwin > N) = N;
         begwin = num2cell(begwin);
         endwin = num2cell(endwin);
-        begwin(cellfun(@isnan, begwin)) = {[]};
-        endwin(cellfun(@isnan, endwin)) = {[]};
+        begwin(~detecmask) = {[]};
+        endwin(~detecmask) = {[]};
         
         % Get trajectory (i.e. beliefs in each hypothesis) in that window
         % of interest
@@ -100,9 +90,9 @@ for iHyp = 1:2
         
         % Fill with NaNs to make the trajectories the same size of each
         % other
+        nSamp = numel(xXp{lock});
         fing(cellfun(@isempty, fing)) = {NaN(nSamp,3)};
         fing = cellfun(@(x) [x; NaN(nSamp-size(x,1),3)], fing, 'UniformOutput', 0);
-        fing(~detecmask) = {NaN(nSamp,3)};
         
         % Convert the cells into a big 3D matrix
         fingerposwrtp{iHyp,lock} = cell2mat(reshape(fing, [1, 1, size(fing)]));
@@ -111,17 +101,15 @@ end
 
 % For deterministic regularities, also express the lag in terms of the
 % number of repetitions of the rule
-lag2 = lag{iHyp} ./ cellfun(@numel, dr);
+lag2 = lag{2} ./ cellfun(@numel, dr);
 
 % Average over sequences for each type of regularity
 avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerposwrtp, 'UniformOutput', 0);
 avglag = cellfun(@(x) mean(x, 'OmitNaN'), lag, 'UniformOutput', 0);
 
 % Average finger trajectory over subjects
-avgsubtraj = cellfun(@(x) mean(x, 3), avgfingerwrtp, 'UniformOutput', 0);
+avgsubtraj = cellfun(@(x) mean(x, 3, 'OmitNaN'), avgfingerwrtp, 'UniformOutput', 0);
 semsubtraj = cellfun(@(x) sem( x ,3), avgfingerwrtp, 'UniformOutput', 0);
-avgsublag = cellfun(@mean, avglag);
-semsublag = cellfun(@sem,  avglag);
 
 %% DISPLAY TRAJECTORIES LOCKED TO DIFFERENT IMPORTANT POINTS
 %  =========================================================
@@ -136,7 +124,7 @@ tricol = [066 146 198; 239 059 033; 065 171 093] ./ 255;
 % Prepare a new window
 figure('Position', [1 855 700 250]);
 
-% For change- and detection- points
+% For change-, detection- and end- points
 for lock = 1:3
     subplot(1,3,lock);
     
@@ -156,7 +144,7 @@ for lock = 1:3
     
     % Display the trajectories
     for iHyp = 1:2
-        cc = avgsubtraj{iHyp,lock}*tricc; % cartesian coordinates
+        cc = avgsubtraj{iHyp,lock} * tricc; % cartesian coordinates
         plot(cc(:,1), cc(:,2), '.-', 'Color', tricol(iHyp,:), ...
             'LineWidth', 1, 'MarkerSize', 10);
         
@@ -187,28 +175,41 @@ figure('Position', [1 381 700 400]);
 % For change- and detection- points
 pt = {'change', 'detection', 'end'};
 for lock = 1:3
-    x = xXp{lock};
+    xval = xXp{lock};
     
     % For each type of regularity
     for iHyp = 1:2
         subplot(2, sum(spw), (cspw(1,lock):cspw(2,lock))+sum(spw)*(iHyp-1)); hold('on');
         
         % Draw some grid lines
-        plot(x([1,end]),    ones(1,2)./2, '-',  'Color', g, 'LineWidth', 1/2);
-        plot(x([1,end]),    ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
-        plot(x([1,end]), 2.*ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
+        plot(xval([1,end]),    ones(1,2)./2, '-',  'Color', g, 'LineWidth', 1/2);
+        plot(xval([1,end]),    ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
+        plot(xval([1,end]), 2.*ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
+        
+        % Display distribution of change/detection point positions
+        if     lock == 1, dist = lag{iHyp}(:);        klim = [-2,Inf];  idx = xval >= 0;
+        elseif lock == 2, dist = -lag{iHyp}(:);       klim = [-Inf,2];  idx = xval <  0;
+        elseif lock == 3, dist = -(N - dp{iHyp}(:));  klim = [-Inf,2];  idx = xval <= N;
+        end
+        [fout0,xout] = ksdensity(dist, ...          % which distribution to plot
+            interp(xval(idx), 10), ...              % grid of positions
+            'BandWidth',            8, ...          % bandwidth of the kernel smoothing window 
+            'Support',              klim, ...       % restrict the kernel to a certain range of values
+            'BoundaryCorrection',   'Reflection');	% type of correction for the boundaries
+        fill([xout(1),xout,xout(end)], [0,fout0.*10,0], 'k', 'FaceColor', g);
+        
         
         % Draw barycentric coordinates
         lt = repmat({'--'}, 1, 3);
         lt{iHyp} = '-';
         for iDim = 1:3
-            plotMSEM(x, avgsubtraj{iHyp,lock}(:,iDim), ...
+            plotMSEM(xval, avgsubtraj{iHyp,lock}(:,iDim), ...
                         semsubtraj{iHyp,lock}(:,iDim), ...
                 0.15, tricol(iDim,:), tricol(iDim,:), 1+1*(iDim == iHyp), 1, lt{iDim}, 'none');
         end
         
         % Customize the axes
-        set(gca, 'Box', 'Off', 'XLim', x([1,end]), 'YLim', [0,1]);
+        set(gca, 'Box', 'Off', 'XLim', xval([1,end]), 'YLim', [0,1]);
         set(gca, 'YAxisLocation', 'Origin');
         if lock == 2, set(gca, 'YTickLabel', {}); end
         
@@ -224,7 +225,7 @@ for lock = 1:3
             ax = get(gca, 'Position');
             axes('Position', [ax(1) ax(2)+0.8*ax(4) ax(3) 0.2*ax(4)]);
             Emergence_PlotSubGp(avglag{iHyp}, tricol(iHyp,:));
-            axis([0, 2, x([1,end])]); axis('off');
+            axis([0, 2, xval([1,end])]); axis('off');
             view([90,90]);
             Emergence_DispStatTest(avglag{iHyp});
         end

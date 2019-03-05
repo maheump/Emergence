@@ -8,11 +8,10 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% INITIALIZATION
-%  ==============
+%% DISPLAY INDIVIDUAL TRIALS LIKELIHOODS IN THE RELEVANT HYPOTHESIS
+%  ===============================================================
 
 % Prepare output variable
-detecmask   = cell(1,2);
 cp          = cell(1,2);
 sortedcp    = cell(1,2);
 idxcp       = cell(1,2);
@@ -22,21 +21,18 @@ belincorhyp = cell(1,2);
 for iHyp = 1:2
     
     % Get sequences that were correctly labelled
-    detecmask{iHyp} = logical(cellfun(@(x) x.Questions(2) == iHyp, G(cidx{iHyp},:)));
+    detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
     
     % Order according to change point's position and detected/undetected
     cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'UniformOutput', 1);
     [sortedcp{iHyp}, idxcp{iHyp}] = sortrows([cp{iHyp}(:), ...
-        detecmask{iHyp}(:)], [2,1], 'Descend');
+        detecmask(:)], [2,1]);
     
     % Get the beliefs in the corresponding (correct) hypothesis ordered
     % according to the position the change point
     belincorhyp{iHyp} = cellfun(@(x) x.BarycCoord(:,iHyp)', ...
         D(cidx{iHyp},:), 'UniformOutput', 0);
 end
-
-%% DISPLAY INDIVIDUAL TRIAL LIKELIHOODS IN THE RELEVANT HYPOTHESIS
-%  ===============================================================
 
 % Prepare a new window
 figure('Position', [702 705 230 400]);
@@ -55,21 +51,18 @@ for iHyp = 1:2
     colormap(sp, cbrewer2(cmapcol{iHyp}));
     
     % Display the position of the change points
-    for i = [0,1]
-        x = cp{iHyp}(idxcp{iHyp}(sortedcp{iHyp}(:,2) == i));
-        y = find(sortedcp{iHyp}(:,2) == i);
+    for d = [0,1]
+        x = cp{iHyp}(idxcp{iHyp}(sortedcp{iHyp}(:,2) == d));
+        y = find(sortedcp{iHyp}(:,2) == d);
         stairs([x(1);x], [y(1)-1;y], 'k-');
     end
 	
     % Display limits between detected and undetected sequences
     lim = find(abs(diff(sortedcp{iHyp}(:,2))) == 1) + 1/2;
     plot([0,N+1], repmat(lim, 1, 2), 'k-');
-    set(gca, 'YTick', [mean([1/2,lim]), mean([size(belincorhyp,1)+1/2,lim])], ...
-        'YTicklabel', {'Detected', 'Undetected'}, 'YTickLabelRotation', 90);
-    set(gca, 'TickLen', zeros(1,2));
     
     % Add some text labels
-    set(gca, 'XTick', [1, get(gca, 'XTick')], 'YTick', []);
+    axis('xy'); set(gca, 'XTick', [1, get(gca, 'XTick')], 'YTick', [1,50]);
     xlabel('Observation #');
     ylabel({'Sequence # (sorted by', 'change point''s position)'});
     title(sprintf('%s sequences', proclab{iHyp}));
@@ -94,15 +87,20 @@ o_sub = cell(1,2); o_gp = cell(1,2); % quality of fit
 for iHyp = 1:2
     
     % Get beliefs in the relevant hypothesis post-change point
-    Y = cellfun(@(x,c) x(round(c):end)', belincorhyp{iHyp}, ...
-       num2cell(cp{iHyp}), 'UniformOutput', 0);
+	cp = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'UniformOutput', 0);
+    Y = cellfun(@(x,c) x.BarycCoord(c:end,iHyp), D(cidx{iHyp},:), cp, 'UniformOutput', 0);
+    
+    % Select sequences that were correctly identified by subjects AND for
+    % which we were able to find a detection point for subjects and the
+    % ideal observer
+    detecmask = (filter{iHyp} == 3);
     
     % For each type of regularity
     for iSeq = 1:numel(cidx{iHyp})
         
         % Select current sequence for subjects that correctly labeled it
         y = Y(iSeq,:);
-        idx = detecmask{iHyp}(iSeq,:);
+        idx = detecmask(iSeq,:);
         y = y(idx);
         nsub = numel(y);
         
@@ -144,8 +142,8 @@ for iHyp = 1:2
     
     % For non-identified sequences, fill with NaNs
     idx = find(cellfun(@isempty, p_sub{iHyp}));
-    for i = 1:numel(idx)
-        p_sub{iHyp}{idx(i)}.muPhi = NaN(4,1);
+    for d = 1:numel(idx)
+        p_sub{iHyp}{idx(d)}.muPhi = NaN(4,1);
     end
     
     % Get the (4) fitted parameters of the sigmoid function

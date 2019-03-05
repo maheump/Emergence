@@ -1,4 +1,4 @@
-% This script performs a correlation betweeen detection speed of
+% This script performs a correlation betweeen detection update of
 % probabilistic regularities from human subjects and the ideal observer on
 % one hand and detection lag of deterministic regularities form human
 % subjects and the ideal observer on the other hand.
@@ -12,17 +12,17 @@
 Var = cell(2);
 
 % Get IO's trajctories around change and detection points as well as
-% meaningful measures such as detection delays and speed
+% meaningful measures such as detection delays and update
 D = IO;
 Emergence_FTA_Dynamics2;
-Var{1,1} = speed{1};
+Var{1,1} = update{1};
 Var{2,1} = lag{2};
 
 % Get subjects' trajctories around change and detection points as well as
-% meaningful measures such as detection delays and speed
+% meaningful measures such as detection delays and update
 D = G;
 Emergence_FTA_Dynamics2;
-Var{1,2} = speed{1};
+Var{1,2} = update{1};
 Var{2,2} = lag{2};
 
 %% CORRELATION BETWEEN SUBJECTS AND IDEAL OBSERVER
@@ -99,7 +99,7 @@ for iHyp = 1:2
     % Test if the correlation coefficient is significantly different
     % from zero across subjects
     [~,pval,tci,stats] = ttest(cc');
-    disptstats(pval,tci,stats);
+    Emergence_PrintTstats(pval,tci,stats);
     
     % Display the dispersion of correlation coefficients across
     % subjects

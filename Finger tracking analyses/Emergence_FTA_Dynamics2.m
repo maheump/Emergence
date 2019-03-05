@@ -1,9 +1,9 @@
 % This script inspects whether there is an effect of manipulated factors
-% of probabilistic and deterministic regularities on  the detection speed
+% of probabilistic and deterministic regularities on the detection update
 % of probabilistic regularities and the detection lag of deterministic
 % regularities. These measures were chosen because they reflect how the
 % beleifs are updated in both cases: progressively for probabilistic
-% regularities (the speed can thus vary), abruptly for deterministic
+% regularities (the update can thus vary), abruptly for deterministic
 % regularities (the lag can thus vary).
 % 
 % Copyright (c) 2018 Maxime Maheu
@@ -18,131 +18,140 @@ Emergence_FTA_Dynamics1;
 condmap = cell(1,2);
 condmkr = cell(1,2);
 
-% Define markers to use
-mrkr = {'s', 'o', '^', 'd'};
+% Define usefule variables
+mrkr = {'s', 'o', '^', 'd', 'p'};
+lgdlab = {'Frequency', 'Alternation', 'Repetition', 'Outside', 'No'};
+cmap = {'Blues', 'Purples'};
 
-%% FACTORS MODULATING DETECTION VELOCITY OF PROBABILISTIC REGULARITIES
-%  ===================================================================
+%% EFFECT OF SHANNON ENTROPY ON BELIEF UPDATE
+%  ==========================================
 
-% Get factors
-% ~~~~~~~~~~~
-
-% Compute entropy levels of theoretical transition probabilities
-PpXgY = cell2mat(prob')';
-PpAgB = PpXgY(1,:);
-PpBgA = PpXgY(2,:);
-TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), PpAgB, PpBgA)';
-
-% Create colormap for the entropy
-minH = 1.4;
-maxH = Emergence_MarkovEntropy(1/2, 1/2);
-prec = 1001;
-offset = round(prec * (maxH - minH));
-EntCMap = flipud([flipud(cbrewer2('Blues', offset)); cbrewer2('Greys', prec)]);
-prec = size(EntCMap,1);
-
-% Get dedicated color for each condition that is indexed on the entropy of
-% the rule
-[~,idx] = min(abs(linspace(0, maxH, prec) - TPent), [], 2);
-condmap{1} = EntCMap(idx,:);
-
-% Define the type of biases that have been used
-biases = NaN(1, numel(prob));
-biases(PpXgY(1,:) < 1/2 & PpXgY(2,:) > 1/2) = 1; % frequency biases
-biases(sum(PpXgY < 1/2) == 2) = 2;               % repetition biases
-biases(sum(PpXgY > 1/2) == 2) = 3;               % alternation biases
-biases(isnan(biases)) = 4;                       % outside diagonals
-
-% Get detection velocity
-% ~~~~~~~~~~~~~~~~~~~~~~
-
-% Regress entropy against detection velocity for each subject
-var = speed{1};
-subvar = mat2cell(var', ones(nSub,1), numel(cidx{1}));
-subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
-offset = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta0'), subvar);
-slope  = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta1'), subvar);
-[~,pval,tci,stats] = ttest(slope);
-disptstats(pval,tci,stats);
-
-% Regress out the effect of entropy (our experimental design is not
-% fully factorial)
-yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + TPent'.*b1), subvar, ...
-    num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
-
-% Average detection velocity for each group of probabilistic biases
-avggpergp = cell2mat(arrayfun(@(i) mean(yhat(biases == i,:), 1, ...
-    'OmitNaN')', unique(biases), 'UniformOutput', 0));
-
-% Perform a repeated-measures 1-way ANOVA on detection velocity depending
-% on the group of probabilistic biases
-T = rmANOVA(avggpergp);
-disp(T);
-
-% Get average detection speed over subjects
-avg = mean(speed{1}, 2, 'OmitNaN');
-err = sem(speed{1}, 2);
-
-% Display detection velocity as a function of entropy
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Prepare a new window
-figure('Position', [702 780 200 325]);
-lgd = NaN(1,3); hold('on');
-
-% Display the regression line between Shannon entropy and detection speed
-confint  = Emergence_Regress(avg, TPent, 'OLS', 'confint');
-confintx = Emergence_Regress(avg, TPent, 'OLS', 'confintx');
-fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
-    tricol(1,:), 'EdgeColor', 'none', 'FaceColor', tricol(1,:), 'FaceAlpha', 0.15);
-b = Emergence_Regress(avg, TPent, 'OLS', {'beta0', 'beta1'});
-plot(confintx([1,end]), confintx([1,end]).*b(2)+b(1), '-', ...
-    'Color', tricol(1,:), 'LineWidth', 3);
-
-% For each type of bias
-for iGp = 1:4
-    idx = find(biases == iGp);
-    condmkr{1}(idx) = mrkr{iGp};
-	
-    % Conenct individual dots with a line
-    if iGp ~= 4
-        plot(TPent(idx), avg(idx), '-', 'Color', 'k', 'LineWidth', 1);
+% For each type of regularity
+for iHyp = [2,1]
+    
+    % Get factors
+    % ~~~~~~~~~~~
+    
+    % Compute entropy levels of theoretical transition probabilities
+    if iHyp  == 1
+        pXgY = cell2mat(prob');
+        
+    % Get transition probabilities from the deterministic regularities
+    elseif iHyp == 2
+        [~, ~, pAgB, pBgA] = cellfun(@(x) pat2proba(x, 1:2, true), det');
+        pAgB(pAgB == 1) = 1-eps;
+        pXgY = [pAgB, pBgA];
     end
     
-    % For each level (strength) of that bias
-    for j = 1:numel(idx)
-        k = idx(j);
+    % Define the type of biases that have been used
+    biases = NaN(numel(cidx{iHyp}), 1);
+    biases(pXgY(:,1) == 1 - pXgY(:,2)) = 1;               % frequency biases
+    biases(pXgY(:,1) > 1/2 & pXgY(:,1) == pXgY(:,2)) = 2; % repetition biases
+    biases(pXgY(:,1) < 1/2 & pXgY(:,1) == pXgY(:,2)) = 3; % alternation biases
+    biases(pXgY(:,1) == 1/2 & pXgY(:,1) == 1/2) = 5;      % no biases
+    biases(isnan(biases)) = 4;                            % outside diagonals
+    
+    % Create colormap for the entropy
+    minH = 1.4;
+    maxH = Emergence_MarkovEntropy(1/2, 1/2);
+    prec = 1001;
+    offset = round(prec * (maxH - minH));
+    EntCMap = flipud([flipud(cbrewer2(cmap{iHyp}, offset)); cbrewer2('Greys', prec)]);
+    prec = size(EntCMap,1);
+    
+    % Compute Shannon entropy on transition probabilities
+    TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), pXgY(:,1), pXgY(:,2));
+    
+    % Get dedicated color for each condition that is indexed on the entropy of
+    % the rule
+    [~,idx] = min(abs(linspace(0, maxH, prec) - TPent), [], 2);
+    condmap{1} = EntCMap(idx,:);
+    
+    % Get detection velocity
+    % ~~~~~~~~~~~~~~~~~~~~~~
+    
+    % Regress entropy against detection velocity for each subject
+    subvar = mat2cell(update{iHyp}', ones(nSub,1), numel(cidx{iHyp}));
+    subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
+    offset = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta0'), subvar);
+    slope  = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta1'), subvar);
+    
+    % Frequentist t-test on the distribution of statistics over subjects
+    [~,pval,tci,stats] = ttest(slope);
+    Emergence_PrintTstats(pval,tci,stats);
+    
+    % Frequentist t-test on the distribution of statistics over subjects
+    [~,bf01] = BF_ttest(slope);
+    fprintf('BF in favour of the null: %1.2f\n', bf01);
+    
+    % Get average detection update over subjects
+    avg = mean(update{iHyp}, 2, 'OmitNaN');
+    err = sem(update{iHyp}, 2);
+    
+    % Display detection velocity as a function of entropy
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    % Prepare a new window
+    figure('Position', [501+201*iHyp 780 200 325]); hold('on');
+    
+    % Display the regression line between Shannon entropy and detection update
+    confint  = Emergence_Regress(avg, TPent, 'OLS', 'confint');
+    confintx = Emergence_Regress(avg, TPent, 'OLS', 'confintx');
+    col = cbrewer2(cmap{iHyp}, 1);
+    fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
+        col, 'EdgeColor', 'none', 'FaceAlpha', 0.15);
+    b = Emergence_Regress(avg, TPent, 'OLS', {'beta0', 'beta1'});
+    plot(confintx([1,end]), confintx([1,end]).*b(2)+b(1), '-', ...
+        'Color', col, 'LineWidth', 3);
+    
+    % Plot the distribution of 
+    fill(minH + fout0./5e3, xout, 'k');
+    
+    % For each type of bias
+    lgd = NaN(1,numel(lgdlab));
+    for iGp = 1:numel(lgdlab)
+        idx = find(biases == iGp);
+        condmkr{1}(idx) = mrkr{iGp};
         
-        % Display the SEM over subjects
-        plot(TPent(k) + zeros(1,2), avg(k) + err(k) * [-1,1], '-', 'Color', 'k');
+        % Connect individual dots with a line
+        if iGp ~= 4
+            plot(TPent(idx), avg(idx), '-', 'Color', 'k', 'LineWidth', 1);
+        end
         
-        % Display the average detection speed
-        lgd(iGp) = plot(TPent(k), avg(k), 'k-', 'MarkerEdgeColor', 'k', ...
-            'MarkerFaceColor', condmap{1}(k,:), 'Marker', mrkr{iGp}, 'MarkerSize', 10);
+        % For each level (strength) of that bias
+        for j = 1:numel(idx)
+            k = idx(j);
+            
+            % Display the SEM over subjects
+            plot(TPent(k) + zeros(1,2), avg(k) + err(k) * [-1,1], '-', 'Color', 'k');
+            
+            % Display the average detection update
+            lgd(iGp) = plot(TPent(k), avg(k), 'k-', 'MarkerEdgeColor', 'k', ...
+                'MarkerFaceColor', condmap{1}(k,:), 'Marker', mrkr{iGp}, 'MarkerSize', 10);
+        end
+    end
+    
+    % Display the colormap
+    caxis([0,1]);
+    colormap(EntCMap);
+    
+    % Customize the axes
+    set(gca, 'Box', 'Off', 'XLim', [minH, maxH], 'YLim', [0.002,0.013]);
+    
+    % Add some text labels
+    legend(lgd(unique(biases)), lgdlab(unique(biases)), 'Location', 'South', 'Box', 'Off');
+    xlabel('Entropy (bits)');
+    ylabel('Update');
+    
+    % Save the figure
+    fname = sprintf('F_Dyn_Ent%sS.pdf', proclab{iHyp}(1));
+    if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', fname));
+    else, save2pdf(fullfile(ftapath, 'figs', fname));
     end
 end
 
-% Display the colormap
-caxis([0,1]);
-colormap(EntCMap);
-
-% Customize the axes
-set(gca, 'Box', 'Off', 'YLim', [0,0.012]);
-
-% Add some text labels
-legend(lgd, cellfun(@(x) sprintf('%s diag.', x), {'Frequency', ...
-    'Alternation', 'Repetition', 'Outside'}, 'UniformOutput', 0), ...
-    'Location', 'South', 'Box', 'Off');
-xlabel('Entropy (bits)');
-ylabel('Speed');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_DetProbaS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_DetProbaIO.pdf'));
-end
-
-%% FACTORS MODULATING DETECTION DELAY OF DETERMINISTIC REGULARITIES
-%  ================================================================
+%% EFFECT OF PATTERN LENGTH ON THE DETECTION OF DETERMINISTIC REGULARITIES
+%  =======================================================================
 
 % Get factors
 % ~~~~~~~~~~~
@@ -161,18 +170,18 @@ condmap{2} = condmap{2}(idx,:);
 % ~~~~~~~~~~~~~~~~~~~~
 
 % Regress pattern length against detection delay for each subject
-var = lag{2}; % lag2 or lag{2}
-subvar = mat2cell(var', ones(nSub,1), numel(cidx{2}));
+delay = lag{2}; % lag2 or lag{2}
+subvar = mat2cell(delay', ones(nSub,1), numel(cidx{2}));
 subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
 offset = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta0'), subvar);
 slope  = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta1'), subvar);
 [~,pval,tci,stats] = ttest(slope);
-disptstats(pval,tci,stats);
+Emergence_PrintTstats(pval,tci,stats);
 
 % Regress out the effect of pattern length (our experimental design is not
 % fully factorial)
 yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + len'.*b1), subvar, ...
-    num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
+   num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
 
 % Average detection lag for each group of patterns
 avggpergp = cell2mat(arrayfun(@(i) mean(yhat(group == i,:), 1, ...
@@ -191,7 +200,7 @@ err = sem(lag{2}, 2);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [702 381 200 325]);
+figure('Position', [1103 780 200 325]);
 lgd = NaN(1,3);
 
 % Display a grid that expresses the detection delays in terms of the number
@@ -233,135 +242,13 @@ for iGp = 1:max(group)
 end
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XLim', [min(len)-1, max(len)+1], 'YLim', [0,80]);
+set(gca, 'Box', 'Off', 'XLim', [min(len)-1, max(len)+1], 'YLim', [0,ceil(max(avg+err)/10)*10]);
 
 % Add some text labels
 xlabel('Length (# obs.)');
 ylabel('Detection delay (# obs.)');
 
 % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_DetDeterS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_DetDeterIO.pdf'));
-end
-
-%% DISPLAY DETECTION SPEED OF MATCHED PROBABILISTIC/DETERMINISTIC REGULARITIES
-%  ===========================================================================
-
-% Get regularities that are matched across probabilistic/deterministic
-% versions
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Get transition probabilities from the deterministic regularities
-[~, DpAlt, DpAgB, DpBgA] = cellfun(@(x) pat2proba(x, 1:2, true), det');
-
-% Restrict to regularities on the repetition/alternation diagonal
-Pidx = find(PpAgB == PpBgA);
-nidx = numel(Pidx);
-
-% Find corresponding probabilistic biases 
-Didx = NaN(1,nidx);
-for i = 1:nidx
-    Didx(i) = find(PpAgB(Pidx(i)) == DpAgB & PpBgA(Pidx(i)) == DpBgA);
-end
-
-% Sort according to the frequency of alternations
-DpAlt = DpAlt(Didx);
-[DpAlt, sortidx] = sort(DpAlt);
-IDX = {Pidx(sortidx), Didx(sortidx)};
-
-% Get speed measures (put NaN for negative speeds)
-spd = cellfun(@(x,i) x(i,:), speed, IDX, 'UniformOutput', 0);
-for i = 1:2, spd{i}(spd{i} < 0) = NaN; end
-spd = cellfun(@(x) log(x), spd, 'UniformOutput', 0);
-
-% Perform a t-test on average speed between probabilistic and deterministic
-% versions
-avgverspd = cell2mat(cellfun(@(x) mean(x, 1, 'OmitNaN')', spd, 'UniformOutput', 0));
-[~,pval,tci,stats] = ttest(diff(avgverspd, 1, 2));
-disptstats(pval,tci,stats);
-
-% Perform a t-test on the effect of entropy on detection speed in
-% probabilistic versus deterministic versions of regularities
-mtcH = TPent(IDX{1}(1:3)); % 3 entropy levels
-probaver = fliplr(nanmean(cat(3, spd{1}(1:3,:)', flipud(spd{1}(4:6,:))'), 3));
-deterver = fliplr(nanmean(cat(3, spd{2}(1:3,:)', flipud(spd{2}(4:6,:))'), 3));
-probaslope = cellfun(@(x) Emergence_Regress(x', mtcH, 'OLS', 'beta1'), ...
-    mat2cell(probaver, ones(nSub,1), 3));
-deterslope = cellfun(@(x) Emergence_Regress(x', mtcH, 'OLS', 'beta1'), ...
-    mat2cell(deterver, ones(nSub,1), 3));
-[~,pval,tci,stats] = ttest(probaslope-deterslope);
-disptstats(pval,tci,stats);
-
-% Compute group average and error
-avgregspd = cell2mat(cellfun(@(x) mean(x, 2, 'OmitNaN'), spd, 'UniformOutput', 0));
-semregspd = cell2mat(cellfun(@(x) sem( x, 2           ), spd, 'UniformOutput', 0));
-
-% Display matched detection velocity
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Prepare a new figure
-figure('Position', [903 858 400 300]); hold('on');
-
-% Define colors indexed on entropy levels
-prec = 1001;
-cmap = cbrewer2('BuPu', prec);
-hgrid = linspace(minH, maxH, prec);
-[~,idx] = min(abs(hgrid - [sort(mtcH, 'Descend'); sort(mtcH, 'Ascend')]), [], 2);
-cmap = cmap(idx,:);
-
-% Display a distance map
-lim = [-6.5, -4.5];
-idx = linspace(lim(1), lim(2), 100);
-bgmap = imagesc2image(abs(idx - idx'), flipud(gray));
-image(idx, idx, bgmap); alpha(1/2);
-
-% Display error bars in both dimensions
-for i = 1:nidx
-    plot(avgregspd(i,2)+semregspd(i,2).*[-1,1], repmat(avgregspd(i,1),1,2), ...
-        '-', 'Color', 'k', 'LineWidth', 1/2);
-    plot(repmat(avgregspd(i,2),1,2), avgregspd(i,1)+semregspd(i,1).*[-1,1], ...
-        '-', 'Color', 'k', 'LineWidth', 1/2);
-end
-
-% Connect dots corresponding to repetition/alternation biases
-for i = [1,4]
-    idx = i:i+2;
-    plot(avgregspd(idx,2), avgregspd(idx,1), '-', ...
-        'LineWidth', 3, 'Color', mean(cmap(idx,:)));
-end
-
-% Display average speed
-mkr = {'^', 'o'};
-for i = 1:nidx
-    plot(avgregspd(i,2), avgregspd(i,1), mkr{1 + (DpAlt(i) > 1/2)}, ...
-        'MarkerSize', 8, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', cmap(i,:));
-end
-
-% Customize the axes
-axis(repmat(lim, 1, 2)); axis('square');
-set(gca, 'Box', 'On', 'XColor', tricol(2,:), 'YColor', tricol(1,:));
-
-% Add an identity line
-plot(lim, lim, '-', 'Color', g);
-text(lim(1), lim(1), '   Identity', 'Rotation', 45, 'Color', g, ...
-    'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Bottom');
-
-% Add text labels
-xlabel({'log average speed along p(H_D|y)', 'for the deterministic versions'}, ...
-    'Color', tricol(2,:));
-ylabel({'log average speed along p(H_P|y)', 'for the probabilistic versions'}, ...
-    'Color', tricol(1,:));
-
-% Add a colorbar
-colormap(cmap);
-cbr = colorbar;
-clab1 = dr(IDX{2})';
-clab2 = arrayfun(@(p1,p2) sprintf('p(A|B) = %1.2f & p(A|B) = %1.2f', ...
-    p1, p2), PpAgB(IDX{1}), PpBgA(IDX{1}), 'UniformOutput', 0);
-set(cbr, 'Ticks', linspace(1/6/2, 1-1/6/2, 6), 'TickLabels', ...
-    cellfun(@(x,y) sprintf('%s <=> %s', x, y), clab1, clab2, 'UniformOutput', 0));
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_DetVsProbaSpeedS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_DetVsProbaSpeedIO.pdf'));
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_LagDS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_LagDIO.pdf'));
 end
