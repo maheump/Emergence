@@ -135,13 +135,9 @@ for iHyp = 1:2
     % Display limits between (in)correctly labeled sequences
     lim = size(pcppos{1,iHyp},1) + 1/2;
     plot([0,N+1], repmat(lim, 1, 2), 'k-');
-    set(gca, 'YTick', [mean([1,size(pcppos{1,iHyp}, 1)]), ...
-        mean([size(pcppos{1,iHyp}, 1), size(pcppos{2,iHyp}, 1)])], ...
-        'YTicklabel', {'Detected', 'Undetected'}, 'YTickLabelRotation', 90);
-    set(gca, 'TickLen', zeros(1,2));
     
     % Customize the axes
-    axis('xy'); set(gca, 'XTick', [1, get(gca, 'XTick')], 'YTick', []);
+    axis('xy'); set(gca, 'XTick', [1, get(gca, 'XTick')], 'YTick', [1,50]);
     
     % Add some text labels
     xlabel('Observation #');
