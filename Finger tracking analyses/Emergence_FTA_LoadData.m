@@ -71,11 +71,9 @@ for iHyp = 1:3
     if iHyp < 3
         
         % CRITERION 1: keep only sequences for which sequences were
-        % correctly labelled by subjects and the ideal observer at the
-        % post-sequence questions
+        % correctly labelled by subjects at the post-sequence questions
         subrp = cellfun(@(x) x.Questions(2) == iHyp,  G(cidx{iHyp},:));
-        iorp  = cellfun(@(x) x.Questions(2) == iHyp, IO(cidx{iHyp},:));
-        offlinedetecmask = subrp & iorp;
+        offlinedetecmask = subrp;
         
         % CRITERION 2: keep only sequences for which we have a regular
         % detection point for the subjects AND the ideal observer
@@ -88,11 +86,9 @@ for iHyp = 1:3
     else
         
         % CRITERION: keep only sequences for which sequences were
-        % correctly labelled by subjects and the ideal observer at the
-        % post-sequence questions
+        % correctly labelled by subjects at the post-sequence questions
         subrp = cellfun(@(x) isnan(x.Questions(2)), G(cidx{iHyp},:));
-        iorp  = cellfun(@(x) isnan(x.Questions(2)), IO(cidx{iHyp},:));
-        offlinedetecmask = subrp & iorp;
+        offlinedetecmask = subrp;
         
         % No other criterion: we don't look for detection points in
         % fully-stochastic sequences

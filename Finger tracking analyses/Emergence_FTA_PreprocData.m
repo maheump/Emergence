@@ -271,17 +271,13 @@ for iSub = 1:nSub
             IO{iSeq,iSub}.Questions(1) = 1; % a regularity was found
             IO{iSeq,iSub}.Questions(2) = IO{iSeq,iSub}.Mhat(end) - 1;
             % 1 for probabilistic, 2 for deterministic
-            
-            % 3) p(Jump)?
-            if IO{iSeq,iSub}.Questions(2) == 1
-                pJump = IO{iSeq,iSub}.pJkgYMsp(:,end);
-            elseif IO{iSeq,iSub}.Questions(2) == 2
-                pJump = IO{iSeq,iSub}.pJkgYMsd(:,end);
-            end
-            [val,idx] = max(pJump);
-            IO{iSeq,iSub}.Questions(3) = idx; % change point's position
-            IO{iSeq,iSub}.Questions(4) = val; % confidence in change point's position
         end
+        
+        % 3) p(Jump)?
+        pJump = IO{iSeq,iSub}.pJkgY(:,end);
+        [val,idx] = max(pJump);
+        IO{iSeq,iSub}.Questions(3) = idx; % change point's position
+        IO{iSeq,iSub}.Questions(4) = val; % confidence in change point's position
     end
 end
 

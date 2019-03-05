@@ -29,8 +29,7 @@ for iHyp = 1:2
     
     % Get beliefs about the change point's position at the end of each
     % sequence
-    lab = sprintf('pJkgYMs%s', lower(proclab{iHyp}(1)));
-    bel = cellfun(@(x) x.(lab)(:,end)', IO(cidx{iHyp},:), 'UniformOutput', 0);
+    bel = cellfun(@(x) x.pJkgY(:,end)', IO(cidx{iHyp},:), 'UniformOutput', 0);
     
     % Get sequences that were corretly labeled 
     detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
