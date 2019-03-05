@@ -189,6 +189,7 @@ figure('Position', [804 906 120 200]);
 
 % Prepare the output variable
 prc = 1e4;
+xgrid = linspace(0, 1, prc);
 f = NaN(2,prc);
 
 % For each type of regularity
@@ -197,10 +198,10 @@ for iHyp = 1:2
     % Measure a kernel density from subjects' confidence ratings
     dist = conf(cidx{iHyp},:);
     [f(iHyp,:), u] = ksdensity( dist(:), ...        % which distribution to plot
+        xgrid, ...                                  % grid of confidence levels
         'BandWidth',            0.05, ...           % bandwidth of the kernel smoothing window 
-        'Support',              [0,1], ...          % restrict the kernel to a certain range of values
-        'BoundaryCorrection',   'Reflection', ...   % type of correction for the boundaries
-        'NumPoints',            prc);               % size of the grid
+        'Support',              [0-eps,1+eps], ...  % restrict the kernel to a certain range of values
+        'BoundaryCorrection',   'Reflection');      % type of correction for the boundaries
     
     % Normalize the distribution such that it can be directly compared
     % between both conditions (because there are not necessarily the same
