@@ -78,9 +78,6 @@ save2pdf(fullfile(ftapath, 'figs', 'F_HW_PredMaps.pdf'));
 % Define options
 % ~~~~~~~~~~~~~~
 
-% Whether to restrict to fully-stochastic parts of sequences
-onlystoch = true;
-
 % Define the number of bins to use when plotting the results
 nBin = 10;
 
@@ -180,7 +177,7 @@ bar(1:3, m, 'FaceColor', g, 'EdgeColor', 'k'); hold('on');
 plot(repmat(1:3, 2, 1), m+[-s;s], 'k-');
 
 % Customize the axes
-if onlystoch, axis([0,4,0,0.4]); end
+axis([0,4,0,0.4]);
 set(gca, 'Box', 'Off', 'XTick', 1:3);
 xlabel('Regression models');
 ylabel('Regression coefficient for P/D beliefs');
