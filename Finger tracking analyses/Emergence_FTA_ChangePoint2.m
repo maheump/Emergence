@@ -119,8 +119,8 @@ ylabel('Inferred changes point''s position');
 
 % Display the real distribution of change points
 yyaxis('right');
-y = linspace(bot, N-bot, 13);
-[n,x] = histcounts(allcp(:), y, 'Normalization', 'Probability');
+dist = linspace(bot, N-bot, 13);
+[n,x] = histcounts(allcp(:), dist, 'Normalization', 'Probability');
 bar((x(1:end-1) + x(2:end)) / 2, n, 'EdgeColor', 'None', 'FaceColor', 'k', 'FaceAlpha', 1/4);
 set(gca, 'YColor', 'None');
 axis([x([1,end]), 0, 1]);
@@ -172,6 +172,10 @@ end
 % Get confidence levels
 conf = cellfun(@(x) x.Questions(4), D) ./ 100;
 
+% Remove sequences in which regularities were not detected
+detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
+conf(~detecmask) = NaN;
+
 % Average over regularities for each condition (proba. & deter.)
 avgConf = NaN(nSub,2);
 for iHyp = 1:2, avgConf(:,iHyp) = mean(conf(cidx{iHyp},:), 1, 'OmitNaN')'; end
@@ -183,14 +187,20 @@ for iHyp = 1:2, avgConf(:,iHyp) = mean(conf(cidx{iHyp},:), 1, 'OmitNaN')'; end
 % Prepare the window
 figure('Position', [804 906 120 200]);
 
-prc = 1000;
+% Prepare the output variable
+prc = 1e4;
 f = NaN(2,prc);
 
+% For each type of regularity
 for iHyp = 1:2
     
     % Measure a kernel density from subjects' confidence ratings
-    y = conf(cidx{iHyp},:);
-    [f(iHyp,:), u] = ksdensity(y(:), linspace(0,1,prc), 'BandWidth', 0.05);
+    dist = conf(cidx{iHyp},:);
+    [f(iHyp,:), u] = ksdensity( dist(:), ...        % which distribution to plot
+        'BandWidth',            0.05, ...           % bandwidth of the kernel smoothing window 
+        'Support',              [0,1], ...          % restrict the kernel to a certain range of values
+        'BoundaryCorrection',   'Reflection', ...   % type of correction for the boundaries
+        'NumPoints',            prc);               % size of the grid
     
     % Normalize the distribution such that it can be directly compared
     % between both conditions (because there are not necessarily the same
@@ -198,7 +208,7 @@ for iHyp = 1:2
     f(iHyp,:) = f(iHyp,:) ./ sum(f(iHyp,:));
     
     % Measure average confidence rating
-    avg = mean(y(:), 'OmitNaN');
+    avg = mean(dist(:), 'OmitNaN');
     [~,i] = min(abs(avg - u));
     
     % Mirror the second distribution
