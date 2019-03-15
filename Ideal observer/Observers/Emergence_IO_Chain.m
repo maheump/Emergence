@@ -45,7 +45,7 @@ cond = ff2n(i) + 1;
 ncond = 2^i;
 
 % Count the number of As and Bs after each transition
-o_nXgX = NaN(1,ncond);
+o_nXgX = NaN(2,ncond);
 for c = 1:ncond
     
     % Locate positions of the current transition
@@ -69,7 +69,7 @@ if isa(prior, 'char') && strcmpi(prior, 'Bayes-Laplace')
     
 % Non-informative Jeffreys prior
 elseif isa(prior, 'char') && strcmpi(prior, 'Jeffreys')
-    p_nXgX = ones(2,ncond)./i;
+    p_nXgX = ones(2,ncond) ./ 2;
     
 % Custom prior
 elseif isa(prior, 'double') && numel(prior) == ncond*2
