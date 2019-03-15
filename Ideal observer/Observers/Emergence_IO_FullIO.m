@@ -28,8 +28,8 @@ function out = Emergence_IO_FullIO( ...
 % point such that the sequence is simply a fully stochastic one. The
 % possible sequences are thus:
 %   - y = [Fully stochastic (1:N)]
-%   - y = [Fully stochastic (1:Jk), Probabilistically generated (Jk:N)]
-%   - y = [Fully stochastic (1:Jk), Deterministically generated (Jk:N)]
+%   - y = [Fully stochastic (1:Jk), Probabilistically generated (Jk+1:N)]
+%   - y = [Fully stochastic (1:Jk), Deterministically generated (Jk+1:N)]
 % where Jk is the position of the change point.
 % 
 % The present observer tries to infer the posterior probability of each of
@@ -245,7 +245,7 @@ if ischar(p_pTi)
     end
     if verbose, fprintf('  * Type of prior over statistics: %s\n', p_pTi); end
 elseif ~ischar(p_pTi)
-    if any(size(p_pTi) ~= [nTdim(probamod), 2])
+    if any(size(p_pTi) ~= [2, nTdim])
         error('The custom prior has the wrong size');
     end
     if verbose, fprintf('  * Type of prior over statistics: custom\n'); end
