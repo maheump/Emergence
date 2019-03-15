@@ -43,12 +43,6 @@ strpat = cellfun(@(xval) pat2str(xval), numpat, 'UniformOutput', 0);   % strings
 % Get theoretical probabilities associated with those patterns
 [pA, pAlt, pAgB, pBgA] = cellfun(@(xval) pat2proba(xval, [1 2], true), numpat);
 
-% Shannon entropy is not defined for discrete probability values
-pAgB(pAgB == 0) =   eps;
-pAgB(pAgB == 1) = 1-eps;
-pBgA(pBgA == 0) =   eps;
-pBgA(pBgA == 1) = 1-eps;
-
 % Get corresponding entropy levels
 TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), pAgB, pBgA);
 
