@@ -1,4 +1,4 @@
-function [ lines ] = Emergence_PlotGridOnTri( nGrid, dims, col, tricc )
+function lines = Emergence_PlotGridOnTri( nGrid, dims, col, tricc )
 % EMERGENCE_PLOTGRIDONTRI displays a grid on the triangle.
 %   - "nGrid": a scalar number specifying the number of grid lines to
 %       display.
