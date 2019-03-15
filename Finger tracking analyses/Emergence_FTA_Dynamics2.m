@@ -39,7 +39,6 @@ for iHyp = [2,1]
     % Get transition probabilities from the deterministic regularities
     elseif iHyp == 2
         [~, ~, pAgB, pBgA] = cellfun(@(x) pat2proba(x, 1:2, true), det');
-        pAgB(pAgB == 1) = 1-eps;
         pXgY = [pAgB, pBgA];
     end
     
