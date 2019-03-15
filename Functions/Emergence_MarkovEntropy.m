@@ -14,10 +14,20 @@ pBgB = 1 - pAgB;
 pA = pAgB ./ (pAgB + pBgA);
 pB = 1 - pA;
 
-% Compute entropy
-H = -(pA.*pAgA.*(log2(pA) + log2(pAgA)) ...
-    + pA.*pBgA.*(log2(pA) + log2(pBgA)) ...
-    + pB.*pAgB.*(log2(pB) + log2(pAgB)) ...
-    + pB.*pBgB.*(log2(pB) + log2(pBgB)));
+% Compute the 4 different parts of the entropy
+H = [pA .* pAgA .* (log2(pA) + log2(pAgA)), ...
+     pA .* pBgA .* (log2(pA) + log2(pBgA)), ...
+     pB .* pAgB .* (log2(pB) + log2(pAgB)), ...
+     pB .* pBgB .* (log2(pB) + log2(pBgB))];
+
+% Get transitions for which the probability is null
+na = [pAgA, pBgA, pAgB, pBgB] == 0;
+
+% Replace the corresponding (uncomputablte) part in the entropy by the
+% limit 0*log2(0) = 0
+H(na) = 0;
+ 
+% Compute Shannon entropy by summing over the 4 different parts
+H = -sum(H);
 
 end
