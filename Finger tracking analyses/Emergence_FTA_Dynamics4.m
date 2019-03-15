@@ -95,14 +95,14 @@ for iHyp = 1:2
     % ideal observer
     detecmask = (filter{iHyp} == 3);
     
-    % For each type of regularity
-    for iSeq = 1:numel(cidx{iHyp})
+    % Separately for each subject
+    for iSub = 1:nSub
         
-        % Select current sequence for subjects that correctly labeled it
-        y = Y(iSeq,:);
-        idx = detecmask(iSeq,:);
+        % Get data over the different sequences
+        y = Y(:,iSub);
+        idx = detecmask(:,iSub);
         y = y(idx);
-        nsub = numel(y);
+        nseq = numel(y);
         
         % Specify the dimensions of the problem
         dim         = []; % empty variable
@@ -111,24 +111,24 @@ for iHyp = 1:2
         dim.n_theta = 0;  % number of evolution parameters
         dim.n_t     = 1;  % number of time samples
         
-        % Define minimal options
+        % Specify options
         options             = [];
         options.DisplayWin  = 0;
         options.verbose     = 0;
-        options             = repmat({options}, [nsub,1]);
+        options             = repmat({options}, [nseq,1]);
         optiongp            = [];
         optiongp.DisplayWin = 0;
         optiongp.verbose    = 0;
         
         % Explaining variable: position of the observation post-change-point
-        for iSub = 1:nsub, options{iSub}.inG.p = (1:numel(y{iSub})); end
+        for iseq = 1:nseq, options{iseq}.inG.p = (1:numel(y{iseq})); end
         
         % Run the mixed-effect fitting scheme (it deduces priors through
         % empirical Bayes) using a variational procedure (it uses Laplace
         % approximation) in order to estimate the best parameters for each
         % model, each condition and each subject
-        [p_sub{iHyp}(iSeq,idx), o_sub{iHyp}(iSeq,idx), ...
-         p_gp{iHyp}(iSeq,idx),  o_gp{iHyp}(iSeq,idx)] = ...
+        [p_sub{iHyp}(idx,iSub), o_sub{iHyp}(idx,iSub), ...
+         p_gp{iHyp}(idx,iSub),  o_gp{iHyp}(idx,iSub)] = ...
             VBA_MFX(y, [], [], @g_SIGM, dim, options, [], optiongp);
     end
 end
@@ -218,7 +218,7 @@ Emergence_PlotSubGp(avgslope, tricol(1:2,:));
 
 % Customize the axes
 set(gca, 'XTick', [], 'XColor', 'None', 'Box', 'Off');
-axis([0,3,0,1.4]);
+axis([0,3,0,1.8]);
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(avgslope);
