@@ -18,8 +18,7 @@ nt = nBin^2; % total number of vertices
 
 % Build the barycentric grids based on the number of bins
 pgrid = linspace(0, 1, nBin+1);
-pPgrid = cell2mat(cellfun(@(x,y) repmat(x,y,1), num2cell(pgrid), ...
-    num2cell(nBin+1:-1:1), 'UniformOutput', 0)');
+pPgrid = cell2mat(arrayfun(@(x,y) repmat(x,y,1), pgrid, nBin+1:-1:1, 'UniformOutput', 0)');
 pDgrid = cell2mat(arrayfun(@(x) (0:1/nBin:x)', 1-pgrid, 'UniformOutput', 0)');
 
 % Triangle's specifications
@@ -45,8 +44,8 @@ tri = tri(triidx,:);
 % Get the (2) cartesian coordinates of the (3) points (the vertices)
 % defining each small triangle
 rsptri = reshape(tri', [1,3,nt]);
-toto = cat(1, x(rsptri), y(rsptri));
-tricartescoord = squeeze(mat2cell(toto, 2, 3, ones(1,1,nt)));
+intermvar = cat(1, x(rsptri), y(rsptri));
+tricartescoord = squeeze(mat2cell(intermvar, 2, 3, ones(1,1,nt)));
 
 % Convert cartesian coordinates of vertices to barycentric ones
 tribaryccoord = cellfun(@(x) cartes2baryc(x, tcn), tricartescoord, 'UniformOutput', 0);
@@ -74,11 +73,11 @@ for iMap = 1:2
     
     % Get reported subjective probabilities from the subjects/IO
     condpoints = cellfun(@(x) x.BarycCoord, eval(lab{iMap}{2}), 'UniformOutput', 0);
-    condpoints = cell2mat(condpoints(detecmask));
+    condpoints = cell2mat(condpoints(:));
     
     % Bin those reported subjective probabilities according to the
     % barycentric grid defined earlier
-    obsidx = cellfun(@(x) all(condpoints > x(1,:) & ...
+    obsidx = cellfun(@(x) all(condpoints > x(1,:)  & ...
                               condpoints < x(2,:), 2), barycbinlim, 'UniformOutput', 0);
     
     % Count the number of observations in each bin
@@ -90,7 +89,7 @@ for iMap = 1:2
     obspoints = cellfun(@(x) x.BarycCoord, eval(lab{iMap}{1}), 'UniformOutput', 0);
     
     % Select only sequences that were correctly labelled
-    obspoints = cell2mat(obspoints(detecmask));
+    obspoints = cell2mat(obspoints(:));
     
     % Get and average data from the IO/subjects in those bins  
     obsavgbel = cellfun(@(x) mean(obspoints(x,:), 1), obsidx, 'UniformOutput', 0);
