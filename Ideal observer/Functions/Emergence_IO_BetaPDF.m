@@ -1,10 +1,17 @@
 function  y = Emergence_IO_BetaPDF(x,a,b,n)
-% Way faster than the regular MATLAB "betapdf" function because:
-%   - it does not check the inputs, but directly "repmat" the coefficients
-%   - it does not have to check whether the inputs are smaller than 0
-%   - it does not have to check the size of x
+% EMERGENCE_BETAPDF returns the beta probability density as the MATLAB
+% "betadf" function but in a much faster way because:
+%   (1) it does not check the inputs, but directly "repmat" the coefficients
+%   (2) it does not check whether the inputs are smaller than 0
+%   (3) it does not check the size of x
+%   - "x": values to be evaluated.
+%   - "a": first parameter.
+%   - "b": second parameter.
+%   - "n": number of values to be evaluated (for efficiency).
 % 
 % Copyright (c) 2018 Maxime Maheu
+
+if nargin < 4, n = numel(x); end
 
 y = zeros(1, n);
 

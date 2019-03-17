@@ -57,12 +57,12 @@ if any(dist2(:) >  1), dist2(dist2 > 1) = 1-eps; end
 %  ====================
 
 % Define Kullback-Leibler divergence
-% !!! It is NOT symmetrical: D_KL(p,q) =/ D_KL(q,p))
+% !!! It is NOT symmetrical: D_KL(p,q) =/ D_KL(q,p)
 % see https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 KL = @(p,q) sum(p .* log2(p./q), 2, 'OmitNaN')';
 
 % Define Jensen-Shannon divergence
-% !!! It is symmetrical: D_JS(p,q) = D_JS(q,p))
+% !!! It is symmetrical: D_JS(p,q) = D_JS(q,p)
 % see https://en.wikipedia.org/wiki/Jensen%E2%80%93Shannon_divergence
 JS = @(p,q) (1/2) .* KL(p, (p+q)/2) + (1/2) .* KL(q, (p+q)/2);
 

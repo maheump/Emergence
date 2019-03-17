@@ -41,7 +41,7 @@ for k = 1:N
     end
     
     % Compute the entropy of the prediction
-    predent(k)  = Emergence_IO_Entropy(pObs);
+    predent(k) = Emergence_IO_Entropy(pObs);
     
     % Compute theoretical Shannon surprise
     pe(k)   = 1 - pObs;   % prediction error
@@ -55,8 +55,8 @@ for k = 1:N
      IOfun(seq(1:k), inputs{:});
 end
 
-% Discard the last prediction because we do not have any observation to
-% compare with (the sequence is over)
+% Discard the last prediction because there is no observation to compare it
+% with (the sequence is over)
 if nargout > 1, predA = predA(1:end-1); end
 
 % If posterior distributions are marginal distributions, we assume

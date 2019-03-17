@@ -1,6 +1,7 @@
 function [ pY, pAgY ] = Emergence_IO_Null( K, scaleme )
 % EMERGENCE_IO_NULL returns the marginal likelihood of a sequence under a
-% fully random model that assume that
+% fully random model that assume that observations are at chance level and
+% independent.
 %   - "K": the length of the sequence to consider (note that we do not need
 %       the actual sequence here).
 %   - "scaleme": a string ('lin' or 'log') specifying whether the model
