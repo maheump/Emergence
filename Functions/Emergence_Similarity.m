@@ -45,6 +45,9 @@ elseif isnumeric(optim)
 end
 nd = numel(dlist);
 
+% Get the number of dimensions
+k = size(pc, 2);
+
 % Prepare output variable
 all = NaN(nd,1);
 
@@ -61,8 +64,8 @@ for d = 1:nd
     if checkfun('P')
         p = p(:); % column vector
         q = q(:); % column vector
-        mp = sum(p) / n; % average (over observations and dimensions)
-        mq = sum(q) / n; % average (over observations and dimensions)
+        mp = sum(p) / (k*n); % average (over observations and dimensions)
+        mq = sum(q) / (k*n); % average (over observations and dimensions)
         all(d) = sum((p - mp) .* (q - mq)) / ... % correlation coefficient
             (sqrt(sum((p - mp) .^ 2)) * sqrt(sum((q - mq) .^ 2)));
         
@@ -97,7 +100,6 @@ for d = 1:nd
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     elseif checkfun('M')
         e = p - q; % signed error
-        k = size(e, 2); % number of dimensions
         S = (1/n) * (e' * e); % covariance matrix
         all(d) = -1/2 * sum(log(det(S)) + sum(e * inv(S) .* e, 2) + k * log(2*pi));
         % log-likelihood of the bivariate distance
