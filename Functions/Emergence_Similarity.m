@@ -21,7 +21,7 @@ function [ out, all, idx ] = Emergence_Similarity( pb, qb, metric, optim )
 if isstruct(pb), pb = pb.BarycCoord; end
 if isstruct(qb), qb = qb.BarycCoord; end
 if any(size(pb) ~= size(qb)), error('Inputs must have the same size'); end
-N = size(pb,1);
+[N,k] = size(pb);
 
 % Which metric to use
 if nargin < 3 || isempty(metric), metric = 'MC'; end
@@ -32,6 +32,7 @@ if checkfun('C')
     tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
     pc = pb * tcn;
     qc = qb * tcn;
+    k = 2; % 2 dimensions in that case
 end
 
 % Whether to optimize for temporal delay
@@ -45,9 +46,6 @@ elseif isnumeric(optim)
     if any(dlist < -N | dlist > N), error('Check the shift array.'); end
 end
 nd = numel(dlist);
-
-% Get the number of dimensions
-k = size(pc, 2);
 
 % Prepare output variable
 all = NaN(nd,1);
