@@ -1,7 +1,7 @@
 % Script showing the effect of the memory leak onto different variables
 % reflecting the inference scenario of ideal observers learning either
 % probabilistic or deterministic regularities.
-%
+% 
 % Copyright (c) 2018 Maxime Maheu
 
 %% INITIALIZATION
