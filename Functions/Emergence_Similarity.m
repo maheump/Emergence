@@ -72,7 +72,7 @@ for d = 1:nd
         e = p - q; % signed error
         se = e.^2; % squared error
         sse = sum(se, 2); % sum of squared error (over dimensions)
-        all(d) = mean(sse); % average squared error (over observations)
+        all(d) = sum(sse) / n; % average squared error (over observations)
         
     % Euclidean distance
     % ~~~~~~~~~~~~~~~~~~
@@ -81,7 +81,7 @@ for d = 1:nd
         se = e.^2; % squared error
         sse = sum(se, 2); % sum of squared error (over dimensions)
         ed = sqrt(sse); % euclidean distance
-        all(d) = mean(ed); % average euclidean distance (over observations)
+        all(d) = sum(ed) / n; % average euclidean distance (over observations)
         
     % Log-likelihood under univariate normally distributed errors
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
