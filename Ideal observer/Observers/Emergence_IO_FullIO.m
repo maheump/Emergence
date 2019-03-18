@@ -344,6 +344,9 @@ if islog, p_pJk = log(p_pJk); end
 % parameter(s) of a given model) for the models because it is
 % computationaly demanding
 if nargin < 11, postprec = []; end
+if numel(postprec) > 1 || any(postprec < 0 | postprec > 1)
+    error('Check the precision of the probability grid ');
+end
 if ~isempty(postprec), fprintf(['  * Precision of the posterior over ', ...
         'models'' parameters = %1.0f%%\n'], ceil(postprec*100)); end
 if ~isempty(postprec), nTprec = 1/postprec; end
