@@ -91,7 +91,8 @@ for d = 1:nd
         p = p(:); % column vector
         q = q(:); % column vector
         e = p - q; % signed error
-        s2 = (1/(n-1)) * sum(e.^2); % variance with mu = 0
+        me = sum(e,1) ./ n; % average error
+        s2 = (1/(n-1)) * sum((e-me).^2); % variance with mu = 0
         all(d) = - n/2 * log(2*pi) - n/2 * log(s2) - 1/(2*s2) * sum(e.^2);
         % log-likelihood of the univariate distance
         
