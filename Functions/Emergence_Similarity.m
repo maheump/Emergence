@@ -91,7 +91,7 @@ for d = 1:nd
         p = p(:); % column vector
         q = q(:); % column vector
         e = p - q; % signed error
-        s2 = (1/n) * sum(e.^2); % variance with mu = 0
+        s2 = (1/(n-1)) * sum(e.^2); % variance with mu = 0
         all(d) = - n/2 * log(2*pi) - n/2 * log(s2) - 1/(2*s2) * sum(e.^2);
         % log-likelihood of the univariate distance
         
@@ -99,7 +99,8 @@ for d = 1:nd
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     elseif checkfun('M')
         e = p - q; % signed error
-        S = (1/n) * (e' * e); % covariance matrix
+        me = sum(e,1) ./ n; % average error
+        S = (1/(n-1)) * ((e-me)' * (e-me)); % covariance matrix
         all(d) = -1/2 * sum(log(det(S)) + sum(e * inv(S) .* e, 2) + k * log(2*pi));
         % log-likelihood of the bivariate distance
         % N.B. It is equivalent to the univariate case when e is a vector, 
