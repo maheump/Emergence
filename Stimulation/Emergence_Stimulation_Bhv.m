@@ -267,7 +267,7 @@ RandFun = @(len) (rand(1, len) < 0.5) + 1;
 
 % Save triangle specifications
 S.Tri.w = trglw;
-S.Tri.h = trglw;
+S.Tri.h = trglh;
 S.Tri.x = trglxgc;
 S.Tri.y = trglygc;
 S.Tri.Coord = trglc;
@@ -408,7 +408,7 @@ fprintf('The experiment will thus last ~%i minutes.\n', (S.SeqDur * S.Ntrials) /
 fprintf('\nExperiment started...');
 
 % For each trial
-for t = 1%:S.Ntrials
+for t = 1:S.Ntrials
     
     % Prepare output variables
     D{t}.StimOnTime  = NaN(1, S.Nstims);
