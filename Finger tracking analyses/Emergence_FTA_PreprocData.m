@@ -180,8 +180,9 @@ for iSub = 1:nSub
         traj = G{iSeq,iSub}.DiscreteMouseCoord';
         
         % Correct trajectories
-        traj = Emergence_ProjOnTri(traj, tripxl);
+        [traj, corr] = Emergence_ProjOnTri(traj, tripxl);
         G{iSeq,iSub}.CartesCoord = traj;
+        G{iSeq,iSub}.Corr = corr;
         
         % Convert these x/y coordinates into barycentric ones
         % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -205,6 +206,14 @@ for iSub = 1:nSub
         G{iSeq,iSub}.BarycCoord = lambda;
     end
 end
+
+% Display the average distance
+corr = mat2cell(G, nSeq, ones(1,nSub));
+corr = cellfun(@(y) cell2mat(cellfun(@(x) x.Corr, y, 'UniformOutput', 0)), ...
+    corr, 'UniformOutput', 0);
+dist = cellfun(@(x) mean(x(:,2)), corr);
+fprintf('=> Average projection distance: %1.2f pixels [%1.2f, %1.2f] (%1.2f).\n', ...
+    mean(dist), min(dist), max(dist), sem(dist));
 
 %% RUN THE IDEAL OBSERVER ON SEQUENCES THAT WERE PRESENTED TO THE SUBJECTS
 %  =======================================================================
