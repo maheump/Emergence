@@ -1,7 +1,7 @@
 function dp = Emergence_FindDetecPoint(bel)
 % EMERGENCE_FINDDETECPOINT returns position of the detection point.
 %   - "bel": the 1xN array of posterior probabilities as a function of
-%   time.
+%       time.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
