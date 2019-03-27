@@ -27,23 +27,24 @@ Emergence_DefaultFigureProperties;
 % true value of theta and (2) the weight parameter
 theta  = 0:0.01:1;
 weight = 1/2:0.005:1;
-thetastar = (theta'*weight) + ((1-theta')*(1-weight));
+thetastar = (weight'*theta) + ((1-weight')*(1-theta));
 
 % Prepare a new window
 figure('Units', 'Normalized', 'Position', [0.4 1/3 1/5 1/3]);
 
 % Display the heat map
-imagesc(weight, theta, thetastar); hold('on');
+imagesc(theta, weight, thetastar); hold('on');
+contour(theta, weight, thetastar, 'k-');
 
 % Add a colorbar and customize the axes 
 cbr = colorbar('Location', 'SouthOutside'); caxis([0,1]);
-axis('xy'); axis('square');
+axis('square');
 
 % Add some text labels
 cbr.Label.String = 'Remembered value of $\theta$';
-cbr.Label.Interpreter = 'LaTeX'; 
-xlabel('Weights $w = p(\hat{y}_{k} = {y}_{k})$', 'Interpreter', 'LaTeX');
-ylabel('True value of $\theta$', 'Interpreter', 'LaTeX');
+cbr.Label.Interpreter = 'LaTeX';
+xlabel('True value of $\theta$', 'Interpreter', 'LaTeX');
+ylabel('Weights $w = p(\hat{y}_{k} = {y}_{k})$', 'Interpreter', 'LaTeX');
 
 %% DEFINE A SET OF LEAKY PARAMETERS
 %  ================================
