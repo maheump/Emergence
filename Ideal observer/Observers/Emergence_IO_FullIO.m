@@ -347,7 +347,7 @@ if nargin < 11, postprec = []; end
 if numel(postprec) > 1 || any(postprec < 0 | postprec > 1)
     error('Check the precision of the probability grid ');
 end
-if ~isempty(postprec), fprintf(['  * Precision of the posterior over ', ...
+if ~isempty(postprec) && verbose, fprintf(['  * Precision of the posterior over ', ...
         'models'' parameters = %1.0f%%\n'], ceil(postprec*100)); end
 if ~isempty(postprec), nTprec = 1/postprec; end
 
