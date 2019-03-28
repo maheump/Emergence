@@ -7,6 +7,7 @@ The different observers available are:
 * ```Emergence_IO_Markov``` estimates the frequency of first-order transitions (A|A, A|B, B|A, and B|B).
 * ```Emergence_IO_Chain``` estimates the frequency of transitions of any order.
 * ```Emergence_IO_Tree``` detects repetition of pattern of any length up to a given limit.
+
 They all return the marginal likelihood of the sequence and the probability that the next observation will be an A.
 
 The full Bayesian ideal observer of the task is implemented in  ```Emergence_IO_FullIO``` and considers there might be a change point in the sequence separating a fully-stochastic part from a regular part that can be described using one of the previous observers.
@@ -50,7 +51,7 @@ In the case of the stochastic-to-deterministic hypothesis, the likelihood of the
 <p align="center">
   <a href="https://www.codecogs.com/eqnedit.php?latex=p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\sum_{r\in\{\mathcal{R}\}}&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)&space;\\&space;p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\frac{1}{2}&space;\cdot&space;\left(\sum_{i=1}^{\min\left(K,\nu\right)}&space;(y_{k&plus;1:K}&space;\equiv&space;[y_{k&plus;1:k&plus;i}]^{n})&space;\cdot&space;\frac{1}{3^{i}}&space;&plus;&space;\sum_{i=K&plus;1}^{\nu}&space;2^{i-K}&space;\cdot&space;\frac{1}{3^{i}}\right)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\sum_{r\in\{\mathcal{R}\}}&space;p\left(y_{k&plus;1:K}|r,\mathcal{M}_{\text{D}}\right)&space;\cdot&space;p\left(r|\mathcal{M}_{\text{D}}\right)&space;\\&space;p\left(y_{k&plus;1:K}|\mathcal{M}_{\text{D}}\right)&space;=&space;\frac{1}{2}&space;\cdot&space;\left(\sum_{i=1}^{\min\left(K,\nu\right)}&space;(y_{k&plus;1:K}&space;\equiv&space;[y_{k&plus;1:k&plus;i}]^{n})&space;\cdot&space;\frac{1}{3^{i}}&space;&plus;&space;\sum_{i=K&plus;1}^{\nu}&space;2^{i-K}&space;\cdot&space;\frac{1}{3^{i}}\right)" title="p\left(y_{k+1:K}|\mathcal{M}_{\text{D}}\right) = \sum_{r\in\{\mathcal{R}\}} p\left(y_{k+1:K}|r,\mathcal{M}_{\text{D}}\right) \cdot p\left(r|\mathcal{M}_{\text{D}}\right) \\ p\left(y_{k+1:K}|\mathcal{M}_{\text{D}}\right) = \frac{1}{2} \cdot \left(\sum_{i=1}^{\min\left(K,\nu\right)} (y_{k+1:K} \equiv [y_{k+1:k+i}]^{n}) \cdot \frac{1}{3^{i}} + \sum_{i=K+1}^{\nu} 2^{i-K} \cdot \frac{1}{3^{i}}\right)" /></a>
 </p>
-Where nu is the length of the longest possible pattern considered here. 
+Where nu is the length of the longest possible pattern considered here.
 
 The first group of plots from ```Emergence_IO_ToyExampleFullIO``` displays the posterior distribution over models (and related metrics).
 
