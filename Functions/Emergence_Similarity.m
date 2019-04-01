@@ -1,4 +1,4 @@
-function [ out, all, idx ] = Emergence_Similarity( pb, qb, metric, optim )
+function [ out, gro, idx ] = Emergence_Similarity( pb, qb, metric, optim )
 % EMERGENCE_SIMILARITY returns similarity index between 2 matrices of
 % posterior probability.
 %   - "pb": first N*3 matrix of posterior probability.
@@ -7,8 +7,9 @@ function [ out, all, idx ] = Emergence_Similarity( pb, qb, metric, optim )
 %       - "P*": Pearson correlation coefficient...
 %       - "E*": Mean squared error...
 %       - "D*": Euclidean distance...
-%       - "U*": Univariate log-likelihood...
-%       - "M*": Multivariate log-likelihood...
+%       - "R*": Mean squared error from univariate regressions...
+%       - "M*": Mean squared error from multivariate regression...
+%       - "L*": log-likelihood from multivariate regression...
 %       - "*B": ...on Barycentric coordinates
 %       - "*C": ...on Cartesian coordinates
 %   - "optim": either a boolean specifying whether to optimize for temporal
@@ -25,7 +26,8 @@ if any(size(pb) ~= size(qb)), error('Inputs must have the same size'); end
 
 % Which metric to use
 if nargin < 3 || isempty(metric), metric = 'MC'; end
-checkfun = @(x) contains(metric, x, 'IgnoreCase', true);
+metric = upper(metric);
+checkfun = @(x) any(x == metric);
 
 % Convert to cartesian coordinates
 if checkfun('C')
@@ -43,20 +45,22 @@ if islogical(optim)
     end
 elseif isnumeric(optim)
     dlist = optim;
-    if any(dlist < -N | dlist > N), error('Check the shift array.'); end
+    if any(dlist < -N | dlist > N)
+        dlist = dlist(dlist >= -N & dlist <= N);
+    end
 end
 nd = numel(dlist);
 
 % Prepare output variable
-all = NaN(nd,1);
+gro = NaN(nd,1);
 
 % Shift one with respect to the other
 for d = 1:nd
-    curd = dlist(d);
-    if     checkfun('C'), [p,q] = Emergence_Shift(pc, qc, curd);
-    elseif checkfun('B'), [p,q] = Emergence_Shift(pb, qb, curd);
+    m = dlist(d);
+    if     checkfun('C'), [p,q] = Emergence_Shift(pc, qc, m);
+    elseif checkfun('B'), [p,q] = Emergence_Shift(pb, qb, m);
     end
-    n = N - abs(curd); % number of remaining observations
+    n = N - abs(m); % number of remaining observations
     
     % Pearson correlation coefficient
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,8 +69,9 @@ for d = 1:nd
         q = q(:); % column vector
         mp = sum(p) / (k*n); % average (over observations and dimensions)
         mq = sum(q) / (k*n); % average (over observations and dimensions)
-        all(d) = sum((p - mp) .* (q - mq)) / ... % correlation coefficient
+        gro(d) = sum((p - mp) .* (q - mq)) / ... % correlation coefficient
             (sqrt(sum((p - mp) .^ 2)) * sqrt(sum((q - mq) .^ 2)));
+        gro(d) = gro(d) / abs(m);
         
     % Mean squared error
     % ~~~~~~~~~~~~~~~~~~
@@ -74,7 +79,7 @@ for d = 1:nd
         e = p - q; % signed error
         se = e.^2; % squared error
         sse = sum(se, 2); % sum of squared error (over dimensions)
-        all(d) = sum(sse) / n; % average squared error (over observations)
+        gro(d) = sum(sse) / n; % average squared error (over observations)
         
     % Euclidean distance
     % ~~~~~~~~~~~~~~~~~~
@@ -83,41 +88,55 @@ for d = 1:nd
         se = e.^2; % squared error
         sse = sum(se, 2); % sum of squared error (over dimensions)
         ed = sqrt(sse); % euclidean distance
-        all(d) = sum(ed) / n; % average euclidean distance (over observations)
+        gro(d) = sum(ed) / n; % average euclidean distance (over observations)
         
-    % Log-likelihood under univariate normally distributed errors
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    elseif checkfun('U')
-        p = p(:); % column vector
-        q = q(:); % column vector
-        e = p - q; % signed error
-        me = sum(e,1) ./ n; % average error
-        s2 = (1/(n-1)) * sum((e-me).^2); % variance with mu = 0
-        all(d) = - n/2 * log(2*pi) - n/2 * log(s2) - 1/(2*s2) * sum(e.^2);
-        % log-likelihood of the univariate distance
+	% Univariate linear regression
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    elseif checkfun('R')
+        e = NaN(size(p));
+        for i = 1:k % for each dimension
+            Y = p(:,i); % variable to explain
+            X = [ones(n,1), q(:,i)]; % design matrix
+            B = pinv(X) * Y; % regression coefficients (slower than X \ Y but handles singular values)
+            Yhat = X * B; % predictions
+            e(:,i) = Y - Yhat; % signed error
+        end
+        se = e.^2; % squared error
+        sse = sum(se, 2); % sum of squared error (over dimensions)
+        gro(d) = sum(sse) / n; % average squared error (over observations)
         
-    % Log-likelihood under multivariate normally distributed errors
-    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    elseif checkfun('M')
-        e = p - q; % signed error
-        me = sum(e,1) ./ n; % average error
-        S = (1/(n-1)) * ((e-me)' * (e-me)); % covariance matrix
-        all(d) = -1/2 * sum(log(det(S)) + sum(e * inv(S) .* e, 2) + k * log(2*pi));
-        % log-likelihood of the bivariate distance
-        % N.B. It is equivalent to the univariate case when e is a vector, 
-        % and thus k = 1.
-    end    
+	% Multivariate linear regression
+    % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    % See http://users.stat.umn.edu/~helwig/notes/mvlr-Notes.pdf
+    elseif checkfun('M') || checkfun('L')
+        Y = p; % variable to explain
+        X = [ones(n,1), q]; % design matrix
+        B = inv(X' * X) * X' * Y; % regression coefficients
+        Yhat = X * B; % predictions
+        E = Y - Yhat; % signed error
+        if checkfun('M')
+            gro(d) = mean(E(:).^2); % average squared error (over observations)
+        elseif checkfun('L')
+            S = ((Y'-Yhat') * (Y'-Yhat')') ./ (n-k-1); % covariance matrix
+            LLH = NaN(1,n); % log likelihood of each observation
+            for i = 1:n
+                LLH(i) = (Y(i,:)' - B'*X(i,:)')' * S * (Y(i,:)' - B'*X(i,:)');
+            end
+            gro(d) = -1/2 * sum(LLH);
+        end
+    end
 end
 
 % Whether to find the maximum or the minimum over shifts
 if     checkfun('P'), funtooptim = @max; % maximum correlation coefficient
 elseif checkfun('E'), funtooptim = @min; % minimum error
 elseif checkfun('D'), funtooptim = @min; % minimum distance
-elseif checkfun('U'), funtooptim = @max; % maximum log-likelihood
-elseif checkfun('M'), funtooptim = @max; % maximum log-likelihood
+elseif checkfun('R'), funtooptim = @min; % minimum error
+elseif checkfun('M'), funtooptim = @min; % minimum error
+elseif checkfun('L'), funtooptim = @max; % maximum likelihood
 end
     
 % Find the best temporal shift
-[out,idx] = funtooptim(all);
+[out,idx] = funtooptim(gro);
 
 end
