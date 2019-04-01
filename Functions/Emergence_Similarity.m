@@ -31,9 +31,9 @@ checkfun = @(x) any(x == metric);
 
 % Convert to cartesian coordinates
 if checkfun('C')
-    tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-    pc = pb * tcn;
-    qc = qb * tcn;
+    tricc = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
+    pc = pb * tricc;
+    qc = qb * tricc;
     k = 2; % 2 dimensions in that case
 end
 
