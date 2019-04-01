@@ -37,4 +37,8 @@ for k = 1:3
         'FontWeight', 'Bold', 'HorizontalAlignment', hal{k}, 'VerticalAlignment', val{k});
 end
 
+% Hide the axes
+axis('equal');
+axis('off');
+
 end
