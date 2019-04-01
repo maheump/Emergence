@@ -1,7 +1,8 @@
 function randidx = Emergence_SelectFullyStochSeq(data, filter, restopt)
 % EMERGENCE_SELECTFULLYSTOCHSEQ selects fully-stochastic parts of sequences
 %   - "data": the cell matrix of group data structures.
-%   - "filter": 
+%   - "filter": a matrix specifying which fully-stochastic sequences were
+%       accurately classified by the subjects.
 %   - "restopt": a scalar specifying 
 %       * 1: all fully-stochastic parts
 %       * 2: only fully-stochastic sequences
