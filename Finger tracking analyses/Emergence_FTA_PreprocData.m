@@ -329,7 +329,7 @@ letters = {'A','B'};
 g = repmat(0.7,1,3); % grey
 
 % Save the group data file
-savefolder = fullfile(folderpath, 'Finger tracking analyses', 'ppdata');
+savefolder = fullfile(folderpath, 'Finger tracking analyses');
 mkdir(savefolder);
 filename = fullfile(savefolder, 'Emergence_Behaviour_GroupData.mat');
 save(filename, 'G', 'IO', 'N', 'S', 'f', 'cidx', 'condlab', 'folderpath', ...
