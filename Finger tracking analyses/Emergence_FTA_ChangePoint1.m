@@ -31,7 +31,7 @@ for iHyp = 1:2
     % sequence
     bel = cellfun(@(x) x.pJkgY(:,end)', IO(cidx{iHyp},:), 'UniformOutput', 0);
     
-    % Get sequences that were corretly labeled 
+    % Get sequences that were correctly labeled 
     detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
     
     % Get the posterior distribution of change point's position separately
