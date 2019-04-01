@@ -70,8 +70,8 @@ for iHyp = 1:3
     % For sequences with a regularity
     if iHyp < 3
         
-        % CRITERION 1: keep only sequences for which sequences were
-        % correctly labelled by subjects at the post-sequence questions
+        % CRITERION 1: keep only sequences that were correctly labelled by
+        % subjects at the post-sequence questions
         subrp = cellfun(@(x) x.Questions(2) == iHyp,  G(cidx{iHyp},:));
         offlinedetecmask = subrp;
         
@@ -85,8 +85,8 @@ for iHyp = 1:3
     % For sequences without regularities
     else
         
-        % CRITERION: keep only sequences for which sequences were
-        % correctly labelled by subjects at the post-sequence questions
+        % CRITERION: keep only sequences that were correctly labelled by
+        % subjects at the post-sequence questions
         subrp = cellfun(@(x) isnan(x.Questions(2)), G(cidx{iHyp},:));
         offlinedetecmask = subrp;
         
