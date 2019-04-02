@@ -23,12 +23,15 @@ xep = -(nSamp/2):0; % ... locked on end       point
 xXp = {xcp,xdp,xep};
 
 % Prepare the output variables
-cp = cell(1,2); dp = cell(1,2); lag = cell(1,2); % change and detection points
-update = cell(1,2); % measures of the trajectories
+cp = cell(1,2); dp = cell(1,2); ep = cell(1,2); % points
+lag = cell(1,2); update = cell(1,2); % measures of the trajectories
 fingerposwrtp = cell(2,3); % trajectories locked on different point
 
 % For each type of regularity
 for iHyp = 1:2
+    
+    % Get end point positions
+    ep{iHyp} = repmat(N, numel(cidx{iHyp}), nSub);
     
     % Get change point positions
     cp{iHyp} = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:));
@@ -54,6 +57,7 @@ for iHyp = 1:2
     detecmask = (filter{iHyp} == 3);
     cp    {iHyp}(~detecmask) = NaN;
     dp    {iHyp}(~detecmask) = NaN;
+    ep    {iHyp}(~detecmask) = NaN;
     lag   {iHyp}(~detecmask) = NaN;
     update{iHyp}(~detecmask) = NaN;
     
@@ -63,39 +67,21 @@ for iHyp = 1:2
     % For the important points we want to lock onto
     for lock = 1:3
         
-        % Beginning and ending of the window to look in (in # of samples)
-        if     lock == 1 % lock on change point
-            begwin = cp{iHyp} + xcp(1);
-            endwin = cp{iHyp} + xcp(end);
+        % Get observations to lock onto
+        if lock == 1 % lock on change point
+            lockobs = num2cell(cp{iHyp});
         elseif lock == 2 % lock on detection point
-            begwin = dp{iHyp} + xdp(1);
-            endwin = dp{iHyp} + xdp(end);
+            lockobs = num2cell(dp{iHyp});
         elseif lock == 3 % lock on end point
-            begwin = repmat(N+xep(1),   size(cp{iHyp}));
-            endwin = repmat(N+xep(end), size(cp{iHyp}));
+            lockobs = num2cell(ep{iHyp});
         end
         
-        % Make sure the window stays in between the limits of the sequence
-        begwin(begwin < 1) = 1;
-        endwin(endwin > N) = N;
-        begwin = num2cell(begwin);
-        endwin = num2cell(endwin);
-        begwin(~detecmask) = {[]};
-        endwin(~detecmask) = {[]};
-        
-        % Get trajectory (i.e. beliefs in each hypothesis) in that window
-        % of interest
-        fing = cellfun(@(x,b,e) x.BarycCoord(b:e,:), D(cidx{iHyp},:), ...
-            begwin, endwin, 'UniformOutput', 0);
-        
-        % Fill with NaNs to make the trajectories the same size of each
-        % other
-        nSamp = numel(xXp{lock});
-        fing(cellfun(@isempty, fing)) = {NaN(nSamp,3)};
-        fing = cellfun(@(x) [x; NaN(nSamp-size(x,1),3)], fing, 'UniformOutput', 0);
+        % Get trajectory in that window of interest
+        fing = cellfun(@(p,c) Emergence_LockOnPoint(p.BarycCoord, c, xXp{lock}), ...
+            D(cidx{iHyp},:), lockobs, 'UniformOutput', 0);
         
         % Convert the cells into a big 3D matrix
-        fingerposwrtp{iHyp,lock} = cell2mat(reshape(fing, [1, 1, size(fing)]));
+        fingerposwrtp{iHyp,lock} = cell2mat(reshape(fing, [1,1,size(fing)]));
     end
 end
 
