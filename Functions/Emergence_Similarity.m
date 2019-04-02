@@ -71,7 +71,6 @@ for d = 1:nd
         mq = sum(q) / (k*n); % average (over observations and dimensions)
         gro(d) = sum((p - mp) .* (q - mq)) / ... % correlation coefficient
             (sqrt(sum((p - mp) .^ 2)) * sqrt(sum((q - mq) .^ 2)));
-        gro(d) = gro(d) / abs(m);
         
     % Mean squared error
     % ~~~~~~~~~~~~~~~~~~
