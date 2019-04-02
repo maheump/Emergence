@@ -98,9 +98,8 @@ Emergence_PlotTrajOnTri; alpha(0);
 Emergence_PlotGridOnTri(10, iHyp, tricol(iHyp,:));
 
 % Convert beliefs in each hypothesis to cartesian coordinates
-tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-cartavgcoord = flipud(avgsubtraj*tcn);
-cartsemcoord = flipud(semsubtraj*tcn);
+cartavgcoord = flipud(avgsubtraj*tricc);
+cartsemcoord = flipud(semsubtraj*tricc);
 
 % Display error bars
 plot(repmat(cartavgcoord(:,1), 1, 2)', cartavgcoord(:,2)' + [-1;1] .* cartsemcoord(:,2)', 'k-', 'LineWidth', 1/2);

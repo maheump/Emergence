@@ -41,9 +41,8 @@ avgbc = mean(binavg, 3); % average over subjects
 errbc = sem(binavg, 3); % measure dispersion over subjects
 
 % Convert beliefs in each hypothesis to cartesian coordinates
-tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-avgcc = flipud(avgbc*tcn);
-semcc = flipud(errbc*tcn);
+avgcc = flipud(avgbc*tricc);
+semcc = flipud(errbc*tricc);
 
 % Display average position in the triangle according to time spend since
 % the beginning of the sequence (in number of observations)

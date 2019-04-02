@@ -21,9 +21,6 @@ pgrid = linspace(0, 1, nBin+1);
 pPgrid = cell2mat(arrayfun(@(x,y) repmat(x,y,1), pgrid, nBin+1:-1:1, 'UniformOutput', 0)');
 pDgrid = cell2mat(arrayfun(@(x) (0:1/nBin:x)', 1-pgrid, 'UniformOutput', 0)');
 
-% Triangle's specifications
-tcn = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-
 % Deduce vertices
 % ~~~~~~~~~~~~~~~
 
@@ -48,7 +45,7 @@ intermvar = cat(1, x(rsptri), y(rsptri));
 tricartescoord = squeeze(mat2cell(intermvar, 2, 3, ones(1,1,nt)));
 
 % Convert cartesian coordinates of vertices to barycentric ones
-tribaryccoord = cellfun(@(x) cartes2baryc(x, tcn), tricartescoord, 'UniformOutput', 0);
+tribaryccoord = cellfun(@(x) cartes2baryc(x, tricc), tricartescoord, 'UniformOutput', 0);
 
 % Get limits in the 3 barycentric dimensions of each triangular bin
 barycbinlim = cellfun(@(x) [min(x,[],2)'; max(x,[],2)'], tribaryccoord, 'UniformOutput', 0);
@@ -110,7 +107,7 @@ for iMap = 1:2
           'EdgeColor', g); hold('on');
     
     % Add info about the triangle
-    tr = Emergence_PlotTriInfo(tcn, tricol);
+    tr = Emergence_PlotTriInfo(tricc, tricol);
     
     % Customize the axes
     set(gca, 'LineWidth', 1, 'FontSize', 15);
