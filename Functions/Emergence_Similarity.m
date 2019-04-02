@@ -25,7 +25,7 @@ if any(size(pb) ~= size(qb)), error('Inputs must have the same size'); end
 [N,k] = size(pb);
 
 % Which metric to use
-if nargin < 3 || isempty(metric), metric = 'MC'; end
+if nargin < 3 || isempty(metric), metric = 'EC'; end
 metric = upper(metric);
 checkfun = @(x) any(x == metric);
 
