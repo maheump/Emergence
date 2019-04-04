@@ -11,9 +11,6 @@
 %% DISPLAY TRIANGULAR COLORMAPS OF PREDICTORS
 %  ==========================================
 
-% Triangle specifications
-tricc = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
-
 % Define horizontal and vertical cartesian grids
 j = 0.001;
 xgrid = tricc(1,1):j:tricc(2,1);
@@ -36,10 +33,10 @@ ind = sub2ind([nx, ny], sub(1,:), sub(2,:));
 % Create maps of predictors
 nMaps = 4;
 Maps = repmat({NaN(nx, ny)}, 1, nMaps);
-Maps{1}(ind) = ceil(pHpgY);              % b0: offset
-Maps{2}(ind) = pHpgY ./ (pHpgY + pHdgY); % b1: proba./deter. ratio
-Maps{3}(ind) = pHsgY;                    % b2: fully-stochastic hypothesis
-Maps{4} = Maps{1} .* Maps{2};            % b3: interaction
+Maps{1}(ind) = ceil(pHpgY);                       % b0: offset
+Maps{2}(ind) = (pHpgY - pHdgY)./ (pHpgY + pHdgY); % b1: proba./deter. ratio
+Maps{3}(ind) = pHsgY;                             % b2: fully-stochastic hypothesis
+Maps{4} = Maps{1} .* Maps{2};                     % b3: interaction
 
 % Define the colormaps to use for each map
 prec = 100;
@@ -56,13 +53,13 @@ for iMap = 1:nMaps
     
     % Display maps of predictors
     imagesc(xgrid, ygrid, Maps{iMap}', 'AlphaData', ~isnan(Maps{iMap})'); hold('on');
+    contour(xgrid, ygrid, Maps{iMap}', 'k-');
     
     % Display information about the triangle
     tr = fill(tricc(:,1), tricc(:,2), 'k', 'FaceColor', 'None', 'LineWidth', 2);
     
 	% Use corresponding colormap
     colormap(sp, cmap{iMap});
-    caxis([0,1]);
     
     % Customize the axes
     axis([0, 1, 0, sqrt(3)/2]);
@@ -226,6 +223,15 @@ plot(ylim, ylim, '-', 'Color', g);
 fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
        'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2);
 plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
+
+% Display predictions of simpler models
+for iMod = 1:2
+    xm2 = mean( ioavg(:,:,iMod), 2)';
+    ym2 = mean(subavg(:,:,iMod), 2)';
+    B = Emergence_Regress(ym2, xm2, 'TLS', {'beta0', 'beta1'});
+    xval = [min(xm), max(xm)];
+    plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 1);
+end
 
 % Get average size of the bin
 avgbinsize = mean(binsubn, 2);
