@@ -55,8 +55,8 @@ xval = Emergence_Regress(avg(:,2), avg(:,1), 'OLS', 'confintx');
 figure('Position', [1 632 170 200]);
 
 % Display identity line
-plot([0,1]./2, [0,1]./2, '-', 'Color', g, 'LineWidth', 1); hold('on');
-text(0.15, 0.15, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
+plot([-1,1], [-1,1], '-', 'Color', g, 'LineWidth', 1); hold('on');
+text(-0.4, -0.4, 'Identity', 'Color', g, 'VerticalAlignment', 'Top', 'Rotation', 45);
 
 % Display regression line
 fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
@@ -73,7 +73,7 @@ scatter(avg(:,1), avg(:,2), 50+zeros(1,nR), EntCol, ...
 % Customize the axes
 set(gca, 'Box', 'Off');
 axis('equal');
-axis([0,0.3,0,0.6]);
+axis([-0.6,0.1,-0.6,0.1]);
 
 % Add some text labels
 xlabel('Ideal observer');
@@ -108,14 +108,3 @@ Emergence_PrintTstats(pval,tci,stats);
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_HW_SubCorr.pdf'));
-
-% Perform a mediation analysis
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Effect of Shannon entropy on subjects' estimated probabilities mediated
-% by ideal observer model estimated probabilities
-out = mediationAnalysis0(avg(:,2), TPent, avg(:,1));
-set(gcf, 'Position', [293 632 300 200])
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_HW_MedAnal.pdf'));

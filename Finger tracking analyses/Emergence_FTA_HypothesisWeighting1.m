@@ -21,14 +21,15 @@
 % Create colormap for the entropy
 minH = 1.4;
 maxH = Emergence_MarkovEntropy(1/2, 1/2);
-prec = 1001;
+prec = 101;
 offset = round(prec * (maxH - minH));
 EntCMap = flipud([flipud(cbrewer2('Purples', offset)); cbrewer2('Greys', prec)]);
 prec = size(EntCMap,1);
 
 % Compute 2D entropy map
 ProbaGrid = linspace(0, 1, prec);
-EntMap = Emergence_MarkovEntropy(ProbaGrid, ProbaGrid');
+EntMap = arrayfun(@(x,y) Emergence_MarkovEntropy(x,y), ...
+    repmat(ProbaGrid, [prec,1]), repmat(ProbaGrid', [1,prec]));
 
 % Compute entropy of transition probabilities from the patterns
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +116,9 @@ lag = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,2)), D(cidx{2},
 dp = cp + lag;
 
 % Restrict to sequences that were accurately classified by subjects and
-% with a regular detection point for the 
+% with a regular detection point for both the subjects and the ideal
+% observer model (it is true in all cases for the ideal observer model in
+% the case of deterministic regularities)
 detecmask = (filter{2} == 3);
 cp (~detecmask) = NaN;
 dp (~detecmask) = NaN;
@@ -177,7 +180,7 @@ if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriS.pdf'))
 else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriIO.pdf'));
 end
 
-%% Display the P/D ratio locked on the detection of deterministic regularities
+% Display the P/D ratio locked on the detection of deterministic regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Copute the P/D ratio as (p(Hd|y)-p(Hp|y)) / (p(Hd|y)+p(Hp|y))
@@ -319,8 +322,12 @@ end
 % change and the detection points
 celldp = num2cell(dp);
 celldp(cellfun(@isnan, celldp)) = {[]};
-transpbel = cellfun(@(x,d) mean(x.BarycCoord((x.Jump+1/2):d,1)), ...
-    D(cidx{2},:), celldp);
+cellcp = num2cell(cp);
+cellcp(cellfun(@isnan, cellcp)) = {[]};
+transpbel = cellfun(@(p,c,d) ...
+    (p.BarycCoord(c:d,2) - p.BarycCoord(c:d,1)) ./ (p.BarycCoord(c:d,2) + p.BarycCoord(c:d,1)), ...
+    D(cidx{2},:), cellcp, celldp, 'UniformOutput', 0);
+transpbel = cellfun(@mean, transpbel);
 
 % For each subject, average the trajectories
 data = NaN(nSub,nEnt);
@@ -349,9 +356,8 @@ figure('Position', [1266 905 120 200]);
 Emergence_PlotSubGp(data, EntCMap(colidx,:));
 
 % Customize the axes
-xlim([0,nEnt+1]); ylim([0, max(ylim)]);
-set(gca, 'Box', 'Off');
-set(gca, 'XTick', 1:nEnt, 'XTickLabel', EntLab);
+xlim([0,nEnt+1]);
+set(gca, 'XTick', 1:nEnt, 'XTickLabel', EntLab, 'Box', 'Off');
 
 % Add some text labels
 ylabel('Posterior beliefs p(M_P|y)');
