@@ -202,6 +202,11 @@ if contains(SimuType, 'PseudoDeterministic', 'IgnoreCase', true)
     % Append the fully ideal observer model
     mIO = cat(3, mIO, fullIO);
     options = cat(2, options, struct2cell(defo));
+    
+    % Attribute a color to each model
+    modc = [flipud(autumn(nMod)); tricol(2,:)];
+elseif strcmpi(SimuType, 'Leak')
+    modc = [flipud(winter(nMod-1)); zeros(1,3)];
 end
 
 % Compute posterior probability over hypotheses
@@ -210,9 +215,6 @@ nMod = size(pMgY, 3);
 
 % Define starting point
 for i = 1:numel(pMgY), pMgY{i}(1,:) = [0,0,1]; end
-
-% Attribute a color to each model
-modc = [flipud(winter(nMod-1)); zeros(1,3)];
 
 % Remove datasets 
 clear('mIO');
