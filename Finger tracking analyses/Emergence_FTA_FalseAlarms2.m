@@ -179,15 +179,23 @@ semresbinioFAL  = sem( resbinioFAL,  3);
 % Display the correlation between subjects' and ideal observer's beliefs
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% Prepare a new window
+figure('Position', [524 905 200 200]);
+
+% Display predictions from the first simpler model
+iMod = 1;
+xm = avgresbinioFAL(:,iMod);
+ym = avgresbinsubFAL(:,iMod);
+B = Emergence_Regress(ym, xm, 'TLS', {'beta0', 'beta1'});
+xval = [min(xm), max(xm)];
+plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 1); hold('on');
+
 % Residuals from which regression to plot
 iMod = 2;
 xm = avgresbinioFAL(:,iMod);
 ym = avgresbinsubFAL(:,iMod);
 xs = semresbinioFAL(:,iMod);
 ys = semresbinsubFAL(:,iMod);
-
-% Prepare a new window
-figure('Position', [524 905 200 200]);
 
 % Display the regression line
 B = Emergence_Regress(ym, xm, 'TLS', {'beta0', 'beta1'});
