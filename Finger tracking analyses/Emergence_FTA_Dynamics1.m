@@ -7,9 +7,6 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% BARYCENTRIC COORDINATES LOCKED ON DETECTION/CHANGE POINT
-%  ========================================================
-
 % Define properties of windows to look into
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -68,12 +65,9 @@ for iHyp = 1:2
     for lock = 1:3
         
         % Get observations to lock onto
-        if lock == 1 % lock on change point
-            lockobs = num2cell(cp{iHyp});
-        elseif lock == 2 % lock on detection point
-            lockobs = num2cell(dp{iHyp});
-        elseif lock == 3 % lock on end point
-            lockobs = num2cell(ep{iHyp});
+        if     lock == 1, lockobs = num2cell(cp{iHyp}); % lock on change point
+        elseif lock == 2, lockobs = num2cell(dp{iHyp}); % lock on detection point
+        elseif lock == 3, lockobs = num2cell(ep{iHyp}); % lock on end point
         end
         
         % Get trajectory in that window of interest
@@ -96,9 +90,6 @@ avglag = cellfun(@(x) mean(x, 'OmitNaN'), lag, 'UniformOutput', 0);
 % Average finger trajectory over subjects
 avgsubtraj = cellfun(@(x) mean(x, 3, 'OmitNaN'), avgfingerwrtp, 'UniformOutput', 0);
 semsubtraj = cellfun(@(x) sem( x ,3), avgfingerwrtp, 'UniformOutput', 0);
-
-%% DISPLAY TRAJECTORIES LOCKED TO DIFFERENT IMPORTANT POINTS
-%  =========================================================
 
 % Display trajectories in the triangular space
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
