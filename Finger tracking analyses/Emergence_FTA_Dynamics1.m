@@ -7,6 +7,9 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
+%% GET TRAJECTORIES LOCKED ON PARTICULAR POINTS AND ASSESS THEIR PROPERTIES
+%  ========================================================================
+
 % Define properties of windows to look into
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,14 +39,16 @@ for iHyp = 1:2
     % Measure important quantities
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    % Lock trajectories on change point
+    lockbel = cellfun(@(x,c) Emergence_LockOnPoint(x.BarycCoord(:,iHyp),c,[0,N]), ...
+            D(cidx{iHyp},:), num2cell(cp{iHyp}), 'UniformOutput', false);
+    
     % Get detection point position
-    lag{iHyp} = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,iHyp)), ...
-        D(cidx{iHyp},:), num2cell(cp{iHyp}));
+    lag{iHyp} = cellfun(@(p) Emergence_FindDetecPoint(p), lockbel);
     dp{iHyp} = cp{iHyp} + lag{iHyp};
     
     % Measure the build-up of beliefs along the relevant dimension
-    update{iHyp} = cellfun(@(x,c) mean(diff(x.BarycCoord(c:end,iHyp))), ...
-        D(cidx{iHyp},:), num2cell(cp{iHyp}));
+    update{iHyp} = cellfun(@(p) sum(diff(p), 'OmitNaN'), lockbel);
     
     % Remove sequences entailing undetected regularities
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -82,6 +87,9 @@ end
 % For deterministic regularities, also express the lag in terms of the
 % number of repetitions of the rule
 lag2 = lag{2} ./ cellfun(@numel, dr);
+
+%% DISPLAY AVERAGE LIKELIHOODS IN THE RELEVANT HYPOTHESIS
+%  ======================================================
 
 % Average over sequences for each type of regularity
 avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerposwrtp, 'UniformOutput', 0);
@@ -213,4 +221,96 @@ end
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordS.pdf'));
 else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordIO.pdf'));
+end
+
+%% DISPLAY INDIVIDUAL TRIALS LIKELIHOODS IN THE RELEVANT HYPOTHESIS
+%  ================================================================
+
+% Prepare output variable
+cp          = cell(1,2);
+sortedcp    = cell(1,2);
+idxcp       = cell(1,2);
+belincorhyp = cell(1,2);
+
+% For each type of regularity
+for iHyp = 1:2
+    
+    % Get sequences that were correctly labelled
+    detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
+    
+    % Order according to change point's position and detected/undetected
+    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'UniformOutput', 1);
+    [sortedcp{iHyp}, idxcp{iHyp}] = sortrows([cp{iHyp}(:), ...
+        detecmask(:)], [2,1]);
+    
+    % Get the beliefs in the corresponding (correct) hypothesis ordered
+    % according to the position the change point
+    belincorhyp{iHyp} = cellfun(@(x) x.BarycCoord(:,iHyp)', ...
+        D(cidx{iHyp},:), 'UniformOutput', 0);
+end
+
+% Prepare a new window
+figure('Position', [702 381 230 400]);
+cmapcol = {'Blues', 'Reds'};
+
+% For sequences with a probabilistic/deterministic regularity
+for iHyp = 1:2
+    
+    % Display the change in beliefs as a heatmap 
+    sp = subplot(2,1,iHyp);
+    bel = belincorhyp{iHyp}(idxcp{iHyp});
+    imagesc(cell2mat(bel)); hold('on');
+    
+    % Customize the colormap
+    colorbar('Location', 'EastOutside'); caxis([0,1]);
+    colormap(sp, cbrewer2(cmapcol{iHyp}));
+    
+    % Display the position of the change points
+    for d = [0,1]
+        x = cp{iHyp}(idxcp{iHyp}(sortedcp{iHyp}(:,2) == d));
+        y = find(sortedcp{iHyp}(:,2) == d);
+        stairs([x(1);x], [y(1)-1;y], 'k-');
+    end
+	
+    % Display limits between detected and undetected sequences
+    lim = find(abs(diff(sortedcp{iHyp}(:,2))) == 1) + 1/2;
+    plot([0,N+1], repmat(lim, 1, 2), 'k-');
+    
+    % Add some text labels
+    axis('xy'); set(gca, 'XTick', [1, get(gca, 'XTick')], 'YTick', [1,50]);
+    xlabel('Observation #');
+    ylabel({'Sequence # (sorted by', 'change point''s position)'});
+    title(sprintf('%s sequences', proclab{iHyp}));
+end
+
+% Save the figure
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_MapS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_MapIO.pdf'));
+end
+
+%% DISPLAY BELIEF UPDATE FOR THE TWO TYPES OF REGULARITIES
+%  =======================================================
+
+% Average update across sequences for each type of regularity
+avgslope = cell2mat(cellfun(@(x) mean(x,'OmitNaN'), update, 'UniformOutput', false)');
+
+% Perform a t-test
+[h,pval,tci,stats] = ttest(diff(avgslope)');
+Emergence_PrintTstats(pval,tci,stats);
+
+% Prepare a new window
+figure('Position', [702 905 120 200]);
+
+% Display the paired difference
+Emergence_PlotSubGp(avgslope', tricol(1:2,:));
+
+% Customize the axes
+set(gca, 'XLim', [0,3], 'XTick', [], 'XColor', 'none');
+
+% Add a text label
+ylabel('Belief update');
+
+% Save the figure
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SlopeS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SlopeIO.pdf'));
 end
