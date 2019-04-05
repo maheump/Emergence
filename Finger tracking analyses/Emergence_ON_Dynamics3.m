@@ -14,14 +14,14 @@ Var = cell(2);
 % Get IO's trajctories around change and detection points as well as
 % meaningful measures such as detection delays and update
 D = IO;
-Emergence_FTA_Dynamics2;
+Emergence_ON_Dynamics2;
 Var{1,1} = update{1};
 Var{2,1} = lag{2};
 
 % Get subjects' trajctories around change and detection points as well as
 % meaningful measures such as detection delays and update
 D = G;
-Emergence_FTA_Dynamics2;
+Emergence_ON_Dynamics2;
 Var{1,2} = update{1};
 Var{2,2} = lag{2};
 

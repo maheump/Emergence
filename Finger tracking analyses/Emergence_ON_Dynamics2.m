@@ -12,7 +12,7 @@
 %  ==============
 
 % The following script must be run beforehand
-Emergence_FTA_Dynamics1;
+Emergence_ON_Dynamics1;
 
 % Prepare a useful output variable
 condmap = cell(1,2);
