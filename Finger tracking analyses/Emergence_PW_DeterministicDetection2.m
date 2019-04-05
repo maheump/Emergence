@@ -13,12 +13,12 @@
 
 % Run the analysis focusing on pre-detection periods using subjects' data
 D = G;
-Emergence_FTA_HypothesisWeighting1;
+Emergence_PW_DeterministicDetection1;
 subtranspbel = transpbel;
 
 % Run the analysis focusing on pre-detection periods using IO's data
 D = IO;
-Emergence_FTA_HypothesisWeighting1;
+Emergence_PW_DeterministicDetection1;
 iotranspbel = transpbel;
 
 % Combine the beliefs in the probabilistic hypothesis, before the detection
