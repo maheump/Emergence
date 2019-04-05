@@ -4,15 +4,11 @@
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-%% INITIALIZATION
-%  ==============
-
 % Load simulations
+% ~~~~~~~~~~~~~~~~
+
 SimuType = 'PseudoDeterministic'; % 'PseudoDeterministic' or 'BiasedPseudoDeterministic'
 Emergence_MC_ModelSimulations;
-
-%% TRIANGULAR HISTOGRAMS
-%  =====================
 
 % Perform the analysis
 % ~~~~~~~~~~~~~~~~~~~~
