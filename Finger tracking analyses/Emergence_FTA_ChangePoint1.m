@@ -86,7 +86,6 @@ for iHyp = 1:2
     % centered around the real position of the change point
     lgd(iHyp) = fill([xwin(1), xwin, xwin(end)], [0, m, 0], 'k', 'FaceColor', ...
         tricol(iHyp,:), 'EdgeColor', 'None', 'FaceAlpha', 1/7);
-    %plot(xwin, m, '-', 'Color', tricol(iHyp,:), 'LineWidth', 2)
     plotMSEM(xwin, m, s, 1/2, tricol(iHyp,:), tricol(iHyp,:), 2, 1);
     
     % Display the position of the change point (i.e. 0)
