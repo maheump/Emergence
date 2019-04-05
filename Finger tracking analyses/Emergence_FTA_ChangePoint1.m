@@ -74,40 +74,34 @@ figure('Position', [1 906 340 200]);
 
 % For each type of regularity
 lgd = NaN(1,2);
-for iHyp = [2,1]
+for iHyp = 1:2
+    subplot(1,2,iHyp); hold('on');
     
     % Average posterior distributions
     d = pcpposwrtcp(:,:,iHyp);
     m = mean(d, 1);
+    s = sem(d, 1);
     
     % Display the posterior distribution of change point's positions
     % centered around the real position of the change point
     lgd(iHyp) = fill([xwin(1), xwin, xwin(end)], [0, m, 0], 'k', 'FaceColor', ...
-        tricol(iHyp,:), 'EdgeColor', 'None', 'FaceAlpha', 1/3); hold('on');
-    plot(xwin, m, '-', 'Color', tricol(iHyp,:), 'LineWidth', 2)
+        tricol(iHyp,:), 'EdgeColor', 'None', 'FaceAlpha', 1/7);
+    %plot(xwin, m, '-', 'Color', tricol(iHyp,:), 'LineWidth', 2)
+    plotMSEM(xwin, m, s, 1/2, tricol(iHyp,:), tricol(iHyp,:), 2, 1);
     
-    % Perform a t-test against the uniform (prior) distribution at each
-    % position around the true change point's position
-    h = ttest(d, 1/N, 'tail', 'right');
-    h(isnan(h)) = 0;
-    plot(xwin(logical(h)), repmat(0.34+0.005*(iHyp-1),1,sum(h)), ...
-        '-', 'Color', tricol(iHyp,:), 'LineWidth', 2);
+    % Display the position of the change point (i.e. 0)
+    plot(zeros(1,2), ylim, 'k--');
+    
+    % Display the uniform scenario over change point's position
+    plot(xwin([1,end]), repmat(1/N,1,2), '-', 'Color', g);
+    
+    % Customize the axes
+    set(gca, 'XLim', xwin([1,end]), 'Box', 'Off');
+    
+    % Add some text labels
+    xlabel('Position w.r.t. change point');
+    ylabel('p(j_k|H_i,y)');
 end
-
-% Display the position of the change point (i.e. 0)
-plot(zeros(1,2), ylim, 'k--');
-
-% Display the uniform scenario over change point's position
-plot(xwin([1,end]), repmat(1/N,1,2), '-', 'Color', g);
-
-% Customize the axes
-axis([xwin([1,end]),0,0.4]);
-set(gca, 'Box', 'Off');
-
-% Add some text labels
-legend(lgd, proclab(1:2), 'Location', 'NorthWest');
-xlabel('Position w.r.t. change point');
-ylabel('p(j_k|H_i,y)');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_CP_AvgCtrPostCP.pdf'));
