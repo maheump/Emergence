@@ -29,7 +29,7 @@ binmeth = 'equil';
 % 2: only fully-stochastic sequences
 % 3: only fully-stochastic sequences that were correctly labeled
 % 4: only first-part of stochastic-to-regular sequences
-restopt = 3;
+restopt = 1;
 
 % Average subjects' trajectories in fully-stochastic parts according to the
 % ideal observer's beliefs in the probabilistic hypothesis

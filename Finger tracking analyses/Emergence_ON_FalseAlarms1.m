@@ -17,7 +17,7 @@ nBin = 10;
 % 2: only fully-stochastic sequences
 % 3: only fully-stochastic sequences that were correctly labeled
 % 4: only first-part of stochastic-to-regular sequences
-restopt = 3;
+restopt = 1;
 
 % Average hypotheses likelihood in different parts of the sequences
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,7 +49,7 @@ semcc = flipud(errbc*tricc);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Define plot options
-cmap = Emergence_Colormap('Viridis', nBin);
+cmap = flipud(Emergence_Colormap('Viridis', nBin));
 dotsize = 50;
 
 % Prepare a new window
