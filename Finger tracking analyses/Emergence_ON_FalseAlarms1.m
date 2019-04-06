@@ -49,7 +49,7 @@ semcc = flipud(errbc*tricc);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Define plot options
-cmap = flipud(parula(nBin));
+cmap = Emergence_Colormap('Viridis', nBin);
 dotsize = 50;
 
 % Prepare a new window

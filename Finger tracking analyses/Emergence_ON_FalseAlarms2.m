@@ -86,7 +86,7 @@ figure('Position', [323 805 200 300]);
 
 % Create a colormap whose length equals the number of bins
 cmap = {'Blues', 'Reds', 'Greens'};
-cmap = cbrewer2(cmap{iHyp}, nBin);
+cmap = Emergence_Colormap(cmap{iHyp}, nBin);
 
 % Customize the colormap and add a colorbar
 cbr = colorbar('Location', 'SouthOutside');

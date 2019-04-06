@@ -55,7 +55,8 @@ for iHyp = [2,1]
     maxH = Emergence_MarkovEntropy(1/2, 1/2);
     prec = 1001;
     offset = round(prec * (maxH - minH));
-    EntCMap = flipud([flipud(cbrewer2(cmap{iHyp}, offset)); cbrewer2('Greys', prec)]);
+    EntCMap = flipud([flipud(Emergence_Colormap(cmap{iHyp}, offset)); ...
+        Emergence_Colormap('Greys', prec)]);
     prec = size(EntCMap,1);
     
     % Compute Shannon entropy on transition probabilities
@@ -96,7 +97,7 @@ for iHyp = [2,1]
     % Display the regression line between Shannon entropy and detection update
     confint  = Emergence_Regress(avg, TPent, 'OLS', 'confint');
     confintx = Emergence_Regress(avg, TPent, 'OLS', 'confintx');
-    col = cbrewer2(cmap{iHyp}, 1);
+    col = Emergence_Colormap(cmap{iHyp}, 1);
     fill([confintx, fliplr(confintx)], [confint(1,:), fliplr(confint(2,:))], ...
         col, 'EdgeColor', 'none', 'FaceAlpha', 0.15);
     b = Emergence_Regress(avg, TPent, 'OLS', {'beta0', 'beta1'});
@@ -161,7 +162,7 @@ group = [4 1 2 3 1 2 4 1 2 3];
 
 % Get dedicated colors for each condition that is indexed on the length of
 % the corresponding pattern
-condmap{2} = flipud(cbrewer2('Reds', prec));
+condmap{2} = flipud(Emergence_Colormap('Reds', prec));
 idx = round(1 + (len - 3) ./ (11 - 3) .* (prec-1));
 condmap{2} = condmap{2}(idx,:);
 

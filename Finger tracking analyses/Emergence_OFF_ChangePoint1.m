@@ -121,7 +121,7 @@ for iHyp = 1:2
     
     % Customize the colormap
     colorbar('Location', 'EastOutside');
-    colormap(sp, cbrewer2(cmapcol{iHyp}));
+    colormap(sp, Emergence_Colormap(cmapcol{iHyp}));
     caxis([0,0.3+0.2*(iHyp==2)]);
     
     % Display limits between (in)correctly labeled sequences

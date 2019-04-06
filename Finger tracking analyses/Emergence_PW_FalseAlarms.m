@@ -42,9 +42,9 @@ Maps{4} = Maps{1} .* Maps{2};                     % b3: interaction
 prec = 100;
 cmap = cell(1,nMaps);
 cmap{1} = g;
-cmap{2} = [flipud(cbrewer2('Reds', prec)); cbrewer2('Blues', prec)];
-cmap{3} = cbrewer2('Greens', 2*prec);
-cmap{4} = cbrewer2('Purples', 2*prec);
+cmap{2} = [flipud(Emergence_Colormap('Reds', prec)); Emergence_Colormap('Blues', prec)];
+cmap{3} = Emergence_Colormap('Greens', 2*prec);
+cmap{4} = Emergence_Colormap('Purples', 2*prec);
 
 % For each predictor
 figure('Name', 'Maps of predictors', 'Position', [1 974 341 130]);
@@ -205,7 +205,7 @@ xval = Emergence_Regress(ym, xm, 'TLS', 'confintx');
 
 % Create colormap used to color bins according to IO belief
 prec = 100;
-gege = [flipud(cbrewer2('Blues', prec)); cbrewer2('Reds', prec)];
+gege = [flipud(Emergence_Colormap('Blues', prec)); Emergence_Colormap('Reds', prec)];
 grid = linspace(-1/2, 1/2, prec*2);
 [~,colidx] = min(abs(xm'-grid), [], 2);
 

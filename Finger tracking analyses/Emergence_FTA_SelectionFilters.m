@@ -6,8 +6,7 @@
 % Copyright (c) 2018 Maxime Maheu
 
 % Define colors to use
-cmap = gray(10);
-cmap = [ones(1,3); flipud(cmap([2,5,7],:))];
+cmap = Emergence_Colormap('Greys', 4);
 
 % Create a new window
 figure('Position', [522 290 879 576]);

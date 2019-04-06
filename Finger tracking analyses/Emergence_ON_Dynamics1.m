@@ -263,7 +263,7 @@ for iHyp = 1:2
     
     % Customize the colormap
     colorbar('Location', 'EastOutside'); caxis([0,1]);
-    colormap(sp, cbrewer2(cmapcol{iHyp}));
+    colormap(sp, Emergence_Colormap(cmapcol{iHyp}));
     
     % Display the position of the change points
     for d = [0,1]

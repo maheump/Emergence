@@ -19,8 +19,8 @@ for iHyp = 1:2
 end
 
 % Define colormaps to use
-redcmap = flipud(cbrewer2('Reds', 4));
-bluecmap = flipud(cbrewer2('Blues', 4));
+redcmap = flipud(Emergence_Colormap('Reds', 4));
+bluecmap = flipud(Emergence_Colormap('Blues', 4));
 
 % Define simulations
 simu = {abruptness,         abruptness,         detecpoint,         staircaseness; ...
