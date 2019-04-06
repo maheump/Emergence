@@ -149,7 +149,7 @@ for iMod = 1:nMod
     plot([1,nObs], repmat(cumsum(repmat(1/dt, 1, nTdim)),2,1), 'k-');
     
     % Customize the colormap
-    colormap(parula); caxis([min(tp(:)), max(tp(:))]);
+    Emergence_Colormap('Parula'); caxis([min(tp(:)), max(tp(:))]);
     
     % Customize the axes
     axis('xy');
