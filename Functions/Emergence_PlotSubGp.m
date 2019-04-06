@@ -53,8 +53,8 @@ hold('on');
 
 % Display individual differences
 for iSub = 1:nSub
-    p = plot(x(iSub,:), y(iSub,:), 'Color', 'k', ...
-        'LineStyle', '-', 'LineWidth', 1/2);
+    p = plot(x(iSub,:), y(iSub,:), 'ko', ...
+        'MarkerEdgeColor', 'none', 'LineStyle', '-', 'LineWidth', 1/2);
     set(p, 'Color', [get(p, 'Color'), aval]);
 end
 
