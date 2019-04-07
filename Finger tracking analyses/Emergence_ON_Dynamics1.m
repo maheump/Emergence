@@ -48,7 +48,7 @@ for iHyp = 1:2
     dp{iHyp} = cp{iHyp} + lag{iHyp};
     
     % Measure the build-up of beliefs along the relevant dimension
-    update{iHyp} = cellfun(@(p) sum(diff(p), 'OmitNaN'), lockbel);
+    update{iHyp} = cellfun(@(p) mean(diff(p), 'OmitNaN'), lockbel);
     
     % Remove sequences entailing undetected regularities
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -251,7 +251,6 @@ end
 
 % Prepare a new window
 figure('Position', [702 381 230 400]);
-cmapcol = {'Blues', 'Reds'};
 
 % For sequences with a probabilistic/deterministic regularity
 for iHyp = 1:2
@@ -263,7 +262,7 @@ for iHyp = 1:2
     
     % Customize the colormap
     colorbar('Location', 'EastOutside'); caxis([0,1]);
-    colormap(sp, Emergence_Colormap(cmapcol{iHyp}));
+    colormap(sp, Emergence_Colormap('Inferno'));
     
     % Display the position of the change points
     for d = [0,1]
@@ -305,7 +304,7 @@ figure('Position', [702 905 120 200]);
 Emergence_PlotSubGp(avgslope', tricol(1:2,:));
 
 % Customize the axes
-set(gca, 'XLim', [0,3], 'XTick', [], 'XColor', 'none');
+set(gca, 'XLim', [0,3], 'YLim', [2,12].*1e-3,'XTick', [], 'XColor', 'none');
 
 % Add a text label
 ylabel('Belief update');
