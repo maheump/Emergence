@@ -92,11 +92,13 @@ restopt = 1;
 randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 
 % Get subjects' P/D ratio
-pHpgYpHdgY_sub = cellfun(@(x,i) x.BarycCoord(i,2) ./ sum(x.BarycCoord(i,1:2), 2), ...
+pHpgYpHdgY_sub = cellfun(@(x,i) ...
+    (x.BarycCoord(i,2) - x.BarycCoord(i,1)) ./ (x.BarycCoord(i,2) + x.BarycCoord(i,1)), ...
     G, randidx, 'UniformOutput', 0);
 
 % Get ideal observer's P/D ratio
-pHpgYpHdgY_IO = cellfun(@(x,i) x.BarycCoord(i,2) ./ sum(x.BarycCoord(i,1:2), 2), ...
+pHpgYpHdgY_IO = cellfun(@(x,i) ...
+    (x.BarycCoord(i,2) - x.BarycCoord(i,1)) ./ (x.BarycCoord(i,2) + x.BarycCoord(i,1)), ...
     IO, randidx, 'UniformOutput', 0);
 
 % Get ideal observer's belief in the fully-stochastic hypothesis
@@ -244,7 +246,7 @@ plot(xm, ym, 'k-', 'LineWidth', 1);
 scatter(xm, ym, dotsize, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
 
 % Customize the axes
-axis([-0.4,0.4,-0.1,0.1]);
+axis([-0.5,0.75,-0.2,0.2]);
 set(gca, 'Box', 'Off');
 
 % Add some text labels
