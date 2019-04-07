@@ -136,7 +136,7 @@ cbrlabopt = {'FontSize', fs, 'Interpreter', 'LaTeX'};
 tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 regcol = [117, 107, 177] ./ 255;
 cmap1  = hsv(N); % for the observations in the sequence
-cmap2  = Emergence_Colormap('Parula', 1000); % for the heatmaps
+cmap2  = Emergence_Colormap('Parula'); % for the heatmaps
 
 %% POSTERIOR DISTRIBUTIONS OVER MODELS
 %  ===================================

@@ -53,7 +53,7 @@ for iHyp = [2,1]
     % Create colormap for the entropy
     minH = 1.4;
     maxH = Emergence_MarkovEntropy(1/2, 1/2);
-    prec = 1001;
+    prec = 100;
     offset = round(prec * (maxH - minH));
     EntCMap = flipud([flipud(Emergence_Colormap(cmap{iHyp}, offset)); ...
         Emergence_Colormap('Greys', prec)]);

@@ -6,7 +6,7 @@
 % Copyright (c) 2018 Maxime Maheu
 
 % Define colors to use
-cmap = Emergence_Colormap('Greys', 4);
+cmap = Emergence_Colormap('Greys');
 
 % Create a new window
 figure('Position', [522 290 879 576]);

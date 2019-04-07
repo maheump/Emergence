@@ -56,7 +56,7 @@ for iMod = 1:nMod
     axis([0,1,0,sqrt(3)/2]);
     
     % Customize the colormap
-    colormap(Emergence_Colormap('Greens', 2000));
+    colormap(Emergence_Colormap('Greens'));
     caxis([0,max(trajmap{end}(:))]);
     
     % Add some text labels
