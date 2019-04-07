@@ -37,12 +37,12 @@ MSEx = (subpos - iopos) .^ 2;
 % Center on the error of the truly deterministic hypothesis
 if centeronD, MSEx = MSEx - MSEx(:,:,end); end
 
+% Average over sequences
+MSEx = squeeze(mean(MSEx, 1));
+
 % Perform paired t-tests
 [h,pval,tci,stats] = ttest(MSEx);
 Emergence_PrintTstats(pval,tci,stats);
-
-% Average over sequences
-MSEx = squeeze(mean(MSEx, 1));
 
 % Axis #2: abruptness of detection of deterministic regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,12 +69,12 @@ MSEy = (subabr - ioabr) .^ 2;
 % Center on the error of the truly deterministic hypothesis
 if centeronD, MSEy = MSEy - MSEy(:,:,end); end
 
+% Average over sequences
+MSEy = squeeze(mean(MSEy, 1, 'OmitNaN'));
+
 % Perform paired t-tests
 [h,pval,tci,stats] = ttest(MSEy);
 Emergence_PrintTstats(pval,tci,stats);
-
-% Average over sequences
-MSEy = squeeze(mean(MSEy, 1, 'OmitNaN'));
 
 % Display the results
 % ~~~~~~~~~~~~~~~~~~~
