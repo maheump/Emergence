@@ -37,6 +37,10 @@ MSEx = (subpos - iopos) .^ 2;
 % Center on the error of the truly deterministic hypothesis
 if centeronD, MSEx = MSEx - MSEx(:,:,end); end
 
+% Perform paired t-tests
+[h,pval,tci,stats] = ttest(MSEx);
+Emergence_PrintTstats(pval,tci,stats);
+
 % Average over sequences
 MSEx = squeeze(mean(MSEx, 1));
 
@@ -65,6 +69,10 @@ MSEy = (subabr - ioabr) .^ 2;
 % Center on the error of the truly deterministic hypothesis
 if centeronD, MSEy = MSEy - MSEy(:,:,end); end
 
+% Perform paired t-tests
+[h,pval,tci,stats] = ttest(MSEy);
+Emergence_PrintTstats(pval,tci,stats);
+
 % Average over sequences
 MSEy = squeeze(mean(MSEy, 1, 'OmitNaN'));
 
@@ -82,10 +90,13 @@ title(['Error in $p(\mathcal{H}_{\mathrm{D''}}|y)$ relative to ', ...
 % Axis #1
 % ~~~~~~~
 
+% Choose which models to display results from
+modidx = 2:nMod-1;
+
 % Get data to plot aand average over subjects
-x = (1:nMod-1)-1/6;
-m = mean(MSEx(:,1:end-1));
-s = sem(MSEx(:,1:end-1));
+x = modidx-1/6;
+m = mean(MSEx(:,modidx));
+s = sem(MSEx(:,modidx));
 
 % Create the axis
 yyaxis('left');
@@ -104,15 +115,16 @@ plot(x, m, 'k-', 'LineWidth', 3);
 plot(x, m, 'ko', 'MarkerSize', 10, 'MarkerFaceColor', tricol(3,:));
 
 % Customize the axis
+ylim([0,0.02]);
 ylim([-diff(ylim)/10, max(ylim)]);
 
 % Axis #2
 % ~~~~~~~
 
 % Get data to plot aand average over subjects
-x = (1:nMod-1)+1/6;
-m = mean(MSEy(:,1:end-1));
-s = sem(MSEy(:,1:end-1));
+x = modidx+1/6;
+m = mean(MSEy(:,modidx));
+s = sem(MSEy(:,modidx));
 
 % Create the axis
 yyaxis('right');
@@ -131,5 +143,5 @@ plot(x, m, 'k-', 'LineWidth', 3);
 plot(x, m, 'ko', 'MarkerSize', 10, 'MarkerFaceColor', tricol(2,:));
 
 % Customize the aces
-axis([0,nMod,-diff(ylim)/10, max(ylim)]);
-set(gca, 'XTick', 1:nMod-1);
+axis([min(modidx)-1,max(modidx)+1,-diff(ylim)/10, max(ylim)]);
+set(gca, 'XTick', modidx);
