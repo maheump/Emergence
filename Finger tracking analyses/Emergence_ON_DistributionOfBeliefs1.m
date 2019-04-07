@@ -88,10 +88,9 @@ figure('Position', [461 253 1000 650]);
 nBin = 30;
 
 % Create colormaps
-prec = 2000;
-cmaps = {[flipud(Emergence_Colormap('Blues', prec)); (Emergence_Colormap('Reds', prec))], ...
-         Emergence_Colormap('Blues',  prec), Emergence_Colormap('Reds', prec), ...
-         Emergence_Colormap('Greens', prec), Emergence_Colormap('Greens', prec), Emergence_Colormap('Greens', prec)};
+cmaps = {[flipud(Emergence_Colormap('Blues')); (Emergence_Colormap('Reds'))], ...
+         Emergence_Colormap('Blues'), Emergence_Colormap('Reds'), ...
+         Emergence_Colormap('Greens'), Emergence_Colormap('Greens'), Emergence_Colormap('Greens')};
 
 % For each density map
 for iMap = 1:nMap+1
@@ -119,7 +118,7 @@ for iMap = 1:nMap+1
     % Customize the colormap
     colormap(sp, cmaps{iMap});
     if iMap == 1, caxis([-abs(max(caxis)), abs(max(caxis))]);
-    else, caxis([0, max(caxis)]);
+    else, caxis([0,max(cellfun(@(x) max(x(:)), trajmap([2,3,end])))]);
     end
     ax = get(gca, 'Position');
     cbrpos = [ax(1)+ax(3)*3/4 ax(2) 0.01 ax(4)*1/3];
@@ -128,7 +127,7 @@ for iMap = 1:nMap+1
 end
 
 % Use the same zoom level for all the maps
-ScaleAxis('c', 1:4); ScaleAxis('x'); ScaleAxis('y');
+ScaleAxis('x'); ScaleAxis('y');
 
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsS.pdf'));
