@@ -44,10 +44,9 @@ for iHyp = [2,1]
     
     % Define the type of biases that have been used
     biases = NaN(numel(cidx{iHyp}), 1);
-    biases(pXgY(:,1) == 1 - pXgY(:,2)) = 1;               % frequency biases
+    biases(round(100*pXgY(:,1)) == round(100 * (1 - pXgY(:,2)))) = 1; % frequency biases
     biases(pXgY(:,1) > 1/2 & pXgY(:,1) == pXgY(:,2)) = 2; % repetition biases
     biases(pXgY(:,1) < 1/2 & pXgY(:,1) == pXgY(:,2)) = 3; % alternation biases
-    biases(pXgY(:,1) == 1/2 & pXgY(:,1) == 1/2) = 5;      % no biases
     biases(isnan(biases)) = 4;                            % outside diagonals
     
     % Create colormap for the entropy
