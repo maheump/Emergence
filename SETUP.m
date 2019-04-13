@@ -13,7 +13,6 @@ fprintf('#######################################################\n\n');
 fprintf(['Thank you for having downloaded our toolbox.\nWe will now go ', ...
     'through a series of setup steps that ensure that the scripts ', ...
     'featured in that toolbox can run.\n\n']);
-pause(4); % pause for 4 seconds
 
 % Check the version of MATLAB that is running
 fprintf('Checking MATLAB version... ');
