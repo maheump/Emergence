@@ -105,7 +105,7 @@ for iMap = 1:nMap+1
     tr = Emergence_PlotTriInfo(tricc, tricol);
     
     % Draw marginal histograms on the limits of the triangle
-	%if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
+	if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
     
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
@@ -117,7 +117,6 @@ for iMap = 1:nMap+1
     
     % Customize the colormap
     colormap(sp, cmaps{iMap});
-    colormap(sp, Emergence_Colormap('Jet'));
     if iMap == 1, caxis([-abs(max(caxis)), abs(max(caxis))]);
     else, caxis([0,max(cellfun(@(x) max(x(:)), trajmap([2,3,end])))]);
     end
