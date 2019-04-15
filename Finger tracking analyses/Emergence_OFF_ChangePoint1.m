@@ -29,7 +29,7 @@ for iHyp = 1:2
     
     % Get beliefs about the change point's position at the end of each
     % sequence
-    bel = cellfun(@(x) x.pJkgY(:,end)', IO(cidx{iHyp},:), 'UniformOutput', 0);
+    bel = cellfun(@(x) x.pJkgY(:,end)', IO(cidx{iHyp},:), 'uni', 0);
     
     % Get sequences that were correctly labeled 
     detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
@@ -44,12 +44,12 @@ for iHyp = 1:2
     
     % Get a distibution of change point's position restricted around true
     % change point's position
-    winbel = cellfun(@(b,c) b(c+xwin), bel, num2cell(cp), 'UniformOutput', 0);
+    winbel = cellfun(@(b,c) b(c+xwin), bel, num2cell(cp), 'uni', 0);
     
     % Remove posterior beliefs about change point's positions from
     % sequences that were mislabeled
     winbel(~detecmask) = {NaN(1,nwin)};
-    winbel = cellfun(@(x) reshape(x,[1,1,nwin]), winbel, 'UniformOutput', 0);
+    winbel = cellfun(@(x) reshape(x,[1,1,nwin]), winbel, 'uni', 0);
     
     % Save the averaged full posterior distribution over change point
     % position

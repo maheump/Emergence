@@ -18,8 +18,8 @@ nt = nBin^2; % total number of vertices
 
 % Build the barycentric grids based on the number of bins
 pgrid = linspace(0, 1, nBin+1);
-pPgrid = cell2mat(arrayfun(@(x,y) repmat(x,y,1), pgrid, nBin+1:-1:1, 'UniformOutput', 0)');
-pDgrid = cell2mat(arrayfun(@(x) (0:1/nBin:x)', 1-pgrid, 'UniformOutput', 0)');
+pPgrid = cell2mat(arrayfun(@(x,y) repmat(x,y,1), pgrid, nBin+1:-1:1, 'uni', 0)');
+pDgrid = cell2mat(arrayfun(@(x) (0:1/nBin:x)', 1-pgrid, 'uni', 0)');
 
 % Deduce vertices
 % ~~~~~~~~~~~~~~~
@@ -45,10 +45,10 @@ intermvar = cat(1, x(rsptri), y(rsptri));
 tricartescoord = squeeze(mat2cell(intermvar, 2, 3, ones(1,1,nt)));
 
 % Convert cartesian coordinates of vertices to barycentric ones
-tribaryccoord = cellfun(@(x) cartes2baryc(x, tricc), tricartescoord, 'UniformOutput', 0);
+tribaryccoord = cellfun(@(x) cartes2baryc(x, tricc), tricartescoord, 'uni', 0);
 
 % Get limits in the 3 barycentric dimensions of each triangular bin
-barycbinlim = cellfun(@(x) [min(x,[],2)'; max(x,[],2)'], tribaryccoord, 'UniformOutput', 0);
+barycbinlim = cellfun(@(x) [min(x,[],2)'; max(x,[],2)'], tribaryccoord, 'uni', 0);
 
 % Plot the results
 % ~~~~~~~~~~~~~~~~
@@ -69,13 +69,13 @@ for iMap = 1:2
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     % Get reported subjective probabilities from the subjects/IO
-    condpoints = cellfun(@(x) x.BarycCoord, eval(lab{iMap}{2}), 'UniformOutput', 0);
+    condpoints = cellfun(@(x) x.BarycCoord, eval(lab{iMap}{2}), 'uni', 0);
     condpoints = cell2mat(condpoints(:));
     
     % Bin those reported subjective probabilities according to the
     % barycentric grid defined earlier
     obsidx = cellfun(@(x) all(condpoints > x(1,:)  & ...
-                              condpoints < x(2,:), 2), barycbinlim, 'UniformOutput', 0);
+                              condpoints < x(2,:), 2), barycbinlim, 'uni', 0);
     
     % Count the number of observations in each bin
     nobs = cellfun(@sum, obsidx);
@@ -83,17 +83,17 @@ for iMap = 1:2
     facealpha = facealpha./ max(facealpha); % normalize
     
     % Get reported subjective probabilities from the IO/subjects
-    obspoints = cellfun(@(x) x.BarycCoord, eval(lab{iMap}{1}), 'UniformOutput', 0);
+    obspoints = cellfun(@(x) x.BarycCoord, eval(lab{iMap}{1}), 'uni', 0);
     
     % Select only sequences that were correctly labelled
     obspoints = cell2mat(obspoints(:));
     
     % Get and average data from the IO/subjects in those bins  
-    obsavgbel = cellfun(@(x) mean(obspoints(x,:), 1), obsidx, 'UniformOutput', 0);
+    obsavgbel = cellfun(@(x) mean(obspoints(x,:), 1), obsidx, 'uni', 0);
     
     % Convert averaged probabilities in each hypothesis into color level
     % (through weighted average)
-    facecolor = cell2mat(cellfun(@(x) x*tricol, obsavgbel, 'UniformOutput', 0));
+    facecolor = cell2mat(cellfun(@(x) x*tricol, obsavgbel, 'uni', 0));
     
     % Display the triangular histrogram whose faces' color is indexed on
     % the other's averaged probabilistic beliefs

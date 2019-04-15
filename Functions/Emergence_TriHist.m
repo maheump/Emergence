@@ -32,7 +32,7 @@ barc = barc(~cellfun(@isempty, barc));
 if nargin < 4, interp = 1/3; end % must be <= 1, 1 is no interpolation
 
 % Interpolate the trajectories
-barc = cellfun(@(p) interp1(1:size(p,1), p, 1:interp:size(p,1)), barc, 'UniformOutput', 0);
+barc = cellfun(@(p) interp1(1:size(p,1), p, 1:interp:size(p,1)), barc, 'uni', 0);
 barc = cell2mat(barc);
 
 % Make a 2D histogram

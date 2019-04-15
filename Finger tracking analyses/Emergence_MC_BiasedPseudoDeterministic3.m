@@ -23,12 +23,12 @@ idxtrimap = Emergence_SelectFullyStochSeq(G, filter, 1);
 
 % Get average positions in the (pseudo-)deterministic hypothesis from the
 % ideal observer model
-iopos = cellfun(@(x,i) x(i,2), pMgY, repmat(idxtrimap, [1,1,nMod]), 'UniformOutput', 0);
+iopos = cellfun(@(x,i) x(i,2), pMgY, repmat(idxtrimap, [1,1,nMod]), 'uni', 0);
 iopos = squeeze(cellfun(@mean, iopos));
 
 % Get average positions in the (pseudo-)deterministic hypothesis from the
 % subjects
-subpos = cellfun(@(x,i) x.BarycCoord(i,2), G, idxtrimap, 'UniformOutput', 0);
+subpos = cellfun(@(x,i) x.BarycCoord(i,2), G, idxtrimap, 'uni', 0);
 subpos = squeeze(cellfun(@mean, subpos));
 
 % Compute the error between the two
@@ -48,7 +48,7 @@ Emergence_PrintTstats(pval,tci,stats);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Get positions of the change point
-cp = cellfun(@(x) x.Jump+1/2, G(cidx{2},:), 'UniformOutput', 0);
+cp = cellfun(@(x) x.Jump+1/2, G(cidx{2},:), 'uni', 0);
 
 % Define the measure of abruptness
 staircaseness = @(p) mean(abs(diff(p,2,1)));

@@ -26,10 +26,10 @@ restopt = 1;
 randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 
 % Get data from fully-stochastic sequences
-data = cellfun(@(x,i) [x.BarycCoord(i,:); NaN(sum(~i),3)], D, randidx, 'UniformOutput', 0);
+data = cellfun(@(x,i) [x.BarycCoord(i,:); NaN(sum(~i),3)], D, randidx, 'uni', 0);
 
 % Group positions in the triangle by consecutive bins of n trials
-binavg = cell2mat(cellfun(@(x) reshape(x, [1 1 N 3]), data, 'UniformOutput', 0));
+binavg = cell2mat(cellfun(@(x) reshape(x, [1 1 N 3]), data, 'uni', 0));
 binavg = permute(binavg, [3 4 2 1]);
 binavg = mat2cell(binavg, repmat(N/nBin,nBin,1,1,1), ...
     ones(1,3,1,1), ones(1,1,nSub,1), ones(1,1,1,nSeq));
@@ -85,10 +85,10 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Concatenate data for each subject across the different sequences
-inddata = cellfun(@(x) cell2mat(x), mat2cell(data, nSeq, ones(1,nSub)), 'UniformOutput', 0);
+inddata = cellfun(@(x) cell2mat(x), mat2cell(data, nSeq, ones(1,nSub)), 'uni', 0);
 
 % Correlate likelihood of the fully-stochastic hypothesis 
-nanidx = cellfun(@(x) ~isnan(x(:,3)), inddata, 'UniformOutput', 0);
+nanidx = cellfun(@(x) ~isnan(x(:,3)), inddata, 'uni', 0);
 obspos = repmat((1:N)', nSeq, 1);
 coef = cellfun(@(x,i) corr(x(i,3), obspos(i)), inddata, nanidx)';
 

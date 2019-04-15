@@ -36,9 +36,9 @@ nRep = 3;                      % number of repetition of the longest pattern
 nObs = nRep*maxL;              % number of observations
 
 % Create sequences based on these patterns
-patternsrecod = cellfun(@str2pat, patterns, 'UniformOutput', 0);
-Seq = cellfun(@(x) repmat(x, 1, nObs), patternsrecod, 'UniformOutput', 0);
-Seq = cellfun(@(x) x(1:nObs), Seq, 'UniformOutput', 0);
+patternsrecod = cellfun(@str2pat, patterns, 'uni', 0);
+Seq = cellfun(@(x) repmat(x, 1, nObs), patternsrecod, 'uni', 0);
+Seq = cellfun(@(x) x(1:nObs), Seq, 'uni', 0);
 nSeq = numel(Seq);
 
 %% RUN THE BAYESIAN IDEAL OBSERVER

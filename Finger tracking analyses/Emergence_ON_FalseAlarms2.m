@@ -42,7 +42,7 @@ randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 if strcmpi(binmeth, 'unif') % bins of the same amplitude
     pgrid = linspace(0, 1, nBin+1);
 elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
-    iobel = cellfun(@(x,y) x.BarycCoord(y,iHyp), IO, randidx, 'UniformOutput', 0);
+    iobel = cellfun(@(x,y) x.BarycCoord(y,iHyp), IO, randidx, 'uni', 0);
     iobel = cell2mat(iobel(:));
     pgrid = prctile(iobel, linspace(0, 100, nBin+1));
 else, error('Please check the binnig method that is provided');
@@ -59,16 +59,16 @@ for iSub = 1:nSub
     % Get beliefs of both subject and ideal observer in the
     % fully-stochastic parts of the sequence
     subbel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
-        G(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
+        G(:,iSub), randidx(:,iSub), 'uni', 0));
     iobel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
-        IO(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
+        IO(:,iSub), randidx(:,iSub), 'uni', 0));
     
     % Get in which bin falls each observation
     [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
     
     % Average likelihoods in each bin
-    binsubtraj(:,:,iSub) = cell2mat(arrayfun(@(i) mean(subbel(bins == i,:)), 1:nBin, 'UniformOutput', 0)');
-    biniotraj(:,:,iSub)  = cell2mat(arrayfun(@(i) mean(iobel( bins == i,:)), 1:nBin, 'UniformOutput', 0)');
+    binsubtraj(:,:,iSub) = cell2mat(arrayfun(@(i) mean(subbel(bins == i,:)), 1:nBin, 'uni', 0)');
+    biniotraj(:,:,iSub)  = cell2mat(arrayfun(@(i) mean(iobel( bins == i,:)), 1:nBin, 'uni', 0)');
 end
 
 % Average over subjects
@@ -134,15 +134,15 @@ for iSub = 1:nSub
     % Get beliefs of both subject and ideal observer in the
     % fully-stochastic parts of the sequence
     subbel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
-        G(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
+        G(:,iSub), randidx(:,iSub), 'uni', 0));
     iobel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
-        IO(:,iSub), randidx(:,iSub), 'UniformOutput', 0));
+        IO(:,iSub), randidx(:,iSub), 'uni', 0));
     
     % Get in which bin falls each observation
     [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
     
     % Build the design matrix
-    obsidx = cell2mat(cellfun(@find, randidx(:,iSub), 'UniformOutput', 0));
+    obsidx = cell2mat(cellfun(@find, randidx(:,iSub), 'uni', 0));
     desmat = [ones(numel(obsidx),1), iobel(:,iHyp), obsidx];
     
     % Center predictors

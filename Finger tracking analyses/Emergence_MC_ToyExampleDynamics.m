@@ -15,7 +15,7 @@ staircaseness = @(p) mean(abs(diff(p,2,1)));
 % Get change point positions
 cp = cell(1,2);
 for iHyp = 1:2
-    cp{iHyp} = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'UniformOutput', 0);
+    cp{iHyp} = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'uni', 0);
 end
 
 % Define colormaps to use
@@ -56,7 +56,7 @@ for iSimu = 1:nSimu
         traj(:,:,i) = cell2mat(cellfun(@(p,c) ...
             Emergence_LockOnPoint(p(:,iHyp(i)), c, win), ...
             pMgY(cidx{iHyp(i)}(iReg(i)),:,iMod(i)), cp{iHyp(i)}(iReg(i),:), ...
-            'UniformOutput', 0));
+            'uni', 0));
     end
     
     % Display trajectories

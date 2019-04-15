@@ -119,7 +119,7 @@ plot([0,nMod+1], -ones(1,2)./3, '--', 'Color', g);
 % Customize the axes
 axis([1/2,nMod+1/2,-1,1]);
 set(gca, 'XTick', 1:nMod, 'XTickLabel', cellfun(@num2str, options(2,:), ...
-    'UniformOutput', 0), 'XTickLabelRotation', 90, 'Box', 'Off');
+    'uni', 0), 'XTickLabelRotation', 90, 'Box', 'Off');
 
 % Add some text labels
 xlabel('Substitution error');
@@ -174,16 +174,16 @@ ylabel('Belief difference btw un/detec reg');
 % ~~~~~~~~~~~~~~~~~
 
 % Get change point positions
-cp = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'UniformOutput', 0);
+cp = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'uni', 0);
 
 % Get detection point positions
 dp = cellfun(@(p,c) c + Emergence_FindDetecPoint(p(c:end,iHyp)), ...
-    pMgY(cidx{iHyp},:,:), repmat(cp, [1,1,nMod]), 'UniformOutput', 0);
+    pMgY(cidx{iHyp},:,:), repmat(cp, [1,1,nMod]), 'uni', 0);
 
 % Lock trajectories on detection point
 win = 0:60;
 traj = cellfun(@(p,d) Emergence_LockOnPoint(p,d,win), ...
-    pMgY(cidx{iHyp},:,:), repmat(cp, [1,1,nMod]), 'UniformOutput', 0);
+    pMgY(cidx{iHyp},:,:), repmat(cp, [1,1,nMod]), 'uni', 0);
 
 % Remove sequences entailing regularities that were missed by subjects and
 % for which we could not find a detection point in subjects or the full

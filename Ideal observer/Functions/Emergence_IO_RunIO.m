@@ -67,7 +67,7 @@ nTdim = size(margpost{1},2);
 if nTdim > 1
     if nargout > 5
         if nargout > 6
-            jointpost = cellfun(@indepmarg2joint, margpost, 'UniformOutput', 0);
+            jointpost = cellfun(@indepmarg2joint, margpost, 'uni', 0);
             jointpost = cell2mat(reshape(jointpost, [ones(1,nTdim), N]));
         end
         margpost  = permute(squeeze(cell2mat(reshape(margpost,  [ones(1,nTdim), N]))), [1,3,2]);
@@ -95,7 +95,7 @@ function joint = indepmarg2joint( marg )
 
 [ngrid,ndim] = size(marg);
 idim = 1:ndim;
-step1 = arrayfun(@(x) repmat(marg(:,x), [1,repmat(ngrid,1,ndim-1)]), idim, 'UniformOutput', 0);
+step1 = arrayfun(@(x) repmat(marg(:,x), [1,repmat(ngrid,1,ndim-1)]), idim, 'uni', 0);
 step2 = reshape(step1, [ones(1,ndim),ndim]);
 joint = prod(cell2mat(step2), ndim+1);
 

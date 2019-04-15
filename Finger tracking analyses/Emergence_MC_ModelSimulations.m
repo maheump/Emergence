@@ -42,7 +42,7 @@ if strcmpi(SimuType, 'PseudoDeterministic')
     
     % Change the statistics to learn for these models
     lidx = strcmpi(lab, 'stat');
-    options(lidx,:) = arrayfun(@(x) sprintf('Chain%1.0f', x), orders, 'UniformOutput', 0);
+    options(lidx,:) = arrayfun(@(x) sprintf('Chain%1.0f', x), orders, 'uni', 0);
     
 % SIMU #2: Alternative deterministic hypotheses that estimate higher-order
 % transitions and preferring predictive cases
@@ -60,9 +60,9 @@ elseif strcmpi(SimuType, 'BiasedPseudoDeterministic')
     % Change the statistics to learn and the prior over transitions for
     % these models
     lidx = strcmpi(lab, 'stat');
-    options(lidx,:) = arrayfun(@(x) sprintf('Chain%1.0f', x), orders, 'UniformOutput', 0);
+    options(lidx,:) = arrayfun(@(x) sprintf('Chain%1.0f', x), orders, 'uni', 0);
     lidx = strcmpi(lab, 'pT');
-    options(lidx,:) = arrayfun(@(x) repmat(999/1000, 2, 2^x), orders, 'UniformOutput', 0);
+    options(lidx,:) = arrayfun(@(x) repmat(999/1000, 2, 2^x), orders, 'uni', 0);
     
 % SIMU #3: Alternative probabilistic hypothesis assuming a local integration
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,7 +88,7 @@ elseif strcmpi(SimuType, 'Leak')
     
     % Change the substitution error probability for these models
     lidx = strcmpi(lab, 'pEp');
-    options(lidx,:) = arrayfun(@(x) x, pe, 'UniformOutput', 0);
+    options(lidx,:) = arrayfun(@(x) x, pe, 'uni', 0);
     
     % Also specify the precision grid since in the case of leaky
     % integration, only grid based computations are available
@@ -112,7 +112,7 @@ elseif strcmpi(SimuType, 'TreeDepth')
     
     % Change the depth of the tree for these models
     lidx = strcmpi(lab, 'patlen');
-    options(lidx,:) = arrayfun(@(x) x, nu, 'UniformOutput', 0);
+    options(lidx,:) = arrayfun(@(x) x, nu, 'uni', 0);
 end
 
 % Create a name for the file
@@ -120,7 +120,7 @@ fname = sprintf('Emergence_MC_%s', SimuType);
 
 % Prepare the output variable
 mIO = cell(nSeq,nSub,nMod); % conditions x subjects cell matrix with IO's inference
-mIO = cellfun(@(x) NaN(N,3), mIO, 'UniformOutput', 0);
+mIO = cellfun(@(x) NaN(N,3), mIO, 'uni', 0);
 
 %% RUN SIMULATIONS
 %  ===============
@@ -185,10 +185,10 @@ end
 if contains(SimuType, 'PseudoDeterministic', 'IgnoreCase', true)
     
     % Get sequence likelihood under different hypotheses
-    pYgMsp = cellfun(@(x) x(:,1), mIO(:,:,1), 'UniformOutput', 0); % 1st-order Markov chain
-    pYgMsd = cellfun(@(x) x(:,2), mIO(:,:,1), 'UniformOutput', 0); % pattern learner
-    pYgMss = cellfun(@(x) x(:,3), mIO(:,:,1), 'UniformOutput', 0); % fully-stochastic
-    pYgMsc = cellfun(@(x) x(:,1), mIO,        'UniformOutput', 0); % higher-order Markov chains
+    pYgMsp = cellfun(@(x) x(:,1), mIO(:,:,1), 'uni', 0); % 1st-order Markov chain
+    pYgMsd = cellfun(@(x) x(:,2), mIO(:,:,1), 'uni', 0); % pattern learner
+    pYgMss = cellfun(@(x) x(:,3), mIO(:,:,1), 'uni', 0); % fully-stochastic
+    pYgMsc = cellfun(@(x) x(:,1), mIO,        'uni', 0); % higher-order Markov chains
     
     % Get sequence likelihood for the fully ideal observer modem
     fullIO = mIO(:,:,1);
@@ -197,7 +197,7 @@ if contains(SimuType, 'PseudoDeterministic', 'IgnoreCase', true)
     % hypothesies, with the probabilistic and fully-stochastic hypotheses
     mIO = cellfun(@(pH,pD,pS) cat(2,pH,pD,pS), ...
         repmat(pYgMsp, [1,1,nMod]), pYgMsc, repmat(pYgMss, [1,1,nMod]), ...
-        'UniformOutput', 0);
+        'uni', 0);
     
     % Append the fully ideal observer model
     mIO = cat(3, mIO, fullIO);
@@ -210,7 +210,7 @@ elseif strcmpi(SimuType, 'Leak')
 end
 
 % Compute posterior probability over hypotheses
-pMgY = cellfun(@(x) exp(x) ./ sum(exp(x), 2), mIO, 'UniformOutput', 0);
+pMgY = cellfun(@(x) exp(x) ./ sum(exp(x), 2), mIO, 'uni', 0);
 nMod = size(pMgY, 3);
 
 % Define starting point

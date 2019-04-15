@@ -38,8 +38,8 @@ EntMap = arrayfun(@(x,y) Emergence_MarkovEntropy(x,y), ...
 nR = numel(cidx{2});
 
 % Get the list of patterns used in the experiment
-numpat = cellfun(@(xval) xval.Rule, G(cidx{2},1), 'UniformOutput', 0); % numbers
-strpat = cellfun(@(xval) pat2str(xval), numpat, 'UniformOutput', 0);   % strings
+numpat = cellfun(@(xval) xval.Rule, G(cidx{2},1), 'uni', 0); % numbers
+strpat = cellfun(@(xval) pat2str(xval), numpat, 'uni', 0);   % strings
 
 % Get theoretical probabilities associated with those patterns
 [pA, pAlt, pAgB, pBgA] = cellfun(@(xval) pat2proba(xval, [1 2], true), numpat);
@@ -57,7 +57,7 @@ EntCol = EntCMap(colidx,:);
 
 % Group deterministic regularities together according to the entropy bins
 EntBin = [1.4, 1.7665, 1.853, 2]';
-EntLab = arrayfun(@(x) sprintf('%1.0f', x), 1:numel(EntBin), 'UniformOutput', 0);
+EntLab = arrayfun(@(x) sprintf('%1.0f', x), 1:numel(EntBin), 'uni', 0);
 nEnt = numel(EntBin)-1;
 [~,~,EntIdx] = histcounts(TPent, EntBin);
 
@@ -85,7 +85,7 @@ plot([0,1], [1,0], 'k-', 'LineWidth', 1/2);
 
 % Display each deterministic regularity
 scatter(pAgB, pBgA, 100, EntCol, 'filled', 'MarkerEdgeColor', 'k');
-text(pAgB, pBgA, cellfun(@(x) sprintf('  %s', x), strpat, 'UniformOutput', 0), ...
+text(pAgB, pBgA, cellfun(@(x) sprintf('  %s', x), strpat, 'uni', 0), ...
    'HorizontalAlignment', 'Left', 'VerticalAlignment', 'Top');
 
 % Customize the colormap
@@ -133,25 +133,25 @@ xval = -130:60;
 nsp = numel(xval);
 
 % Beginning and ending of the window to look into
-idx = arrayfun(@(x) x+xval, dp, 'UniformOutput', 0);
+idx = arrayfun(@(x) x+xval, dp, 'uni', 0);
 
 % Create a useful logical indexing that makes sure that the window around
 % the detection point does not go beyond the observations' indices of the
 % sequence
-ok = cellfun(@(x) x >= 1 & x <= N, idx, 'UniformOutput', 0);
+ok = cellfun(@(x) x >= 1 & x <= N, idx, 'uni', 0);
 
 % Get the posterior beliefs over the 3 different hypotheses
-beliefs = cellfun(@(x) x.BarycCoord, D(cidx{2},:), 'UniformOutput', 0);
+beliefs = cellfun(@(x) x.BarycCoord, D(cidx{2},:), 'uni', 0);
 
 % Select posterior beliefs around the detection point
-subtraj = cellfun(@(x) NaN(nsp,3), cell(size(idx)), 'UniformOutput', 0);
+subtraj = cellfun(@(x) NaN(nsp,3), cell(size(idx)), 'uni', 0);
 for iSeq = 1:numel(idx)
     subtraj{iSeq}(ok{iSeq},:) = beliefs{iSeq}(idx{iSeq}(ok{iSeq}),:);
 end
 
 % Average trajectories over sequences and subjects
 avgtraj = squeeze(mean(cell2mat(cellfun(@(x) reshape(x, [1 1 size(x)]), ...
-    subtraj, 'UniformOutput', 0)), [1,2], 'OmitNaN'));
+    subtraj, 'uni', 0)), [1,2], 'OmitNaN'));
 cc = avgtraj*tricc;
 
 % Show the trajectory in the triangle locked on the detection of
@@ -186,7 +186,7 @@ end
 % Copute the P/D ratio as (p(Hd|y)-p(Hp|y)) / (p(Hd|y)+p(Hp|y))
 ratioPD = cell2mat(cellfun(@(pHgY) reshape(...
     (pHgY(:,2) - pHgY(:,1)) ./ (pHgY(:,2) + pHgY(:,1)), ...
-    [1 1 nsp]), subtraj, 'UniformOutput', 0));
+    [1 1 nsp]), subtraj, 'uni', 0));
 
 % Average over sequences for each subject
 ratioPD = squeeze(mean(ratioPD, 1, 'OmitNaN'));
@@ -241,7 +241,7 @@ for iEnt = 1:nEnt
     n = sum(EntIdx == iEnt);
     d = mat2cell(subtraj(EntIdx == iEnt,:), n, ones(nSub,1));
     d = cellfun(@(x) mean(cell2mat(reshape(x, [1,1,n])), 3, 'OmitNaN'), ...
-        d, 'UniformOutput', 0);
+        d, 'uni', 0);
     subavgtrajent(:,:,iEnt,:) = cell2mat(reshape(d, [1,1,nSub]));
 end
 
@@ -326,7 +326,7 @@ cellcp = num2cell(cp);
 cellcp(cellfun(@isnan, cellcp)) = {[]};
 transpbel = cellfun(@(p,c,d) ...
     (p.BarycCoord(c:d,2) - p.BarycCoord(c:d,1)) ./ (p.BarycCoord(c:d,2) + p.BarycCoord(c:d,1)), ...
-    D(cidx{2},:), cellcp, celldp, 'UniformOutput', 0);
+    D(cidx{2},:), cellcp, celldp, 'uni', 0);
 transpbel = cellfun(@mean, transpbel);
 
 % For each subject, average the trajectories

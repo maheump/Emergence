@@ -41,7 +41,7 @@ for iHyp = 1:2
     
     % Lock trajectories on change point
     lockbel = cellfun(@(x,c) Emergence_LockOnPoint(x.BarycCoord(:,iHyp),c,[0,N]), ...
-            D(cidx{iHyp},:), num2cell(cp{iHyp}), 'UniformOutput', false);
+            D(cidx{iHyp},:), num2cell(cp{iHyp}), 'uni', false);
     
     % Get detection point position
     lag{iHyp} = cellfun(@(p) Emergence_FindDetecPoint(p), lockbel);
@@ -77,7 +77,7 @@ for iHyp = 1:2
         
         % Get trajectory in that window of interest
         fing = cellfun(@(p,c) Emergence_LockOnPoint(p.BarycCoord, c, xXp{lock}), ...
-            D(cidx{iHyp},:), lockobs, 'UniformOutput', 0);
+            D(cidx{iHyp},:), lockobs, 'uni', 0);
         
         % Convert the cells into a big 3D matrix
         fingerposwrtp{iHyp,lock} = cell2mat(reshape(fing, [1,1,size(fing)]));
@@ -92,12 +92,12 @@ lag2 = lag{2} ./ cellfun(@numel, dr);
 %  ======================================================
 
 % Average over sequences for each type of regularity
-avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerposwrtp, 'UniformOutput', 0);
-avglag = cellfun(@(x) mean(x, 'OmitNaN'), lag, 'UniformOutput', 0);
+avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerposwrtp, 'uni', 0);
+avglag = cellfun(@(x) mean(x, 'OmitNaN'), lag, 'uni', 0);
 
 % Average finger trajectory over subjects
-avgsubtraj = cellfun(@(x) mean(x, 3, 'OmitNaN'), avgfingerwrtp, 'UniformOutput', 0);
-semsubtraj = cellfun(@(x) sem( x ,3), avgfingerwrtp, 'UniformOutput', 0);
+avgsubtraj = cellfun(@(x) mean(x, 3, 'OmitNaN'), avgfingerwrtp, 'uni', 0);
+semsubtraj = cellfun(@(x) sem( x ,3), avgfingerwrtp, 'uni', 0);
 
 % Display trajectories in the triangular space
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -239,14 +239,14 @@ for iHyp = 1:2
     detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
     
     % Order according to change point's position and detected/undetected
-    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'UniformOutput', 1);
+    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'uni', 1);
     [sortedcp{iHyp}, idxcp{iHyp}] = sortrows([cp{iHyp}(:), ...
         detecmask(:)], [2,1]);
     
     % Get the beliefs in the corresponding (correct) hypothesis ordered
     % according to the position the change point
     belincorhyp{iHyp} = cellfun(@(x) x.BarycCoord(:,iHyp)', ...
-        D(cidx{iHyp},:), 'UniformOutput', 0);
+        D(cidx{iHyp},:), 'uni', 0);
 end
 
 % Prepare a new window
@@ -291,7 +291,7 @@ end
 %  =======================================================
 
 % Average update across sequences for each type of regularity
-avgslope = cell2mat(cellfun(@(x) mean(x,'OmitNaN'), update, 'UniformOutput', false)');
+avgslope = cell2mat(cellfun(@(x) mean(x,'OmitNaN'), update, 'uni', false)');
 
 % Perform a t-test
 [h,pval,tci,stats] = ttest(diff(avgslope)');

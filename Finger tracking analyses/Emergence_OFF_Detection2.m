@@ -99,7 +99,7 @@ entgpttl = {sprintf('Low (< %1.2f)', entlim), sprintf('High (> %1.2f)', entlim)}
 
 % Get the average detection rate in each entropy bins
 entdetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{1}(x),:) == 1, 1)', ...
-    entgpidx, 'UniformOutput', 0));
+    entgpidx, 'uni', 0));
 
 % Prepare a window
 figure('Position', [956 806 240 200]);
@@ -134,7 +134,7 @@ nGp = numel(biasgpidx);
 
 % Get the average detection rate in each group of regularities
 biasdetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{1}(x),:) == 1, 1)', ...
-    biasgpidx, 'UniformOutput', 0));
+    biasgpidx, 'uni', 0));
 
 % Display chance level
 subplot(1,2,2);
@@ -168,12 +168,12 @@ end
 
 % Create groups
 len = cellfun(@numel, dr(1:end));
-lengpidx = cellfun(@(x) find(x == len), num2cell(unique(len)), 'UniformOutput', 0)';
+lengpidx = cellfun(@(x) find(x == len), num2cell(unique(len)), 'uni', 0)';
 nGp = numel(lengpidx);
 
 % Get the average detection rate in each group of regularities
 lendetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{2}(x),:) == 2, 1)', ...
-    lengpidx, 'UniformOutput', 0));
+    lengpidx, 'uni', 0));
 
 % Prepare a new window
 figure('Position', [1196 806 240 200]);
@@ -207,7 +207,7 @@ nGp = numel(cplxidx);
 
 % Get the average detection rate in each group of regularities
 cplxetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{2}(x),:) == 2, 1)', ...
-    cplxidx, 'UniformOutput', 0));
+    cplxidx, 'uni', 0));
 
 % Display chance level
 subplot(1,2,2);

@@ -12,7 +12,7 @@ function randidx = Emergence_SelectFullyStochSeq(data, filter, restopt)
 % Copyright (c) 2018 Maxime Maheu
 
 % Select moment in which sequences do not entail any regularities
-randidx = cellfun(@(x) (x.Gen == 1)', data, 'UniformOutput', 0);
+randidx = cellfun(@(x) (x.Gen == 1)', data, 'uni', 0);
 
 % Get fully-stochastic sequences
 seqfs = all(cellfun(@(x) strcmpi(x.Cond(1), 'S'), data), 2);

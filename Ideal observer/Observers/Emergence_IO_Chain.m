@@ -176,7 +176,7 @@ end
 % % quickly becomes highly computationaly demanding
 % joint = mat2cell(pTgY, ones(ncond, 1), nt);
 % reshmat = mat2cell(eye(ncond)*(nt-1)+1, ones(ncond,1), ncond);
-% joint = cellfun(@(x,y) reshape(x', y), joint, reshmat, 'UniformOutput', 0);
-% joint = cellfun(@(x,y) repmat(x, -y+nt+1), joint, reshmat, 'UniformOutput', 0);
+% joint = cellfun(@(x,y) reshape(x', y), joint, reshmat, 'uni', 0);
+% joint = cellfun(@(x,y) repmat(x, -y+nt+1), joint, reshmat, 'uni', 0);
 % joint = cell2mat(reshape(joint, [ones(1,ncond), ncond]));
 % joint = prod(joint, N+2);

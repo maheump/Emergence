@@ -71,7 +71,7 @@ for iHyp = [2,1]
     
     % Regress entropy against detection velocity for each subject
     subvar = mat2cell(update{iHyp}', ones(nSub,1), numel(cidx{iHyp}));
-    subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
+    subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'uni', 0);
     offset = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta0'), subvar);
     slope  = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta1'), subvar);
     
@@ -171,7 +171,7 @@ condmap{2} = condmap{2}(idx,:);
 % Regress pattern length against detection delay for each subject
 delay = lag{2}; % lag2 or lag{2}
 subvar = mat2cell(delay', ones(nSub,1), numel(cidx{2}));
-subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'UniformOutput', 0);
+subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'uni', 0);
 offset = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta0'), subvar);
 slope  = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta1'), subvar);
 [~,pval,tci,stats] = ttest(slope);
@@ -180,11 +180,11 @@ Emergence_PrintTstats(pval,tci,stats);
 % Regress out the effect of pattern length (our experimental design is not
 % fully factorial)
 yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + len'.*b1), subvar, ...
-   num2cell(offset), num2cell(slope), 'UniformOutput', 0))';
+   num2cell(offset), num2cell(slope), 'uni', 0))';
 
 % Average detection lag for each group of patterns
 avggpergp = cell2mat(arrayfun(@(i) mean(yhat(group == i,:), 1, ...
-    'OmitNaN')', unique(group), 'UniformOutput', 0));
+    'OmitNaN')', unique(group), 'uni', 0));
 
 % Perform a repeated-measures 1-way ANOVA on detection lag depending on the
 % group of pattern

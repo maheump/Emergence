@@ -15,7 +15,7 @@ restodet = true;
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare the output variable
-idxtrimap = repmat({cellfun(@(x) false(N,1), G, 'UniformOutput', 0)}, 1, 5);
+idxtrimap = repmat({cellfun(@(x) false(N,1), G, 'uni', 0)}, 1, 5);
 
 % For sequences entailing regularities
 for iHyp = 1:2
@@ -24,7 +24,7 @@ for iHyp = 1:2
     cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:));
     
     % Get logical indices of post-change-point observations
-    idx = arrayfun(@(c) [false(c-1/2,1); true(N-c+1/2,1)], cp, 'UniformOutput', 0);
+    idx = arrayfun(@(c) [false(c-1/2,1); true(N-c+1/2,1)], cp, 'uni', 0);
     
     % Keep only indices for sequences with the current type of regularity
     idxtrimap{iHyp}(cidx{iHyp},:) = idx;
@@ -67,7 +67,7 @@ for iMap = 1:nMap
 
     % Get the finger's positions in the current condition
     points = cellfun(@(x,y) x.BarycCoord(y,:), ...
-        D, idxtrimap{iMap}, 'UniformOutput', 0);
+        D, idxtrimap{iMap}, 'uni', 0);
     
     % Compute triangular histogram
     [trajmap{iMap+1}, gppoints{iMap}, xgrid, ygrid, mask] = Emergence_TriHist(points);
@@ -81,7 +81,7 @@ trajmap{1} = (trajmap{3} ./ max(trajmap{3}(:))) ...
 % Display triangular and marginal histograms
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% Prepare the window
+%% Prepare the window
 figure('Position', [461 253 1000 650]);
 
 % Number of bins for the marginal histrograms
@@ -105,7 +105,7 @@ for iMap = 1:nMap+1
     tr = Emergence_PlotTriInfo(tricc, tricol);
     
     % Draw marginal histograms on the limits of the triangle
-	if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
+	%if iMap > 1, Emergence_PlotMargHist(gppoints{iMap-1}, nBin); end
     
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
@@ -117,6 +117,7 @@ for iMap = 1:nMap+1
     
     % Customize the colormap
     colormap(sp, cmaps{iMap});
+    colormap(sp, Emergence_Colormap('Jet'));
     if iMap == 1, caxis([-abs(max(caxis)), abs(max(caxis))]);
     else, caxis([0,max(cellfun(@(x) max(x(:)), trajmap([2,3,end])))]);
     end

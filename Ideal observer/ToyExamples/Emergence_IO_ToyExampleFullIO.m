@@ -214,7 +214,7 @@ end
 ax = {get(gca, 'YLim'), get(gca, 'YTick')};
 yyaxis('right');
 set(gca, 'YLim', ax{1}, 'YTick', ax{2}, 'YTickLabel', ...
-    cellfun(@(x) sprintf('%1.2g', x), num2cell(fun(ax{2})), 'UniformOutput', 0));
+    cellfun(@(x) sprintf('%1.2g', x), num2cell(fun(ax{2})), 'uni', 0));
 defaxprop(gca);
 
 % Display models' posterior probabilities the triangular arena
@@ -226,7 +226,7 @@ Emergence_PlotTrajOnTri([], J, tricol, 10, [], false, fs*1.5); alpha(3/4);
 Emergence_PlotGridOnTri(3);
 
 % Convert barycentric coordinates to cartesian ones
-pMgY = cell2mat(arrayfun(@(x) io.(['pMs',smlab{x},'gY'])', 1:3, 'UniformOutput', 0));
+pMgY = cell2mat(arrayfun(@(x) io.(['pMs',smlab{x},'gY'])', 1:3, 'uni', 0));
 tricc = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
 cartcoor = pMgY*tricc;
 
@@ -532,9 +532,9 @@ figpath = fullfile(scriptpath(1:max(strfind(scriptpath,'/'))), 'figs/');
 if exist(figpath, 'dir') ~= 7, mkdir(figpath); end
 
 % Save the figures as separate files
-figimg = arrayfun(@(x) frame2im(getframe(figure(x))), 1:4, 'UniformOutput', 0);
+figimg = arrayfun(@(x) frame2im(getframe(figure(x))), 1:4, 'uni', 0);
 cellfun(@(x,y) imwrite(x, [figpath, sprintf('Emergence_IO_ToyExampleFullIO_fig%i.jpeg', ...
-    y)]), figimg, num2cell(1:4), 'UniformOutput', 0);
+    y)]), figimg, num2cell(1:4), 'uni', 0);
 
 % Save all the figures as a single files
 figimg = cat(1, cat(2, figimg{1}, figimg{2}), cat(2, figimg{3}, figimg{4}));

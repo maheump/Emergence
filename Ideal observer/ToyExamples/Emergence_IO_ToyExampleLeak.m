@@ -55,7 +55,7 @@ nParam = numel(pMemError);
 col = lines(nParam); % choose different colors for each leak parameter
 
 % Labels for each leak parameter
-leakval = cellfun(@(x) sprintf('%1.3f', x), num2cell(pMemError), 'UniformOutput', 0);
+leakval = cellfun(@(x) sprintf('%1.3f', x), num2cell(pMemError), 'uni', 0);
 
 %% CREATE 2 SEQUENCES WITH DIFFERENT REGULARITIES
 %  ==============================================

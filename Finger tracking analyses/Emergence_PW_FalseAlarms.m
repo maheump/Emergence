@@ -94,15 +94,15 @@ randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 % Get subjects' P/D ratio
 pHpgYpHdgY_sub = cellfun(@(x,i) ...
     (x.BarycCoord(i,2) - x.BarycCoord(i,1)) ./ (x.BarycCoord(i,2) + x.BarycCoord(i,1)), ...
-    G, randidx, 'UniformOutput', 0);
+    G, randidx, 'uni', 0);
 
 % Get ideal observer's P/D ratio
 pHpgYpHdgY_IO = cellfun(@(x,i) ...
     (x.BarycCoord(i,2) - x.BarycCoord(i,1)) ./ (x.BarycCoord(i,2) + x.BarycCoord(i,1)), ...
-    IO, randidx, 'UniformOutput', 0);
+    IO, randidx, 'uni', 0);
 
 % Get ideal observer's belief in the fully-stochastic hypothesis
-pHsgY_IO = cellfun(@(x,i) x.BarycCoord(i,3), IO, randidx, 'UniformOutput', 0);
+pHsgY_IO = cellfun(@(x,i) x.BarycCoord(i,3), IO, randidx, 'uni', 0);
 
 % Define bins' edges based on percentiles computed from the ideal
 % observer's estimated probabilities

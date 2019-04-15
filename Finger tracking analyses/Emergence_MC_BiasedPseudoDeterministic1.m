@@ -24,7 +24,7 @@ CorCoef = [];
 for iMod = 1:nMod
     
     % Compute the 2D histogram
-    points = cellfun(@(x,y) x(y,:), pMgY(:,:,iMod), idxtrimap, 'UniformOutput', 0);
+    points = cellfun(@(x,y) x(y,:), pMgY(:,:,iMod), idxtrimap, 'uni', 0);
     [trajmap{iMod}, ~, xgrid, ygrid, mask] = Emergence_TriHist(points);
 end
 
