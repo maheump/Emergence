@@ -81,7 +81,7 @@ trajmap{1} = (trajmap{3} ./ max(trajmap{3}(:))) ...
 % Display triangular and marginal histograms
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%% Prepare the window
+% Prepare the window
 figure('Position', [461 253 1000 650]);
 
 % Number of bins for the marginal histrograms

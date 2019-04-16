@@ -36,7 +36,7 @@ figure('Position', [201 453 1520 250]);
 
 % For each density map
 for iMod = 1:nMod
-    subplot(1,nMod,iMod);
+    sp = subplot(1,nMod,iMod);
     
     % Display the density maps of finger's position
     imagesc(xgrid, ygrid, trajmap{iMod}, 'AlphaData', mask); hold('on');
@@ -56,7 +56,7 @@ for iMod = 1:nMod
     axis([0,1,0,sqrt(3)/2]);
     
     % Customize the colormap
-    colormap(Emergence_Colormap('Greens'));
+    colormap(sp, Emergence_Colormap('Greens'));
     caxis([0,max(trajmap{end}(:))]);
     
     % Add some text labels
