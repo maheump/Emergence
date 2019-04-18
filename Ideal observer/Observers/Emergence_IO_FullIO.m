@@ -69,10 +69,10 @@ function out = Emergence_IO_FullIO( ...
 %       latter case, it must match the "stat" field: e.g. if stat = "Item",
 %       then p_pTi should be a 1x2 array (e.g. [1 1] is a 'Bayes-Laplace'
 %       prior).
-%   - "p_pJk" (default: 'Uniform'): prior distribution over change point's
-%       position. It can be either 'Uniform', [mu, sigma] for a Gaussian
-%       prior or any custom prior distribution (a 1xN array where N is the
-%       length of the sequence "s").
+%   - "p_pJk" (default: 'Bayes-Laplace'): prior distribution over change
+%       point position. It can be either 'Bayes-Laplace', [mu, sigma] for a
+%       Gaussian prior or any custom prior distribution (a 1xN array where
+%       N is the length of the sequence "s").
 %   - "computfor" (default: 'all'): whether to return the iteratively
 %       updated inference ('all') or simply its final status ('last').
 %   - "scaleme" (default: 'log'): scale for the model evidences, either a
@@ -224,9 +224,9 @@ if nargin < 6 || isempty(p_pRi), p_pRi = 'Size-principle'; end
 
 % The two available analytical prior distributions over patterns
 if verbose, fprintf('  * Type of prior over patterns: %s\n', lower(p_pRi)); end
-if ~any(strcmpi(p_pRi, {'Uniform', 'Size-principle'}))
-    error(['Please provide a prior over patterns that is either "Uniform" ', ...
-        'or based on the "Size-principle"']);
+if ~any(strcmpi(p_pRi, {'Bayes-Laplace', 'Size-principle'}))
+    error(['Please provide a prior over patterns that is either ', ...
+        '"Bayes-Laplace" or based on the "Size-principle"']);
 end
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
@@ -239,11 +239,11 @@ if nargin < 7 || isempty(p_pRi), p_pTi = 'Bayes-Laplace'; end
 % If it is a custom prior distribution, check that its size matches the
 % type of statistic that will be estimated
 if ischar(p_pTi)
-    if ~any(strcmpi(p_pRi, {'Uniform', 'Size-principle'}))
+    if ~any(strcmpi(p_pRi, {'Bayes-Laplace', 'Size-principle'}))
         error(['Please provide a prior over statistics that is either ', ...
             '"Bayes-Laplace" or based on the "Size-principle"']);
     end
-    if verbose, fprintf('  * Type of prior over statistics: %s\n', p_pTi); end
+    if verbose, fprintf('  * Type of prior over statistics: %s\n', lower(p_pTi)); end
 elseif ~ischar(p_pTi)
     if any(size(p_pTi) ~= [2, nTdim])
         error('The custom prior has the wrong size');
@@ -257,11 +257,11 @@ end
 
 % By default, the prior probability regarding the position of the change
 % point is uniform over the sequence
-if     nargin <  8 || isempty(p_pJk) || ischar(p_pJk),     Jprior = 'Uniform';
+if     nargin <  8 || isempty(p_pJk) || ischar(p_pJk),     Jprior = 'Bayes-Laplace';
 elseif nargin >= 8 && ~ischar(p_pJk) && numel(p_pJk) == 2, Jprior = 'Gaussian';
 elseif nargin >= 8 && ~ischar(p_pJk) && numel(p_pJk) == N, Jprior = 'Custom';
 else, error(['Please provide a prior distribution over change point''s', ...
-        'positions that is either ''Uniform'', [mu,sigma] or 1xN array']);
+        'positions that is either ''"Bayes-Laplace"'', [mu,sigma] or 1xN array']);
 end
 if verbose
     fprintf('  * Type of prior over change point''s position: %s\n', lower(Jprior));
@@ -274,7 +274,7 @@ end
 % The prior over change point's positions can be a uniform uninformative
 % Bayes-Laplace prior:
 % for all k E [1,N]: p(Jk) = 1/N
-if strcmpi(Jprior, 'Uniform')
+if strcmpi(Jprior, 'Bayes-Laplace')
     p_pJk = ones(1,N) ./ N;
     
 % The prior over change point's positions can also be a non-uniform 
