@@ -45,9 +45,9 @@ for iHyp = [2,1]
     % Define the type of biases that have been used
     biases = NaN(numel(cidx{iHyp}), 1);
     biases(round(100*pXgY(:,1)) == round(100 * (1 - pXgY(:,2)))) = 1; % frequency biases
-    biases(pXgY(:,1) > 1/2 & pXgY(:,1) == pXgY(:,2)) = 2; % repetition biases
-    biases(pXgY(:,1) < 1/2 & pXgY(:,1) == pXgY(:,2)) = 3; % alternation biases
-    biases(isnan(biases)) = 4;                            % outside diagonals
+    biases(pXgY(:,1) > 1/2 & pXgY(:,1) == pXgY(:,2)) = 2;             % repetition biases
+    biases(pXgY(:,1) < 1/2 & pXgY(:,1) == pXgY(:,2)) = 3;             % alternation biases
+    biases(isnan(biases)) = 4;                                        % outside diagonals
     
     % Create colormap for the entropy
     minH = 1.4;
@@ -61,8 +61,8 @@ for iHyp = [2,1]
     % Compute Shannon entropy on transition probabilities
     TPent = arrayfun(@(x,y) Emergence_MarkovEntropy(x, y), pXgY(:,1), pXgY(:,2));
     
-    % Get dedicated color for each condition that is indexed on the entropy of
-    % the rule
+    % Get dedicated color for each condition that is indexed on the entropy
+    % of the rule
     [~,idx] = min(abs(linspace(0, maxH, prec) - TPent), [], 2);
     condmap{1} = EntCMap(idx,:);
     
