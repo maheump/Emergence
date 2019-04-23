@@ -37,14 +37,22 @@ corest = mat2cell(corest(cidx{iHyp},:), numel(cidx{iHyp}), ones(nSub,1));
 ultibel = cellfun(@(x,y) x.BarycCoord(end,y), IO, num2cell(truegenproc));
 ultibel = mat2cell(ultibel(cidx{iHyp},:), numel(cidx{iHyp}), ones(nSub,1));
 
-% Average those values separately in case of detected versus missed
-% regularities (based on subjects' detection)
+% Check whether missed regularities can be explained by lower posterior
+% beliefs in the ideal observer model
 avgbel = cat(2, cellfun(@(x,y) mean(x(y == 0)), ultibel, corest)', ...
                 cellfun(@(x,y) mean(x(y == 1)), ultibel, corest)');
-
-% Perform a paired t-test
 [~,pval,tci,stats] = ttest(diff(avgbel, 1, 2));
 Emergence_PrintTstats(pval, tci, stats);
+
+% Check whether missed regularities can be explained by a latter change
+% point position
+subcp = mat2cell(cp{iHyp} + 1/2, numel(cidx{iHyp}), ones(1,nSub));
+avgcp = cat(2, cellfun(@(x,y) mean(x(y == 0)), subcp, corest)', ...
+               cellfun(@(x,y) mean(x(y == 1)), subcp, corest)');
+[~,pval,tci,stats] = ttest(diff(avgcp, 1, 2));
+Emergence_PrintTstats(pval, tci, stats);
+[~,bf01] = BF_ttest(diff(avgcp, 1, 2));
+fprintf('BF in favour of the null: %1.2f\n', bf01);
 
 % Display average IO's beliefs following sequences entailing a
 % probabilistic regularity that was either detected or missed by subjects
