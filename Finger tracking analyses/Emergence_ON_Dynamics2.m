@@ -72,8 +72,7 @@ for iHyp = [2,1]
     % Regress entropy against detection velocity for each subject
     subvar = mat2cell(update{iHyp}', ones(nSub,1), numel(cidx{iHyp}));
     subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'uni', 0);
-    offset = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta0'), subvar);
-    slope  = cellfun(@(x) Emergence_Regress(x, TPent', 'OLS', 'beta1'), subvar);
+    slope = cellfun(@(x) Emergence_Regress(x, TPent', 'CC', 'r'), subvar);
     
     % Frequentist t-test on the distribution of statistics over subjects
     [~,pval,tci,stats] = ttest(slope);
@@ -172,13 +171,14 @@ condmap{2} = condmap{2}(idx,:);
 delay = lag{2}; % lag2 or lag{2}
 subvar = mat2cell(delay', ones(nSub,1), numel(cidx{2}));
 subvar = cellfun(@(x) x - mean(x, 2, 'OmitNaN'), subvar, 'uni', 0);
-offset = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta0'), subvar);
-slope  = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta1'), subvar);
-[~,pval,tci,stats] = ttest(slope);
+coef = cellfun(@(x) Emergence_Regress(x, len', 'CC', 'r'), subvar);
+[~,pval,tci,stats] = ttest(coef);
 Emergence_PrintTstats(pval,tci,stats);
 
 % Regress out the effect of pattern length (our experimental design is not
 % fully factorial)
+offset = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta0'), subvar);
+slope  = cellfun(@(x) Emergence_Regress(x, len', 'OLS', 'beta1'), subvar);
 yhat = cell2mat(cellfun(@(y,b0,b1) y - (b0 + len'.*b1), subvar, ...
    num2cell(offset), num2cell(slope), 'uni', 0))';
 

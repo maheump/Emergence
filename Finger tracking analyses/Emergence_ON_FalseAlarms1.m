@@ -90,7 +90,8 @@ inddata = cellfun(@(x) cell2mat(x), mat2cell(data, nSeq, ones(1,nSub)), 'uni', 0
 % Correlate likelihood of the fully-stochastic hypothesis 
 nanidx = cellfun(@(x) ~isnan(x(:,3)), inddata, 'uni', 0);
 obspos = repmat((1:N)', nSeq, 1);
-coef = cellfun(@(x,i) corr(x(i,3), obspos(i)), inddata, nanidx)';
+coef = cellfun(@(toexplain,idx) ...
+    Emergence_Regress(toexplain(idx,3), obspos(idx), 'CC', 'r'), inddata, nanidx)';
 
 % Prepare a new window
 figure('Position', [202 905 120 200]);
@@ -102,8 +103,7 @@ plot([0,2], zeros(1,2), '-', 'Color', g); hold('on');
 Emergence_PlotSubGp(coef, zeros(1,3));
 
 % Customize the axes
-set(gca, 'Box', 'Off', 'XTick', [], 'XColor', 'None');
-axis([0,2,-1,1]);
+set(gca, 'Box', 'Off', 'XTick', [], 'XColor', 'None', 'XLim', [0,2]);
 
 % Display whether the difference is significant or not
 Emergence_DispStatTest(coef);
