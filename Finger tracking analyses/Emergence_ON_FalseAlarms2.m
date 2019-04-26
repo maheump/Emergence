@@ -67,8 +67,10 @@ for iSub = 1:nSub
     [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
     
     % Average likelihoods in each bin
-    binsubtraj(:,:,iSub) = cell2mat(arrayfun(@(i) mean(subbel(bins == i,:)), 1:nBin, 'uni', 0)');
-    biniotraj(:,:,iSub)  = cell2mat(arrayfun(@(i) mean(iobel( bins == i,:)), 1:nBin, 'uni', 0)');
+    binsubtraj(:,:,iSub) = cell2mat(arrayfun(@(i) ...
+        mean(subbel(bins == i,:)), 1:nBin, 'uni', 0)');
+    biniotraj(:,:,iSub)  = cell2mat(arrayfun(@(i) ...
+        mean(iobel( bins == i,:)), 1:nBin, 'uni', 0)');
 end
 
 % Average over subjects
@@ -102,8 +104,10 @@ cartavgcoord = flipud(avgsubtraj*tricc);
 cartsemcoord = flipud(semsubtraj*tricc);
 
 % Display error bars
-plot(repmat(cartavgcoord(:,1), 1, 2)', cartavgcoord(:,2)' + [-1;1] .* cartsemcoord(:,2)', 'k-', 'LineWidth', 1/2);
-plot(cartavgcoord(:,1)' + ([-1;1] .* cartsemcoord(:,1)'), repmat(cartavgcoord(:,2), 1, 2)', 'k-', 'LineWidth', 1/2);
+plot(repmat(cartavgcoord(:,1), 1, 2)', cartavgcoord(:,2)' + ...
+    [-1;1] .* cartsemcoord(:,2)', 'k-', 'LineWidth', 1/2);
+plot(cartavgcoord(:,1)' + ([-1;1] .* cartsemcoord(:,1)'), ...
+    repmat(cartavgcoord(:,2), 1, 2)', 'k-', 'LineWidth', 1/2);
 
 % Get average size of the bin
 avgbinsize = mean(binsubn, 2);
