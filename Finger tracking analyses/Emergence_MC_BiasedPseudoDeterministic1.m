@@ -62,3 +62,30 @@ for iMod = 1:nMod
     % Add some text labels
     title(options{4,iMod});
 end
+
+% Compute correlation between deterministic "false alarms" and the order of
+% the transitions that are monitored
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Prepare the output variable
+avgdetfa = NaN(nSub,nMod);
+
+% For each model
+for iMod = 1:nMod
+    
+    % Compute the 2D histogram
+    avgbel = cellfun(@(x,y) mean(x(y,2)), pMgY(:,:,iMod), idxtrimap);
+    
+    % Average over sequences
+    avgdetfa(:,iMod) = mean(avgbel, 1);
+end
+
+% Compare "false alarm" likelihood across order of transitions
+[~,pval,tci,stats] = ttest(avgdetfa(:,1:end-1) - avgdetfa(:,end));
+Emergence_PrintTstats(pval,tci,stats);
+
+% Correlate ?false alarm? likelihood with order of transitions
+corcoef = cellfun(@(x) Emergence_Regress(x, 2:nMod, 'CC', 'r'), ...
+    mat2cell(avgdetfa(:,1:nMod-1), ones(nSub,1), nMod-1)); 
+[~,pval,tci,stats] = ttest(corcoef);
+Emergence_PrintTstats(pval,tci,stats);
