@@ -84,7 +84,7 @@ end
 [~,pval,tci,stats] = ttest(avgdetfa(:,1:end-1) - avgdetfa(:,end));
 Emergence_PrintTstats(pval,tci,stats);
 
-% Correlate ?false alarm? likelihood with order of transitions
+% Correlate "false alarm" likelihood with order of transitions
 corcoef = cellfun(@(x) Emergence_Regress(x, 2:nMod, 'CC', 'r'), ...
     mat2cell(avgdetfa(:,1:nMod-1), ones(nSub,1), nMod-1)); 
 [~,pval,tci,stats] = ttest(corcoef);
