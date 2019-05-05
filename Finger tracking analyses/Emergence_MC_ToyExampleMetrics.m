@@ -43,11 +43,11 @@ for i = 1:nMes
         % Compute similarity measures between subjects' and IO's beliefs by
         % shifting one with respect to the other
         lab = strcat(mes{i}, coord{j});
-        [out, all, optimshift(i,j)] = Emergence_Similarity(...
+        [out, allmet, optimshift(i,j)] = Emergence_Similarity(...
             subtraj, modtraj, lab, shiftgrid);
         
         % Plot metrics as a function of the shift
-        plot(shiftgrid, all, 'k-', 'LineWidth', 2); hold('on');
+        plot(shiftgrid, allmet, 'k-', 'LineWidth', 2); hold('on');
         
         % Display shift inducing best value of the metric
         plot(shiftgrid(optimshift(i,j)), out, 'k.', 'MarkerSize', 15);
