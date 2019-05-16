@@ -20,7 +20,7 @@ plttype = 'tri'; % 'tri' or 'dyn'
 dispseq = true;
 
 % Window around change point to look into (in number of observations)
-ObsWin = 0:100;
+ObsWin = 0:60;
 n = numel(ObsWin);
 
 % Define positions of figures' subplots
@@ -79,6 +79,13 @@ for iReg = 1:2
                 y = y * tricc;
                 plot(y(:,1), y(:,2), '-', 'Color', c);
                 
+                % Overlap sequence
+                if dispseq
+                    obscol = [c; ones(1,3)];
+                    s = scatter(y(:,1), y(:,2), 10, obscol(Seq{iReg}(iSeq,:),:), 'filled');
+                    set(s, 'MarkerEdgeColor', c);
+                end
+                
                 % Customize the axes
                 axis('equal'); axis('off');
                 
@@ -92,10 +99,10 @@ for iReg = 1:2
         
         % Overlap the sequence
         if strcmpi(plttype, 'dyn') && dispseq
-            obscol = {'w', 'k'};
+            obscol = {'k'; 'w'};
             for i = 1:2
-                toto = Seq{iReg}(iSeq,:) == i;
-                plot(ObsWin(toto), repmat(i-1, [1,sum(toto)]), 'o', ...
+                idx = Seq{iReg}(iSeq,:) == i;
+                plot(ObsWin(idx), repmat(i-1, [1,sum(idx)]), 'o', ...
                     'MarkerEdgeColor', 'k', 'MarkerFaceColor', ...
                     obscol{i}, 'MarkerSize', 5);
             end
