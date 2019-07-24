@@ -45,10 +45,8 @@ Compatibility with earlier versions of MATLAB has not been tested and is therefo
 
 ## Dependencies
 
-These are the toolboxes and functions the toolbox depends upon. They are automatically downloaded and installed (if not already available in the case of VBA) in the Dependencies folder of the toolbox.
+These are the toolboxes and functions the toolbox depends upon. They are automatically downloaded and installed in the Dependencies folder of the toolbox.
 
-* [VBA toolbox](http://mbb-team.github.io/VBA-toolbox/)
-* [cbrewer2](https://github.com/maheump/matlab/)
 * [Custom functions](https://github.com/maheump/matlab/)
 
 ## Related toolbox
