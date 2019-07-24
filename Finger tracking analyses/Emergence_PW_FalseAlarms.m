@@ -78,6 +78,9 @@ save2pdf(fullfile(ftapath, 'figs', 'F_HW_PredMaps.pdf'));
 % Define the number of bins to use when plotting the results
 nBin = 10;
 
+% Define the type of binning method
+binmeth = 'equil';
+
 % Select the sequences to look at
 % 1: all fully-stochastic parts
 % 2: only fully-stochastic sequences
@@ -104,14 +107,6 @@ pHpgYpHdgY_IO = cellfun(@(x,i) ...
 % Get ideal observer's belief in the fully-stochastic hypothesis
 pHsgY_IO = cellfun(@(x,i) x.BarycCoord(i,3), IO, randidx, 'uni', 0);
 
-% Define bins' edges based on percentiles computed from the ideal
-% observer's estimated probabilities
-dist = cell2mat(pHpgYpHdgY_IO(:));
-dist(isnan(dist)) = 1/2;
-dist = dist - mean(dist, 1, 'OmitNaN');
-edges = prctile(dist, linspace(0, 100, nBin+1));
-binlist = num2cell(1:nBin);
-
 % Prepare output variable
 binsubn = NaN(nBin,nSub  );
 subavg  = NaN(nBin,nSub,3);
@@ -123,21 +118,33 @@ for iSub = 1:nSub
     
     % Create the design matrix based on ideal observer's beliefs
     ioratioPD = cell2mat(pHpgYpHdgY_IO(:,iSub));
-    ioratioPD(isnan(ioratioPD)) = 1/2;
-    ioratioPD = ioratioPD - mean(ioratioPD, 1, 'OmitNaN');
+    ioratioPD(isnan(ioratioPD)) = 0;
     iobelinS  = cell2mat(pHsgY_IO(:,iSub));
     iointerac = ioratioPD .* iobelinS;
     offset    = ones(numel(ioratioPD), 1);    
     desmat    = [offset, ioratioPD, iobelinS, iointerac];
+    % N.B. when the division is not possible (i.e. P+D = 0) set the ratio
+    % to 0
     
     % Center predictors
-    desmat = desmat - [0, mean(desmat(:,2:end), 1, 'OmitNaN')];
+    desmat = desmat - [0, mean(desmat(:,2:end), 1)];
+    
+    % Find limits of bins
+    regofint = 2;
+    
+    % Get probability bins
+    if strcmpi(binmeth, 'unif') % bins of the same amplitude
+        edges = linspace(-1, 1, nBin+1);
+    elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
+        edges = prctile(desmat(:,regofint), linspace(0, 100, nBin+1));
+    else, error('Please check the binnig method that is provided');
+    end
     
     % Select variable to explain
     subratioPD = cell2mat(pHpgYpHdgY_sub(:,iSub));
-    subratioPD(isnan(subratioPD)) = 1/2;
+    subratioPD(isnan(subratioPD)) = 0;
     % N.B. when the division is not possible (i.e. P+D = 0) set the ratio
-    % to 1/2
+    % to 0
     
     % For each regression model
     % (each new model entails one more predictor than the previous one)
@@ -149,7 +156,6 @@ for iSub = 1:nSub
         regcoef(iMod,iSub,selecpred) = beta;
         
         % Remove variance from all the predictiors except the P/D ratio
-        regofint = 2;
         pidx = setdiff(selecpred, regofint);
         pred = desmat(:,pidx) * beta(pidx); % predictions based on beta values
         subratioPD2 = subratioPD - pred; % pseudo-residuals
@@ -158,8 +164,8 @@ for iSub = 1:nSub
         [binsubn(:,iSub),~,bins] = histcounts(desmat(:,regofint), edges);
         
         % Average IO P/D ratio and subject's residual P/D ratio
-        subavg(:,iSub,iMod) = cellfun(@(i) mean(subratioPD2(bins == i)), binlist);
-        ioavg(:,iSub,iMod)  = cellfun(@(i) mean(ioratioPD(  bins == i)), binlist);
+        subavg(:,iSub,iMod) = arrayfun(@(i) mean(subratioPD2(bins == i)), 1:nBin);
+        ioavg(:,iSub,iMod)  = arrayfun(@(i) mean(desmat(bins == i,regofint)), 1:nBin);
     end
 end
 

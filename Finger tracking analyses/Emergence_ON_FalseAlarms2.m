@@ -38,16 +38,6 @@ restopt = 1;
 % Select observations
 randidx = Emergence_SelectFullyStochSeq(G, filter, restopt);
 
-% Get probability bins
-if strcmpi(binmeth, 'unif') % bins of the same amplitude
-    pgrid = linspace(0, 1, nBin+1);
-elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
-    iobel = cellfun(@(x,y) x.BarycCoord(y,iHyp), IO, randidx, 'uni', 0);
-    iobel = cell2mat(iobel(:));
-    pgrid = prctile(iobel, linspace(0, 100, nBin+1));
-else, error('Please check the binnig method that is provided');
-end
-
 % Prepare output variables
 binsubn    = NaN(nBin,  nSub);
 binsubtraj = NaN(nBin,3,nSub);
@@ -63,8 +53,16 @@ for iSub = 1:nSub
     iobel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
         IO(:,iSub), randidx(:,iSub), 'uni', 0));
     
+    % Get probability bins
+    if strcmpi(binmeth, 'unif') % bins of the same amplitude
+        edges = linspace(0, 1, nBin+1);
+    elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
+        edges = prctile(iobel(:,iHyp), linspace(0, 100, nBin+1));
+    else, error('Please check the binnig method that is provided');
+    end
+    
     % Get in which bin falls each observation
-    [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
+    [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), edges);
     
     % Average likelihoods in each bin
     binsubtraj(:,:,iSub) = cell2mat(arrayfun(@(i) ...
@@ -142,8 +140,16 @@ for iSub = 1:nSub
     iobel = cell2mat(cellfun(@(x,y) x.BarycCoord(y,:), ...
         IO(:,iSub), randidx(:,iSub), 'uni', 0));
     
+    % Get probability bins
+    if strcmpi(binmeth, 'unif') % bins of the same amplitude
+        edges = linspace(0, 1, nBin+1);
+    elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
+        edges = prctile(iobel(:,iHyp), linspace(0, 100, nBin+1));
+    else, error('Please check the binnig method that is provided');
+    end
+    
     % Get in which bin falls each observation
-    [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), pgrid);
+    [binsubn(:,iSub),~,bins] = histcounts(iobel(:,iHyp), edges);
     
     % Build the design matrix
     obsidx = cell2mat(cellfun(@find, randidx(:,iSub), 'uni', 0));
