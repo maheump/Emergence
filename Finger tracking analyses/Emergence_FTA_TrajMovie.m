@@ -70,7 +70,7 @@ end
 %  =======================
 
 % Prepare the window
-ff = figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 806 400 300]);
+ff = figure('Color', ones(1,3), 'Units', 'Pixels', 'Position', [1 800 400 300]);
 fs = 8;
 ms = 8;
 
@@ -108,7 +108,7 @@ for iObs = 1:N
             tricol, eps, {'', '', ''}, false, fs);
         Emergence_PlotGridOnTri(3);
         cc = X{ind}.BarycCoord(iObs,:)*tricc;
-        plot(cc(1), cc(2), 'k.', 'MarkerSize', 10)
+        plot(cc(1), cc(2), 'ko', 'MarkerFaceColor', 'w', 'MarkerSize', 6);
         
         % Display the type of observer
         text(min(xlim), min(ylim), obslab{ind}, 'HorizontalAlignment', ...
@@ -194,8 +194,8 @@ for iObs = 1:N
     if strcmpi(tosave, 'gif')
         im = frame2im(frame);
         [imind, cm] = rgb2ind(im, 256);
-        if     iObs == 1, imwrite(imind, cm, filename, 'gif', 'Loopcount', inf);
-        elseif iObs  > 1, imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append');
+        if     iObs == 1, imwrite(imind, cm, filename, 'gif', 'DelayTime', 0, 'LoopCount', inf);
+        elseif iObs  > 1, imwrite(imind, cm, filename, 'gif', 'DelayTime', 0, 'WriteMode', 'append');
         end
     elseif strcmpi(tosave, 'avi')
     	writeVideo(vidObj, frame);
