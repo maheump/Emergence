@@ -57,8 +57,13 @@ private
 *.wav
 
 # Ignore some folders that we do not want to push online
+Manuscript
+Figures
 Examples
 Notes
 instr
 admin
 ppdata
+
+# Ignore files with "tmp" in the name
+*tmp*
