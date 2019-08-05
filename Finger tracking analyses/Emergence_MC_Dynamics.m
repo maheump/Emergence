@@ -1,23 +1,21 @@
 % This script shows detection dynamics of probabilistic and deterministic
-% regularities locked onto change point position for different ideal
-% observer models previously simulated.
+% regularities locked onto change point position for different models
+% previously simulated.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
-% Load simulations
-% ~~~~~~~~~~~~~~~~
-SimuType = 'PseudoDeterministic';
+% Get model simulations
+SimuType = 'IndependentDifferenceDiscrete';
 Emergence_MC_ModelSimulations;
-% N.B. SimuType can be 'Leak', 'TreeDepth', 'PseudoDeterministic' or 'BiasedPseudoDeterministic'
-
-% Display detection dynamics locked on change point position
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Define the type of plot
-plttype = 'tri'; % 'tri' or 'dyn'
+plttype = 'dyn'; % 'tri' or 'dyn'
 
 % Whether to display 
-dispseq = true;
+dispseq = false;
+
+% Display the other hypothesis
+dispalt = false;
 
 % Window around change point to look into (in number of observations)
 ObsWin = 0:60;
@@ -40,11 +38,12 @@ for iReg = 1:2
     
     % Select sequence likelihood around change point's position
     WinIO = cellfun(@(p,c) Emergence_LockOnPoint(p,c,ObsWin), ...
-        pMgY(cidx{iReg},:,:), repmat(cp, [1,1,nMod]), 'uni', 0);    
+        pMgY(cidx{iReg},:,:), repmat(cp, [1,1,nMod]), 'uni', 0);
     WinIO = cell2mat(cellfun(@(x) reshape(x,[1,1,1,n,3]), WinIO, 'uni', 0));
     
     % Get average sequence
-    seq = cellfun(@(x,i) Emergence_LockOnPoint(x.Seq',i,ObsWin), G(cidx{iReg},:), cp, 'uni', 0);
+    seq = cellfun(@(x,i) Emergence_LockOnPoint(x.Seq',i,ObsWin), ...
+        G(cidx{iReg},:), cp, 'uni', 0);
     seq = cell2mat(cellfun(@(x) reshape(x,[1,1,n]), seq, 'uni', 0));
     Seq{iReg} = squeeze(round(mean(seq, 2, 'OmitNaN')));
     
@@ -60,7 +59,10 @@ for iReg = 1:2
     	subplot(4,4,SpPos{iReg}(iSeq));
         
         % Display information about the triangle
-        if strcmpi(plttype, 'tri'), Emergence_PlotTriInfo; end
+        if strcmpi(plttype, 'tri')
+            Emergence_PlotTriInfo;
+            axis('equal'); axis('off');
+        end
         
         % For each model
         for iMod = 1:nMod
@@ -79,21 +81,25 @@ for iReg = 1:2
                 y = y * tricc;
                 plot(y(:,1), y(:,2), '-', 'Color', c);
                 
-                % Overlap sequence
+                % Overlap average sequence
                 if dispseq
                     obscol = [c; ones(1,3)];
-                    s = scatter(y(:,1), y(:,2), 10, obscol(Seq{iReg}(iSeq,:),:), 'filled');
+                    s = scatter(y(:,1), y(:,2), 15, obscol(Seq{iReg}(iSeq,:),:), 'filled');
                     set(s, 'MarkerEdgeColor', c);
                 end
-                
-                % Customize the axes
-                axis('equal'); axis('off');
                 
             % As a dynamic time-course...
             elseif strcmpi(plttype, 'dyn')
                 
                 % Display temporal dynamics with shaded error area
                 plotMSEM(ObsWin, y(:,iReg), e(:,iReg), 0.15, c, c);
+                
+                % Show beliefs in the two other hypotheses
+                if dispalt
+                    a = setdiff(1:2, iReg);
+                    plotMSEM(ObsWin, y(:,a),   e(:,a),   0.15, c, c, 1, 1, '--');
+                    plotMSEM(ObsWin, y(:,end), e(:,end), 0.15, c, c, 1, 1, ':');
+                end
             end
         end
         
@@ -111,6 +117,11 @@ for iReg = 1:2
         % Add some text labels
         if     iReg == 1, title(pr{iSeq});
         elseif iReg == 2, title(dr{iSeq});
+        end
+        
+        % Customize the axes
+        if     strcmpi(plttype, 'dyn'), axis([ObsWin([1,end]),0,1]); 
+        elseif strcmpi(plttype, 'tri'), axis([-1,1,0,sqrt(3)/2]);
         end
     end
 end

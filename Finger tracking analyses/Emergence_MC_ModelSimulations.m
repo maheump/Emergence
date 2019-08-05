@@ -3,6 +3,28 @@
 % chains of different orders. The simulations are run on sequences that
 % were presented to the subjects.
 % 
+% The different alternative models are the following ones:
+%   - "PseudoDeterministic": replaces the deterministic hypothesis with a
+%       probabilistic hypothesis learning higher-order transition
+%       probabilities.
+%   - "BiasedPseudoDeterministic": same as the previous one but in addition
+%       uses a prior biases for predictable cases.
+%   - "Leak": uses an exponential leak when counting observations in the
+%       case of the probabilistic hypothesis.
+%   - "TreeDepth": uses a deterministic hypothesis that considers different
+%       maximum pattern length than the one of the longest pattern (i.e.
+%       10) used in the experiment.
+%   - "IndependentDiffContinuous": uses a sigmoid on the difference between
+%       independently-computed likelihoods in the regular hypotheses in
+%       order to combine them (instead of the rules of probability).
+%   - "IndependentDiffDiscrete": uses example extreme cases of the previous
+%       one (i.e. a max, linear and example sigmoid versions).
+%   - "IndependentRatioContinuous": uses a sigmoid on the log-ratio between
+%       independently-computed likelihoods in the regular hypotheses in
+%       order to combine them (instead of the rules of probability).
+%   - "IndependentRatioDiscrete": uses example extreme cases of the previous
+%       one (i.e. a max, linear and example sigmoid versions).
+% 
 % Copyright (c) 2018 Maxime Maheu
 
 %% DEFINE OPTIONS OF THE IDEAL OBSERVERS TO SIMULATE
@@ -27,13 +49,16 @@ defo.verb   = 0;                 % do not output messages in the command window
 % Get the names of the options
 lab = fieldnames(defo);
 
+% Create a useful compact function for the follcwing command
+strfun = @(x) contains(SimuType, x, 'IgnoreCase', true);
+
 % SIMU #1: Alternative deterministic hypotheses that estimate higher-order
 % transitions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if strcmpi(SimuType, 'PseudoDeterministic')
+if strfun('PseudoDeterministic')
     
     % Define models to test
-    orders = 1:9;
+    orders = 2:9;
     nMod = numel(orders);
     
     % Replicate the default options for all the models to simulate
@@ -47,26 +72,14 @@ if strcmpi(SimuType, 'PseudoDeterministic')
 % SIMU #2: Alternative deterministic hypotheses that estimate higher-order
 % transitions and preferring predictive cases
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-elseif strcmpi(SimuType, 'BiasedPseudoDeterministic')
-    
-    % Define models to test
-    orders = 1:9;
-    nMod = numel(orders);
-    
-    % Replicate the default options for all the models to simulate
-    options = struct2cell(defo);
-    options = repmat(options, 1, nMod);
-    
-    % Change the statistics to learn and the prior over transitions for
-    % these models
-    lidx = strcmpi(lab, 'stat');
-    options(lidx,:) = arrayfun(@(x) sprintf('Chain%1.0f', x), orders, 'uni', 0);
-    lidx = strcmpi(lab, 'pT');
-    options(lidx,:) = arrayfun(@(x) repmat(999/1000, 2, 2^x), orders, 'uni', 0);
+	if strfun('Biased')
+        lidx = strcmpi(lab, 'pT');
+        options(lidx,:) = arrayfun(@(x) repmat(999/1000, 2, 2^x), orders, 'uni', 0);
+    end
     
 % SIMU #3: Alternative probabilistic hypothesis assuming a local integration
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-elseif strcmpi(SimuType, 'Leak')
+elseif strfun('Leak')
     
     % Define leak/substitution error parameter to test
     pe = [0.3158158158158160 0.1966966966966970 0.1416416416416420 0.1106106106106110 ...
@@ -100,10 +113,10 @@ elseif strcmpi(SimuType, 'Leak')
     
 % SIMU #4: Alternative deterministic hypothesis with different tree depth
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-elseif strcmpi(SimuType, 'TreeDepth')
+elseif strfun('TreeDepth')
     
     % Define depth of trees to explore
-    nu = [unique(cellfun(@numel, dr)') 20 50 N];
+    nu = [4 6 8 20 50 N 10];
     nMod = numel(nu);
     
     % Replicate the default options for all the models to simulate
@@ -113,6 +126,31 @@ elseif strcmpi(SimuType, 'TreeDepth')
     % Change the depth of the tree for these models
     lidx = strcmpi(lab, 'patlen');
     options(lidx,:) = arrayfun(@(x) x, nu, 'uni', 0);
+    
+% SIMU #5: Alternative (non-normative) weighting of the regular hypotheses
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elseif strfun('Independent')
+    
+    % Define models to test
+    if     strfun('Continuous'), sigmparam = logspace(0.5,9.5,100);
+    elseif strfun('Discrete'),	 sigmparam = [-2, 10.^1.5, -1];
+    end
+    nMod = numel(sigmparam);
+    
+    % Replicate the default options for all the models to simulate
+    options = struct2cell(defo);
+    options = repmat(options, 1, nMod);
+    
+    % Specify the type of models that are simulated
+    if strfun('Discrete')
+        options(end+1,:) = {'Lin', 'Sigm', 'Max'};
+    elseif strfun('Continuous')
+        if     strfun('Ratio'), labsigm = 'logratio';
+        elseif strfun('Diff'),  labsigm = 'difference';
+        end
+        options(end+1,:) = arrayfun(@(x) sprintf('sigm(%s,%1.2f)', ...
+            labsigm, x), sigmparam, 'uni', 0);
+    end
 end
 
 % Create a name for the file
@@ -146,34 +184,44 @@ try
 % Otherwise, run the (time-consuming) simulations
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 catch
-    % For each subject
-    for iSub = 1:nSub
+    
+    % Get previously computed simulations
+    if strfun('Independent')
+        exdata = load('Emergence_MC_PseudoDeterministic');
+        mIO = repmat(exdata.mIO(:,:,1), [1,1,nMod]);
+        clear('exdata');
         
-        % For each condition
-        for iSeq = 1:nSeq
-            fprintf('- Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f.\n', ...
-                iSeq, nSeq, iSub, nSub);
+    % Run simulations
+    else
+        % For each subject
+        for iSub = 1:nSub
             
-            % Get the sequence
-            seq = G{iSeq,iSub}.Seq;
-            
-            % For each order of the Markov chain
-            for iMod = 1:nMod
-                fprintf('\t* Model %1.0f/%1.0f... ', iMod, nMod);
-
-                % Run the model with its specific options
-                io = Emergence_IO_FullIO(seq, options{:,iMod});
-                mIO{iSeq,iSub,iMod} = cat(1, io.pYgMsp, io.pYgMsd, io.pYgMss)';
+            % For each condition
+            for iSeq = 1:nSeq
+                fprintf('- Running the IO on sequence #%2.0f/%2.0f from subject #%2.0f/%2.0f.\n', ...
+                    iSeq, nSeq, iSub, nSub);
+                
+                % Get the sequence
+                seq = G{iSeq,iSub}.Seq;
+                
+                % For each order of the Markov chain
+                for iMod = 1:nMod
+                    fprintf('\t* Model %1.0f/%1.0f... ', iMod, nMod);
+                    
+                    % Run the model with its specific options
+                    io = Emergence_IO_FullIO(seq, options{:,iMod});
+                    mIO{iSeq,iSub,iMod} = cat(1, io.pYgMsp, io.pYgMsd, io.pYgMss)';
+                end
+                
+                % Save temporary file
+                save(sprintf('%s_tmp.mat', fname), 'mIO', 'options');
             end
-            
-            % Save temporary file
-            save(sprintf('%s_tmp.mat', fname), 'mIO', 'options');
         end
+        
+        % Save file containing all the simulations and delete temporary file
+        save(sprintf('%s.mat', fname), 'mIO', 'options');
+        delete(sprintf('%s_tmp.mat', fname));
     end
-
-    % Save file containing all the simulations and delete temporary file
-    save(sprintf('%s.mat', fname), 'mIO', 'options');
-    delete(sprintf('%s_tmp.mat', fname));
 end
 
 %% COMPUTE HYPOTHESIS LIKELIHOOD
@@ -182,7 +230,7 @@ end
 % For simulations with high-order Markov chains use them as
 % pseudo-deterministic hypothesis, not as a higher-order probabilistic
 % hypothesis
-if contains(SimuType, 'PseudoDeterministic', 'IgnoreCase', true)
+if strfun('PseudoDeterministic')
     
     % Get sequence likelihood under different hypotheses
     pYgMsp = cellfun(@(x) x(:,1), mIO(:,:,1), 'uni', 0); % 1st-order Markov chain
@@ -190,7 +238,7 @@ if contains(SimuType, 'PseudoDeterministic', 'IgnoreCase', true)
     pYgMss = cellfun(@(x) x(:,3), mIO(:,:,1), 'uni', 0); % fully-stochastic
     pYgMsc = cellfun(@(x) x(:,1), mIO,        'uni', 0); % higher-order Markov chains
     
-    % Get sequence likelihood for the fully ideal observer modem
+    % Get sequence likelihood for the fully ideal observer model
     fullIO = mIO(:,:,1);
     
     % Combine sequence likelihood under the pseudo-deterministic
@@ -204,17 +252,91 @@ if contains(SimuType, 'PseudoDeterministic', 'IgnoreCase', true)
     options = cat(2, options, struct2cell(defo));
     
     % Attribute a color to each model
-    modc = [flipud(autumn(nMod)); tricol(2,:)];
-elseif strcmpi(SimuType, 'Leak')
+    if strfun('Biased'), modc = [flipud(autumn(nMod)); zeros(1,3)];
+    else,                modc = [flipud(winter(nMod)); zeros(1,3)];
+    end
+
+% For stimulations with different maximum pattern length allowed
+elseif strfun('TreeDepth')
+    modc = [flipud(Emergence_Colormap('Reds', nMod-1)); zeros(1,3)];
+    
+% For stimulations with exponential leak
+elseif strfun('Leak')
     modc = [flipud(winter(nMod-1)); zeros(1,3)];
+    
+% For simulations with independent (non rational) combination of hypothesis
+% likelihood
+elseif strfun('Independent')
+	
+    % For each subject, each sequence and each model
+    for iSub = 1:nSub
+        for iSeq = 1:nSeq
+            for iMod = 1:nMod
+                
+                % Get sequence likelihood
+                pYgHp = mIO{iSeq,iSub,iMod}(:,1);
+                pYgHd = mIO{iSeq,iSub,iMod}(:,2);
+                pYgHs = mIO{iSeq,iSub,iMod}(:,3);
+                
+                % Compute posterior likelihood of regular hypotheses
+                % independently
+                qHpgY = exp(pYgHp) ./ (exp(pYgHs) + exp(pYgHp));
+                qHdgY = exp(pYgHd) ./ (exp(pYgHs) + exp(pYgHd));
+                
+                % Get the slope parameter of the sigmoid function to use
+                slope = sigmparam(iMod);
+                
+                % Relative weighting
+                % ~~~~~~~~~~~~~~~~~~
+                if slope == -2
+                    Wp = qHpgY ./ (qHpgY + qHdgY);
+                    
+                % Maximum a posteriori
+                % ~~~~~~~~~~~~~~~~~~~~
+                elseif slope == -1
+                    Wp = double((qHpgY - qHdgY) >= 0);
+                    
+                % Sigmoid weighting
+                % ~~~~~~~~~~~~~~~~~
+                elseif slope > 0
+                    % In the case of a sigmoid based on the log ratio
+                    % between regular hypothesis likelihoods
+                    if strfun('Ratio')
+                        Wp = 1 ./ (1 + exp(-slope .* log(qHpgY ./ qHdgY)));
+                        
+                    % In the case of a sigmoid based on the difference
+                    % between regular hypothesis likelihoods
+                    elseif strfun('Diff')
+                        Wp = 1 ./ (1 + exp(-slope .* (qHpgY - qHdgY)));
+                    end
+                end
+                
+                % Compute the likelihood of the three hypotheses
+                pHsgY = (1 - qHpgY) .* Wp + (1 - qHdgY) .* (1 - Wp);
+                pHpgY = (1 - pHsgY) .* Wp;
+                pHdgY = (1 - pHsgY) .* (1 - Wp);
+                mIO{iSeq,iSub,iMod} = cat(2, pHpgY, pHdgY, pHsgY);
+            end
+        end
+    end
+    
+    % Concatenate results
+    pMgY = cat(3, mIO, cellfun(@(x) x.BarycCoord, IO, 'uni', 0));
+    
+    % Define the colors to use
+    if     strfun('Ratio'), modc = [winter(nMod); zeros(1,3)];
+    elseif strfun('Diff'),  modc = [cool(nMod);   zeros(1,3)];
+    end
 end
 
 % Compute posterior probability over hypotheses
-pMgY = cellfun(@(x) exp(x) ./ sum(exp(x), 2), mIO, 'uni', 0);
+if ~strfun('Independent')
+    pMgY = cellfun(@(x) exp(x) ./ sum(exp(x), 2), mIO, 'uni', 0);
+end
 nMod = size(pMgY, 3);
 
-% Define starting point
+% Make all trajectories to start at the bottom tip of the triangle
 for i = 1:numel(pMgY), pMgY{i}(1,:) = [0,0,1]; end
 
-% Remove datasets 
+% Remove datasets
 clear('mIO');
