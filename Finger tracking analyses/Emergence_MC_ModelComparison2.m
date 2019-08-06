@@ -223,7 +223,7 @@ end
 set(gca, 'YScale', 'Log', 'Box', 'Off', 'Layer', 'Bottom');
 if dispcont, set(gca, 'XScale', 'log');
 else, xlim([0,nMod]); end
-%ylim([-0.02,-0.004]);
+ylim([-0.02,-0.004]);
 
 % Add some text labels
 xlabel('Models');
