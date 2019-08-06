@@ -162,6 +162,7 @@ if ~dispcont
         scatter(xm, ym, 100, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
         
         % Display help lines
+        ylim(max(abs(ylim)) .* [-1,1]);
         limy = ylim;
         plot(zeros(1,2), [-1,1], '-', 'Color', g);
         plot([-1,1], zeros(1,2), '-', 'Color', g);
@@ -211,7 +212,6 @@ if dispcont
             'CData', [y y], 'FaceColor', 'None', 'EdgeColor', 'Interp', ...
             'Marker', 'none', 'LineWidth', 2);
     colormap(c); caxis(y([1,end]));
-    plot(x, m, 'k-');
     
 % If discrete models, use dots instead
 elseif ~dispcont
@@ -223,7 +223,7 @@ end
 set(gca, 'YScale', 'Log', 'Box', 'Off', 'Layer', 'Bottom');
 if dispcont, set(gca, 'XScale', 'log');
 else, xlim([0,nMod]); end
-ylim([-0.02,-0.004]);
+%ylim([-0.02,-0.004]);
 
 % Add some text labels
 xlabel('Models');

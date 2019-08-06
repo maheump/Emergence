@@ -294,7 +294,9 @@ elseif strfun('Independent')
                 % Maximum a posteriori
                 % ~~~~~~~~~~~~~~~~~~~~
                 elseif slope == -1
-                    Wp = double((qHpgY - qHdgY) >= 0);
+                    dif = qHpgY - qHdgY;
+                    Wp = double(dif > 0);
+                    Wp(abs(dif) <= 1e-4) = 1/2; % deal with precision
                     
                 % Sigmoid weighting
                 % ~~~~~~~~~~~~~~~~~

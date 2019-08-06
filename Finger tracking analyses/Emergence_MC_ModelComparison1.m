@@ -89,7 +89,7 @@ m = mean(MSE(:,modidx))';
 s = sem( MSE(:,modidx))';
 
 % Prepare a new window
-%figure('Position', [1 905 300 200]); hold('on');
+figure('Position', [1 905 300 200]); hold('on');
 
 % Display error made by the fully deterministic hypothesis
 plotMSEM(x([1,end]), repmat(mean(MSE(:,end)),1,2), ...
