@@ -30,7 +30,7 @@ if strcmpi(mes, 'abruptness')
     % regularities
     abruptness = @(p) mean(abs(diff(p,2,1)));
     modbeh = cellfun(@(p,c) abruptness(p(c:end,2)), pMgY(cidx{2},:,:), repmat(cp, [1 1 nMod]));
-    subbeh = cellfun(@(p,c) abruptness(p.BarycCoord(c:end,2)), G(cidx{2},:,:), cp);
+    subbeh = cellfun(@(p,c) abruptness(p.BarycCoord(c:end,2)), G(cidx{2},:), cp);
     
     % Remove deterministic regularities that were not identified by subjects
     detecmask = (filter{2} == 3);

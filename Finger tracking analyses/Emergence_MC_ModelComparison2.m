@@ -110,7 +110,7 @@ for iMod = 1:nMod
         % Average IO P/D ratio and subject's residual P/D ratio
         [~,~,bins] = histcounts(desmat(:,regofint), edges);
         subavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(subratioPD2(bins == i)),     1:ncb);
-        modavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(desmat(bins == i,regofint)), 1:ncb);
+        modavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(modratioPD( bins == i)), 1:ncb);
     end
 end
 
@@ -144,7 +144,7 @@ if ~dispcont
         % Create colormap used to color bins according to IO belief
         prec = 100;
         gege = [flipud(Emergence_Colormap('Blues', prec)); Emergence_Colormap('Reds', prec)];
-        grid = linspace(-1/2, 1/2, prec*2);
+        grid = linspace(-1, 1, prec*2);
         [~,colidx] = min(abs(xm'-grid), [], 2);
         
         % Display origin (because variables are centered)
@@ -161,15 +161,8 @@ if ~dispcont
         plot(xm, ym, 'k-', 'LineWidth', 1);
         scatter(xm, ym, 100, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
         
-        % Display help lines
-        ylim(max(abs(ylim)) .* [-1,1]);
-        limy = ylim;
-        plot(zeros(1,2), [-1,1], '-', 'Color', g);
-        plot([-1,1], zeros(1,2), '-', 'Color', g);
-        plot(limy, limy, '-', 'Color', g);
-        ylim(limy);
-        
         % Customize the axes
+        ylim(max(abs(ylim)) .* [-1,1]);
         set(gca, 'Box', 'Off'); axis('square');
         
         % Add some text labels
@@ -223,7 +216,7 @@ end
 set(gca, 'YScale', 'Log', 'Box', 'Off', 'Layer', 'Bottom');
 if dispcont, set(gca, 'XScale', 'log');
 else, xlim([0,nMod]); end
-ylim([-0.02,-0.004]);
+ylim([-0.02,-0.007]);
 
 % Add some text labels
 xlabel('Models');

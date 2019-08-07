@@ -132,8 +132,8 @@ elseif strfun('TreeDepth')
 elseif strfun('Independent')
     
     % Define models to test
-    if     strfun('Continuous'), sigmparam = logspace(0.5,9.5,100);
-    elseif strfun('Discrete'),	 sigmparam = [-2, 10.^1.5, -1];
+    if     strfun('Continuous'), sigmparam = logspace(1/2,10-1/2,100);
+    elseif strfun('Discrete'),	 sigmparam = [-2, 10^1, -1];
     end
     nMod = numel(sigmparam);
     
@@ -187,8 +187,9 @@ catch
     
     % Get previously computed simulations
     if strfun('Independent')
-        exdata = load('Emergence_MC_PseudoDeterministic');
-        mIO = repmat(exdata.mIO(:,:,1), [1,1,nMod]);
+        exdata = load('Emergence_MC_TreeDepth.mat');
+        idx = find(cellfun(@(x) x == 10, exdata.options(3,:)));
+        mIO = repmat(exdata.mIO(:,:,idx), [1,1,nMod]);
         clear('exdata');
         
     % Run simulations
@@ -296,19 +297,14 @@ elseif strfun('Independent')
                 elseif slope == -1
                     dif = qHpgY - qHdgY;
                     Wp = double(dif > 0);
-                    Wp(abs(dif) <= 1e-4) = 1/2; % deal with precision
+                    Wp(dif == 0) = 1/2;
                     
                 % Sigmoid weighting
                 % ~~~~~~~~~~~~~~~~~
                 elseif slope > 0
-                    % In the case of a sigmoid based on the log ratio
-                    % between regular hypothesis likelihoods
-                    if strfun('Ratio')
+                    if strfun('Ratio') % log ratio between regular hypothesis likelihoods
                         Wp = 1 ./ (1 + exp(-slope .* log(qHpgY ./ qHdgY)));
-                        
-                    % In the case of a sigmoid based on the difference
-                    % between regular hypothesis likelihoods
-                    elseif strfun('Diff')
+                    elseif strfun('Difference') % difference between regular hypothesis likelihoods
                         Wp = 1 ./ (1 + exp(-slope .* (qHpgY - qHdgY)));
                     end
                 end
@@ -326,8 +322,8 @@ elseif strfun('Independent')
     pMgY = cat(3, mIO, cellfun(@(x) x.BarycCoord, IO, 'uni', 0));
     
     % Define the colors to use
-    if     strfun('Ratio'), modc = [winter(nMod); zeros(1,3)];
-    elseif strfun('Diff'),  modc = [cool(nMod);   zeros(1,3)];
+    if     strfun('Ratio'),      modc = [winter(nMod); zeros(1,3)];
+    elseif strfun('Difference'), modc = [cool(nMod);   zeros(1,3)];
     end
 end
 
