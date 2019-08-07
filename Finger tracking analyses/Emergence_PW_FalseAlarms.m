@@ -165,7 +165,7 @@ for iSub = 1:nSub
         
         % Average IO P/D ratio and subject's residual P/D ratio
         subavg(:,iSub,iMod) = arrayfun(@(i) mean(subratioPD2(bins == i)), 1:nBin);
-        ioavg(:,iSub,iMod)  = arrayfun(@(i) mean(desmat(bins == i,regofint)), 1:nBin);
+        ioavg(:,iSub,iMod)  = arrayfun(@(i) mean(ioratioPD(  bins == i)), 1:nBin);
     end
 end
 
@@ -214,22 +214,15 @@ xval = Emergence_Regress(ym, xm, 'TLS', 'confintx');
 % Create colormap used to color bins according to IO belief
 prec = 100;
 gege = [flipud(Emergence_Colormap('Blues', prec)); Emergence_Colormap('Reds', prec)];
-grid = linspace(-1/2, 1/2, prec*2);
+grid = linspace(-1, 1, prec*2);
 [~,colidx] = min(abs(xm'-grid), [], 2);
 
 % Create a new window
 figure('Position', [142 700 200 200]);
 
-% Display origin (because variables are centered)
-plot(zeros(1,2), [-1,1], '-', 'Color', g); hold('on');
-plot([-1,1], zeros(1,2), '-', 'Color', g);
-
-% Display identity line
-plot(ylim, ylim, '-', 'Color', g);
-
 % Display the regression line
 fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
-       'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2);
+       'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2); hold('on');
 plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
 
 % Display predictions of simpler models
@@ -252,11 +245,11 @@ plot(xm, ym, 'k-', 'LineWidth', 1);
 scatter(xm, ym, dotsize, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
 
 % Customize the axes
-axis([-0.5,0.75,-0.2,0.2]);
+axis([-1,0.25,-0.2,0.2]);
 set(gca, 'Box', 'Off');
 
 % Add some text labels
-xlabel('Centered beliefs from IO');
+xlabel('Beliefs from IO');
 ylabel('Residual centered beliefs from subjects');
 
 % Save the figure

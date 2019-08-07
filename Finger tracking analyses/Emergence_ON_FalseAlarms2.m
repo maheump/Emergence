@@ -86,7 +86,12 @@ figure('Position', [323 805 200 300]);
 
 % Create a colormap whose length equals the number of bins
 cmap = {'Blues', 'Reds', 'Greens'};
-cmap = Emergence_Colormap(cmap{iHyp}, nBin);
+prec = 100;
+gege = Emergence_Colormap(cmap{iHyp}, prec);
+grid = linspace(0, 1, prec);
+xm = mean(biniotraj(:,iHyp,:), 3);
+[~,colidx] = min(abs(xm-grid), [], 2);
+cmap = gege(colidx,:);
 
 % Customize the colormap and add a colorbar
 cbr = colorbar('Location', 'SouthOutside');
@@ -175,8 +180,8 @@ for iSub = 1:nSub
         
         % Average IO's false alarm likelihood and subject's residual false
         % alarms
-        resbinsubFAL(:,iMod,iSub) = arrayfun(@(i) mean(ressubbel(bins == i  )), 1:nBin);
-        resbinioFAL(:,iMod,iSub)  = arrayfun(@(i) mean(desmat(   bins == i,2)), 1:nBin);
+        resbinsubFAL(:,iMod,iSub) = arrayfun(@(i) mean(ressubbel(bins == i     )), 1:nBin);
+        resbinioFAL(:,iMod,iSub)  = arrayfun(@(i) mean(iobel(    bins == i,iHyp)), 1:nBin);
     end
 end
 
@@ -215,16 +220,6 @@ fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
        'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2); hold('on');
 plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
 
-% Display origin (because variables are centered)
-ax = [-0.4,0.2,-0.15,0.1];
-plot(ax(1:2), zeros(1,2), '-', 'Color', g);
-plot(zeros(1,2), ax(3:4), '-', 'Color', g);
-
-% Display the identity line
-[~,i] = min(diff((reshape(ax, [2,2]))));
-idx = 2*(i-1)+[1,2];
-plot(ax(idx), ax(idx), '-', 'Color', g);
-
 % Display averaged beliefs in each probability bin with its error bars
 plot(xm, ym, 'k-', 'LineWidth', 1/2); 
 plot(xm' + xs'.*[-1;1], repmat(ym',2,1), 'k-');
@@ -232,11 +227,12 @@ plot(repmat(xm',2,1), ym' + ys'.*[-1;1], 'k-');
 scatter(xm, ym, dotsize, cmap, 'filled', 'MarkerEdgeColor', 'k')
 
 % Customize the axes
-axis(ax); axis('square'); set(gca, 'Box', 'Off');
+axis([0.4,1,-0.15,0.1]);
+axis('square'); set(gca, 'Box', 'Off');
 
 % Add some text labels
-xlabel('Centerd beliefs from the IO');
-ylabel('Residual centered beliefs from subjects');
+xlabel('Beliefs from the IO');
+ylabel('Beliefs from subjects (residuals)');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_FA_Corr.pdf'));
