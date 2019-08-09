@@ -67,8 +67,8 @@ subplot(1,4,4);
 plot(x, squeeze(simu(:,30,73,1,:)));
 
 % Customize the axes
-for i = 1:4
-    subplot(1,4,i);
+for iHyp = 1:4
+    subplot(1,4,iHyp);
     axis([0,145,0,1]);
     xlabel('Observation #');
     ylabel('p(H|y)');
@@ -111,6 +111,9 @@ for iHyp = 1:2
     end
 end
 
+%% DISPLAY THE RESULTS OF THE GRID-SEARCH FIT PROCEDURE
+%  ====================================================
+
 % Find best parameters
 % ~~~~~~~~~~~~~~~~~~~~
 
@@ -126,7 +129,7 @@ for iHyp = 1:2
     pind = cell(1,4);
     [pind{1},pind{2},pind{3},pind{4}] = ind2sub(size(MSE{1}{1}), ind);
     
-    % Transform indices along the grid into real paratemer values
+    % Transform indices along the grid into real parameter values
     pmes{iHyp} = cellfun(@(x,y) x(y), pgrid, pind, 'uni', 0);
     
     % Restrict to regularities accurately labeled
@@ -134,25 +137,129 @@ for iHyp = 1:2
     for iParam = 1:4, pmes{iHyp}{iParam}(~detecmask) = NaN; end
 end
 
-%% DISPLAY BEST PARAMETERS
-%  =======================
-
-% Get slope parameter for each group of regularities for each subject
-slopeparam = [mean(pmes{1}{1}, 1, 'OmitNaN')', mean(pmes{2}{1}, 1, 'OmitNaN')'];
-
-% Perform a paired t-test between slope parameters for probabilistis vs.
-% deterministic regularities
-[h,pval,ci,stats] = ttest(diff(slopeparam, 1, 2));
-Emergence_PrintTstats(pval,ci,stats);
+% Display best parameters
+% ~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [702 905 120 200]);
+figure('Position', [702 905 120*4 200]);
 
-% Display the paired difference in slope parameters
-Emergence_PlotSubGp(slopeparam, tricol(1:2,:));
+% For each parameter
+for iParam = 1:4
+    subplot(1,4,iParam);
+    
+    % Get slope parameter for each group of regularities for each subject
+    currparam = [mean(pmes{1}{iParam}, 1, 'OmitNaN')', ...
+                 mean(pmes{2}{iParam}, 1, 'OmitNaN')'];
+    
+    % Perform a paired t-test between slope parameters for probabilistis vs.
+    % deterministic regularities
+    [h,pval,ci,stats] = ttest(diff(currparam, 1, 2));
+    Emergence_PrintTstats(pval,ci,stats);
+    
+    % Display the paired difference in slope parameters
+    Emergence_PlotSubGp(currparam, tricol(1:2,:));
+    
+    % Customize the axes
+    set(gca, 'XLim', [0,3], 'XTick', [], 'XColor', 'None');
+end
 
-% Customize the axes
-set(gca, 'XLim', [0,3], 'XTick', [], 'XColor', 'None');
+ % Save the figure
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_ParamSigmS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_ParamSigmIO.pdf'));
+end
 
-% Add text labels
-ylabel('Slope parameter');
+% Display average sigmoid function
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Define the sigmoid functions
+sigm = @(x,p) (1 ./ (1 + exp(p(1).*(-x'+p(2))))) .* p(4) + p(3);
+
+ % Prepare a new window
+figure('Position', [933 905 220 200]); lgd = NaN(1,2); hold('on');
+
+ % Draw some help lines
+plot(x([1,end]),    ones(1,2)./2, '-',  'Color', g, 'LineWidth', 1/2); 
+plot(x([1,end]),    ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
+plot(x([1,end]), 2.*ones(1,2)./3, '--', 'Color', g, 'LineWidth', 1/2);
+
+% For each type of regularity
+for iHyp = 1:2
+    
+    % Average over sequences
+    param = cell2mat(cellfun(@(x) mean(x, 1, 'OmitNaN')', pmes{iHyp}, 'uni', 0));
+    
+    % Average over subjects
+    avgparam = mean(param, 1, 'OmitNaN');
+    semparam = sem(param, 1);
+    
+    % Draw error bars
+    paramcomb = mat2cell(avgparam + semparam .* (ff2n(4).*2-1), ones(2^4,1), 4);
+    allsigm = cell2mat(cellfun(@(p) sigm(x,p)', paramcomb, 'uni', 0));
+    lowerlim = max(allsigm, [], 1);
+    upperlim = min(allsigm, [], 1);
+    fill([x, fliplr(x)], [upperlim, fliplr(lowerlim)], 'k', 'FaceColor', ...
+        tricol(iHyp,:), 'EdgeColor', 'None', 'FaceAlpha', 0.15); hold('on');
+
+    % Draw the average sigmoid curve
+    avgpred = sigm(x, avgparam);
+    lgd(iHyp) = plot(x, avgpred, 'Color', tricol(iHyp,:), 'LineWidth', 3); 
+end
+
+ % Customize the axes
+set(gca, 'Box', 'Off');
+axis([0,60,0,1]);
+
+ % Add some text labels
+xlabel('# observation w.r.t. change point');
+ylabel('Fitted posterior belief p(M_i|y)');
+legend(lgd, proclab, 'Location', 'NorthWest');
+
+ % Save the figure
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_AvgSigmS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_AvgSigmIO.pdf'));
+end
+
+% Display MSE over the grid for the slope parameter
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Prepare new figure
+figure('Position', [933 905 220 200]);
+
+% For each regularity
+for iHyp = 1:2
+    
+    % Minimize MSE over the other parameters
+    paramcomb = cellfun(@(x) min(x,[],2:4), MSE{iHyp}, 'uni', 0);
+    
+    % Restrict to regularities accurately labeled
+    detecmask = (filter{iHyp} == 3);
+    paramcomb(~detecmask) = {NaN(size(paramcomb{1}))};
+    
+    % Average over sequences
+    paramcomb = cell2mat(cellfun(@(x) reshape(x, [1,1,size(x,1)]), paramcomb ,'uni', 0));
+    paramcomb = squeeze(mean(paramcomb, 1, 'omitnan'));
+    
+    % Overlap MSE for both types of regularity
+    if     iHyp == 1, yyaxis('left');
+    elseif iHyp == 2, yyaxis('right');
+    end
+    
+    % Display MSE averaged over subjects
+    plotMSEM(pgrid{1}, mean(paramcomb), sem(paramcomb), 0.15, tricol(iHyp,:));
+    
+    % Display the best slope parameter (i.e. with the smallest MSE)
+    [m,s] = min(mean(paramcomb));
+    plot(pgrid{1}(s), m, '.', 'MarkerEdgeColor', tricol(iHyp,:), 'MarkerSize', 20);
+    
+    % Customize the axes
+    axis('tight'); xlim([0.1,1]);
+    set(gca, 'YColor', tricol(iHyp,:), 'YScale', 'log', 'Box', 'Off');
+end
+
+% Add some text labels
+xlabel('Slope parameter');
+
+ % Save the figure
+if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_GridSigmS.pdf'));
+else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_GridSigmIO.pdf'));
+end
