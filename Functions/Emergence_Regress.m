@@ -42,12 +42,14 @@ if strcmpi(method, 'OLS')
     beta0 = b(2);
     beta1 = b(1);
     R2 = stats(1);
+    yhat = X*b;
+    mse = mean((y - yhat).^2);
     
     % 95% confidence interval
     [confint, confintx] = regerr(beta0, beta1, x, y);
     
     % Export relevant metrics in the output structure
-    out = struct('beta0', beta0, 'beta1', beta1, 'R2', R2, ...
+    out = struct('beta0', beta0, 'beta1', beta1, 'R2', R2, 'MSE', mse, ...
         'confint', confint, 'confintx', confintx);
     
 % Orthogonal regression / total least squares mathod / Deming regression:
