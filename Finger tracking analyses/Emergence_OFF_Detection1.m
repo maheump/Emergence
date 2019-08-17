@@ -24,7 +24,7 @@ avgcordet = NaN(3,3,nSub);
 for iHyp = 1:3 % generative process
     data = mat2cell(estgenproc(cidx{iHyp},:), numel(cidx{iHyp}), ones(nSub,1));
     avgcordet(iHyp,:,:) = cell2mat(cellfun(@(x) histc(x, 1:3) ...
-        ./ numel(x), data, 'UniformOutput', 0));
+        ./ numel(x), data, 'uni', 0));
 end
 data = squeeze(cat(1, avgcordet(1,1,:), avgcordet(2,2,:), avgcordet(3,3,:)))';
 
