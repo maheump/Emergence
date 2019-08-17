@@ -29,10 +29,10 @@ barc = barc(~cellfun(@isempty, barc));
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Define the degree of interpolation that we apply on the trajectory
-if nargin < 4, interp = 1/3; end % must be <= 1, 1 is no interpolation
+if nargin < 4, intfac = 1/3; end % must be <= 1, 1 is no interpolation
 
 % Interpolate the trajectories
-barc = cellfun(@(p) interp1(1:size(p,1), p, 1:interp:size(p,1)), barc, 'uni', 0);
+barc = cellfun(@(p) interp1(1:size(p,1), p, 1:intfac:size(p,1)), barc, 'uni', 0);
 barc = cell2mat(barc);
 
 % Make a 2D histogram
@@ -78,7 +78,7 @@ T = tril(ones(ng));
 T = [flip(T,2),T];
 mask = logical(round(imresize(T, [round(ng/2*tan(pi/3)), ng])));
 
-% Remove values outside the triangle 
+% Remove values outside the triangle
 density(~mask) = NaN;
 
 % Normalize the histogram
