@@ -1,4 +1,4 @@
-function [ trihist, barc, xgrid, ygrid, mask ] = Emergence_TriHist( barc, gridprec, smooth, interp, tricc )
+function [ density, barc, Xgrid, Ygrid, mask ] = Emergence_TriHist( barc, gridprec, smooth, interp, tricc )
 % EMERGENCE_TRIHIST returns a 2D triangular histogram of a series of
 % barycentricpositions.
 %   - "barc": a Nx3 matrix or a cell-array containing Nx3 matrices, where N
@@ -43,8 +43,16 @@ carc = barc*tricc;
 
 % Define the precision of the mesh
 if nargin < 2, gridprec = 0.01; end
-xgrid = tricc(1,1):gridprec:tricc(2,1);
-ygrid = tricc(3,2):gridprec:tricc(1,2);
+Xgrid = tricc(1,1):gridprec:tricc(2,1);
+Ygrid = tricc(3,2):gridprec:tricc(1,2);
+
+% Make sure we count all the data points, including the most extreme ones
+xgrid = Xgrid;
+ygrid = Ygrid;
+xgrid(1) = xgrid(1)-gridprec;
+ygrid(1) = ygrid(1)-gridprec;
+xgrid(end) = xgrid(end)+gridprec;
+ygrid(end) = ygrid(end)+gridprec;
 
 % Compute the density map
 density = hist3(carc, 'Edges', {xgrid, ygrid})';
@@ -53,32 +61,31 @@ density = hist3(carc, 'Edges', {xgrid, ygrid})';
 % ~~~~~~~~~~~~~~~~~~~~
 
 % Options for the gaussian smooth
-if nargin < 3, smooth = 2; end
-filtWidth = 2*ceil(2*smooth)+1;
+if nargin < 3, smooth = 6; end
+filtWidth = 10*ceil(2*smooth)+1;
 imageFilter = fspecial('Gaussian', filtWidth, smooth);
 
 % Smooth the density map
 density = convn(density, imageFilter, 'same');
 
-% Scale the histogram
-% ~~~~~~~~~~~~~~~~~~~
-
-% Convert it to log scale
-density = log(density+1);
-
-% Normalize it
-trihist = density ./ sum(density(:));
-    
 % Create a mask
 % ~~~~~~~~~~~~~
 
 % Create a mask that specifies which cells of the matrix are outside the
 % triangle
-if nargout > 2
-    ng = 1/gridprec+1;
-    T = tril(ones(ng));
-    T = [flip(T,2),T];
-    mask = round(imresize(T, [round(ng/2*tan(pi/3)), ng]));
-end
+ng = 1/gridprec+1;
+T = tril(ones(ng));
+T = [flip(T,2),T];
+mask = logical(round(imresize(T, [round(ng/2*tan(pi/3)), ng])));
+
+% Remove values outside the triangle 
+density(~mask) = NaN;
+
+% Normalize the histogram
+% ~~~~~~~~~~~~~~~~~~~~~~~
+
+% Divide by sum of bins that are *within* the triangle such that the
+% histogram sums to 1 (and can be compared across subjects and conditions)
+density = density ./ sum(density, 1:2, 'OmitNaN');
 
 end
