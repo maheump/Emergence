@@ -65,7 +65,7 @@ for iReg = 1:2
         end
         
         % For each model
-        for iMod = 1:nMod
+        for iMod = [fliplr(1:nMod-1), nMod]
             
             % Get posterior likelihood in each hypothesis
             y = squeeze(AvgIO{iReg}(iSeq,iMod,:,:));
