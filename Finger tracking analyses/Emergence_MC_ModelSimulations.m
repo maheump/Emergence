@@ -187,10 +187,7 @@ catch
     
     % Get previously computed simulations
     if strfun('Independent')
-        exdata = load('Emergence_MC_TreeDepth.mat');
-        idx = find(cellfun(@(x) x == 10, exdata.options(3,:)));
-        mIO = repmat(exdata.mIO(:,:,idx), [1,1,nMod]);
-        clear('exdata');
+        mIO = repmat(cellfun(@(x) x.SeqLLH, IO, 'uni', 0), [1,1,nMod]);
         
     % Run simulations
     else
@@ -233,14 +230,14 @@ end
 % hypothesis
 if strfun('PseudoDeterministic')
     
-    % Get sequence likelihood under different hypotheses
-    pYgMsp = cellfun(@(x) x(:,1), mIO(:,:,1), 'uni', 0); % 1st-order Markov chain
-    pYgMsd = cellfun(@(x) x(:,2), mIO(:,:,1), 'uni', 0); % pattern learner
-    pYgMss = cellfun(@(x) x(:,3), mIO(:,:,1), 'uni', 0); % fully-stochastic
-    pYgMsc = cellfun(@(x) x(:,1), mIO,        'uni', 0); % higher-order Markov chains
+    % Get sequence likelihood for the ideal observer model
+    fullIO = cellfun(@(x) x.SeqLLH, IO, 'uni', 0);
     
-    % Get sequence likelihood for the fully ideal observer model
-    fullIO = mIO(:,:,1);
+    % Get sequence likelihood under different hypotheses
+    pYgMsp = cellfun(@(x) x(:,1), fullIO, 'uni', 0); % 1st-order Markov chain
+    pYgMsd = cellfun(@(x) x(:,2), fullIO, 'uni', 0); % pattern learner
+    pYgMss = cellfun(@(x) x(:,3), fullIO, 'uni', 0); % fully-stochastic
+    pYgMsc = cellfun(@(x) x(:,1), mIO,    'uni', 0); % higher-order Markov chains
     
     % Combine sequence likelihood under the pseudo-deterministic
     % hypothesies, with the probabilistic and fully-stochastic hypotheses
