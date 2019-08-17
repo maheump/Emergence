@@ -109,14 +109,14 @@ for iSub = 1:nSub
     % ~~~~~~~~~~~~~~~~
     
     % Order conditions
-    rules = cellfun(@(x) x.Cond, subfile.D, 'UniformOutput', 0)';
+    rules = cellfun(@(x) x.Cond, subfile.D, 'uni', 0)';
     
     % Stochastic condition first
     stochidx = find(strcmpi(rules, 'Stochastic'))';
     
     % Probabilistic conditions sorted per entropy level and bias type
     probar = find(strcmpi(rules, 'Probabilistic'));
-    transproba = cellfun(@(x) x.Rule, subfile.D(probar), 'UniformOutput', 0);
+    transproba = cellfun(@(x) x.Rule, subfile.D(probar), 'uni', 0);
     probaidx = NaN(1,numel(prob));
     for k = 1:numel(prob)
         dif = NaN(1,numel(transproba));
@@ -129,7 +129,7 @@ for iSub = 1:nSub
     
     % Deterministic conditions sorted by patterns' length
     deterr = find(strcmpi(rules, 'Deterministic'));
-    pattern = cellfun(@(x) x.Rule, subfile.D(deterr), 'UniformOutput', 0);
+    pattern = cellfun(@(x) x.Rule, subfile.D(deterr), 'uni', 0);
     deteridx = NaN(1,numel(det));
     for k = 1:numel(det)
         dif = NaN(1,numel(pattern));
@@ -209,8 +209,8 @@ end
 
 % Display the average distance
 corr = mat2cell(G, nSeq, ones(1,nSub));
-corr = cellfun(@(y) cell2mat(cellfun(@(x) x.Corr, y, 'UniformOutput', 0)), ...
-    corr, 'UniformOutput', 0);
+corr = cellfun(@(y) cell2mat(cellfun(@(x) x.Corr, y, 'uni', 0)), ...
+    corr, 'uni', 0);
 dist = cellfun(@(x) mean(x(:,2)), corr);
 fprintf('=> Average projection distance: %1.2f pixels [%1.2f, %1.2f] (%1.2f).\n', ...
     mean(dist), min(dist), max(dist), sem(dist));
@@ -243,24 +243,24 @@ for iSub = 1:nSub
             iSeq, nSeq, iSub, nSub);
         
         % Run the observer with these options
-        IO{iSeq,iSub} = Emergence_IO_FullIO(G{iSeq,iSub}.Seq, ... % sequence
+        io = Emergence_IO_FullIO(G{iSeq,iSub}.Seq, ... % sequence
             pEd, pEp, patlen, stat, pR, pT, pJ, comp, scale, pgrid, verb);  % options
-        
-        % Remove unnecessary fields to light up the output MATLAB file
-        IOf = fields(IO{iSeq,iSub});
-        fieldstokeep = {'pMssgY', 'pMspgY', 'pMsdgY', 'Mhat', ... % posterior over models' likelihood
-                        'pJkgYMsp', 'pJkgYMsd', 'pJkgY', ...      % posterior over change point's pos.
-                        'JSpMgY', 'HpMgY'};                       % other metrics
-        fieldstorem  = cellfun(@(x) ~any(strcmpi(x, fieldstokeep)), IOf);
-        IO{iSeq,iSub} = rmfield(IO{iSeq,iSub}, IOf(fieldstorem));
         
         % Append the "Jump" subfield (the IO does not know its true position)
         IO{iSeq,iSub}.Jump = G{iSeq,iSub}.Jump;
         
         % Create a variable with all models' posterior probability
-        IO{iSeq,iSub}.BarycCoord = [IO{iSeq,iSub}.pMspgY', ... % 1: probabilistic component
-                                    IO{iSeq,iSub}.pMsdgY', ... % 2: deterministic component
-                                    IO{iSeq,iSub}.pMssgY'];    % 3: stochastic    component
+        IO{iSeq,iSub}.BarycCoord = [io.pMspgY', ... % 1: probabilistic component
+                                    io.pMsdgY', ... % 2: deterministic component
+                                    io.pMssgY'];    % 3: stochastic    component
+        
+        % Create a variable with sequence likelihood under each models
+        IO{iSeq,iSub}.SeqLLH = [io.pYgMsp', ... % 1: probabilistic component
+                                io.pYgMsd', ... % 2: deterministic component
+                                io.pYgMss'];    % 3: stochastic    component
+        
+        % Create a variable with posterior distribution of chance point position
+        IO{iSeq,iSub}.CPbelief = io.pJkgY;
         
         % Create a variable with (corrected) cartesian coordinates
         traj = round(IO{iSeq,iSub}.BarycCoord * tricoord);
@@ -272,18 +272,18 @@ for iSub = 1:nSub
         IO{iSeq,iSub}.Questions = NaN(1,6);
         
         % 1) Regularity?
-        if IO{iSeq,iSub}.Mhat(end) == 1
+        if io.Mhat(end) == 1
             IO{iSeq,iSub}.Questions(1) = 2; % no regularity found
             
         % 2) Which type?
         else
             IO{iSeq,iSub}.Questions(1) = 1; % a regularity was found
-            IO{iSeq,iSub}.Questions(2) = IO{iSeq,iSub}.Mhat(end) - 1;
+            IO{iSeq,iSub}.Questions(2) = io.Mhat(end) - 1;
             % 1 for probabilistic, 2 for deterministic
         end
         
         % 3) p(Jump)?
-        pJump = IO{iSeq,iSub}.pJkgY(:,end);
+        pJump = io.pJkgY(:,end);
         [val,idx] = max(pJump);
         IO{iSeq,iSub}.Questions(3) = idx; % change point's position
         IO{iSeq,iSub}.Questions(4) = val; % confidence in change point's position
@@ -301,18 +301,18 @@ end
 %  ==========================================
 
 % Get the different conditions
-c = cellfun(@(x) x.Cond, G(:,1), 'UniformOutput', 0);
-c = cellfun(@(x) sprintf('%s', x), c, 'UniformOutput', 0);
+c = cellfun(@(x) x.Cond, G(:,1), 'uni', 0);
+c = cellfun(@(x) sprintf('%s', x), c, 'uni', 0);
 
 % Get the different regularities
-r = cellfun(@(x) x.Rule, G(:,1), 'UniformOutput', 0);
+r = cellfun(@(x) x.Rule, G(:,1), 'uni', 0);
 sr = repmat({''}, 1, sum(strcmpi(c, 'Stochastic')))';
 pr = cellfun(@(x) sprintf('p(A|B) = %1.2f & p(B|A) = %1.2f', x(1), ...
-    x(2)), r(strcmpi(c, 'Probabilistic')), 'UniformOutput', 0);
-dr = cellfun(@pat2str, r(strcmpi(c, 'Deterministic')), 'UniformOutput', 0);
+    x(2)), r(strcmpi(c, 'Probabilistic')), 'uni', 0);
+dr = cellfun(@pat2str, r(strcmpi(c, 'Deterministic')), 'uni', 0);
 
 % Combine conditions and regularities
-condlab = cellfun(@(x,y) sprintf('%s %s', x, y), c, [sr;pr;dr], 'UniformOutput', 0);
+condlab = cellfun(@(x,y) sprintf('%s %s', x, y), c, [sr;pr;dr], 'uni', 0);
 
 % Create indices variables
 proclab = {'Probabilistic', 'Deterministic', 'Stochastic'};
