@@ -1,4 +1,4 @@
-function [ density, barc, Xgrid, Ygrid, mask ] = Emergence_TriHist( barc, gridprec, smooth, interp, tricc )
+function [ density, barc, Xgrid, Ygrid, mask ] = Emergence_TriHist( barc, gridprec, smooth, intfac, tricc )
 % EMERGENCE_TRIHIST returns a 2D triangular histogram of a series of
 % barycentricpositions.
 %   - "barc": a Nx3 matrix or a cell-array containing Nx3 matrices, where N
@@ -61,7 +61,7 @@ density = hist3(carc, 'Edges', {xgrid, ygrid})';
 % ~~~~~~~~~~~~~~~~~~~~
 
 % Options for the gaussian smooth
-if nargin < 3, smooth = 6; end
+if nargin < 3, smooth = 4; end
 filtWidth = 10*ceil(2*smooth)+1;
 imageFilter = fspecial('Gaussian', filtWidth, smooth);
 
