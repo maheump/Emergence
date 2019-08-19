@@ -1,9 +1,8 @@
-function [ marghist, bars ] = Emergence_PlotMargHist( pMgY, nBin, tricc, tricol )
+function [ marghist, bars ] = Emergence_PlotMargHist( marghist, tricc, tricol )
 % EMERGENCE_PLOTMARGHIST draws the 3 marginal histograms along the limits
 % of the triangle. It assumes an equilateral triangle oriented with one tip
 % to the bottom and the two remaing tips to the top, like that: ^
-%   - "pMgY": a Nx3 matrix with the values of beliefs for each hypothesis.
-%   - "nBin": a scalar number specifying the number of bins.
+%   - "marghist": a Nx3 specifying the histogram to plot.
 %   - "tricc": a 3x2 matrix specifying the x/y coordinates (columns) of
 %       each vertex of the triangle. By default the width is 1, the height
 %       sqrt(3)/2 and it is drawn at (0,0).
@@ -27,22 +26,8 @@ if nargin < 4 || isempty(tricol)
     tricol = [049, 130, 189; 222, 045, 038; 049, 163, 084] ./ 255;
 end
 
-% Get the three marginal histograms
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Get limits of the bins
-Bins = linspace(0, 1, nBin);
-
-% Compute the marginal histograms along each dimension/hypothesis
-marghist = NaN(nBin,3);
-for iDim = 1:3
-    marghist(:,iDim) = hist(pMgY(:,iDim), Bins);
-end
-
-% Normalize the histogram
-marghist = marghist./sum(marghist,1);
-
 % Prepare the variable that will entail bars' properties (colors, ...)
+nBin = size(marghist,1);
 bars = NaN(nBin,3);
 
 % Prepare a variable
