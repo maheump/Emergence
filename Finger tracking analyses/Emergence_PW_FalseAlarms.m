@@ -250,7 +250,7 @@ set(gca, 'Box', 'Off');
 
 % Add some text labels
 xlabel('Beliefs from IO');
-ylabel('Residual centered beliefs from subjects');
+ylabel('Residual beliefs from subjects');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_HW_CorrRatio.pdf'));

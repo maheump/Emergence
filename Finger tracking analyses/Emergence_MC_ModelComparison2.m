@@ -109,7 +109,7 @@ for iMod = 1:nMod
         
         % Average IO P/D ratio and subject's residual P/D ratio
         [~,~,bins] = histcounts(desmat(:,regofint), edges);
-        subavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(subratioPD2(bins == i)),     1:ncb);
+        subavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(subratioPD2(bins == i)), 1:ncb);
         modavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(modratioPD( bins == i)), 1:ncb);
     end
 end
@@ -166,8 +166,8 @@ if ~dispcont
         set(gca, 'Box', 'Off'); axis('square');
         
         % Add some text labels
-        xlabel('Centered beliefs from IO');
-        ylabel('Residual centered beliefs from subjects');
+        xlabel('Beliefs from IO');
+        ylabel('Residual beliefs from subjects');
     end
 end
 
