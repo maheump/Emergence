@@ -103,11 +103,8 @@ avgtrihist{1} = avgtrihist{3} - avgtrihist{2};
 % Prepare the window
 figure('Position', [461 253 1000 650]);
 
-% Create colormaps
-cmaps = [flipud(Emergence_Colormap('Blues')); (Emergence_Colormap('Reds'))];
-
 % For each density map
-for iMap = 2:nMap+1
+for iMap = 1:nMap+1
     sp = subplot(2,3,iMap);
     
     % Display the density maps of finger's position
@@ -128,25 +125,29 @@ for iMap = 2:nMap+1
     % Customize the axes
     set(gca, 'LineWidth', 1, 'FontSize', 15);
     axis('xy'); axis('off'); axis('equal');
-
-    % Customize the colormap
-    colormap(sp, (colorcet('R2', 'N', 1e5)));
-    if iMap == 1, caxis([-abs(max(caxis)), abs(max(caxis))]);
-    else, caxis([0,1/2*max(caxis)]);
-    end
     
+    % Add a colorbar
     ax = get(gca, 'Position');
     cbrpos = [ax(1)+ax(3)*3/4 ax(2) 0.01 ax(4)*1/3];
     cbr = colorbar('Position', cbrpos, 'LineWidth', 1);
 
-    set(gca,'ColorScale','log');
-    cbr.Label.String = {'Log-density'};
-    cbr.Ruler.Scale = 'log';
-    cbr.Ruler.MinorTick = 'on';
+    % Customize the colormap
+    if iMap == 1
+        colormap(sp, [flipud(Emergence_Colormap('Blues')); ...
+                             Emergence_Colormap('Reds')]);
+        caxis([-abs(max(caxis)), abs(max(caxis))]);
+    elseif iMap > 1
+        colormap(sp, Emergence_Colormap('Rainbow', 1e5));
+        caxis([0,1/2*max(caxis)]);
+        set(gca,'ColorScale','log');
+        cbr.Label.String = {'Log-density'};
+        cbr.Ruler.Scale = 'log';
+        cbr.Ruler.MinorTick = 'on';
+    end
 end
 
 % Use the same zoom level for all the maps
-ScaleAxis('x'); ScaleAxis('y'); ScaleAxis('c');
+ScaleAxis('x'); ScaleAxis('y'); ScaleAxis('c', 1:nMap);
 
 % Save the figure
 if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsS.pdf'));
