@@ -111,9 +111,6 @@ for iMap = 1:nMap+1
     imagesc(xgrid, ygrid, avgtrihist{iMap}, 'AlphaData', mask); hold('on');
     contour(xgrid, ygrid, avgtrihist{iMap}, 11, 'k-', 'LineWidth', 1/2);
     image(xgrid, ygrid, repmat(~mask, [1,1,3]), 'AlphaData', ~mask);
-	
-    % Display an empty triangle
-    tr = Emergence_PlotTriInfo(tricc, tricol);
     
     % Draw marginal histograms on the limits of the triangle
 	if iMap > 1, Emergence_PlotMargHist(avgmarghist{iMap}, nBin); end
@@ -121,6 +118,9 @@ for iMap = 1:nMap+1
     % Overlap the grid corresponding to the resoution of the marginal
     % histrograms
     Emergence_PlotGridOnTri(nBin);
+    
+    % Display an empty triangle
+    Emergence_PlotTriInfo(tricc, tricol);
     
     % Customize the axes
     set(gca, 'LineWidth', 1, 'FontSize', 15);
