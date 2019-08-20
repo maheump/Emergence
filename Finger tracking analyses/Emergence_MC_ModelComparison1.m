@@ -36,6 +36,12 @@ if strcmpi(mes, 'abruptness')
     detecmask = (filter{2} == 3);
     subbeh(~detecmask) = NaN;
     modbeh(~detecmask) = NaN;
+    
+    % Compute the error between models and subjects
+    MSE = (subbeh - modbeh) .^ 2;
+    
+    % Average over sequences
+    MSE = squeeze(mean(MSE, 1, 'OmitNaN'));
 
 % Compute average false alarm position
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,25 +50,21 @@ elseif strcmpi(mes, 'falsealarm')
     % Select fully-stochastic parts of sequences
     idxtrimap = Emergence_SelectFullyStochSeq(G, filter, 1);
     
-    % Get average positions in the (pseudo-)deterministic hypothesis from the
-    % ideal observer model
+    % Get average positions in the (pseudo-)deterministic hypothesis from
+    % the models
     modbeh = cellfun(@(x,i) x(i,2), pMgY, repmat(idxtrimap, [1,1,nMod]), 'uni', 0);
-    modbeh = squeeze(cellfun(@mean, modbeh));
+    modbeh = squeeze(mat2cell(modbeh, nSeq, ones(1,nSub,1), ones(1,1,nMod)));
+    modbeh = cellfun(@(x) mean(cell2mat(x)), modbeh);
     
-    % Get average positions in the (pseudo-)deterministic hypothesis from the
-    % subjects
+    % Get average positions in the (pseudo-)deterministic hypothesis from
+    % the subjects
     subbeh = cellfun(@(x,i) x.BarycCoord(i,2), G, idxtrimap, 'uni', 0);
-    subbeh = squeeze(cellfun(@mean, subbeh));
+    subbeh = squeeze(mat2cell(subbeh, nSeq, ones(1,nSub)))';
+    subbeh = cellfun(@(x) mean(cell2mat(x)), subbeh);
+    
+    % Compute the error between models and subjects
+    MSE = (subbeh - modbeh) .^ 2;
 end
-
-% Compute mean squared error
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Compute the error between models and subjects
-MSE = (subbeh - modbeh) .^ 2;
-
-% Average over sequences
-MSE = squeeze(mean(MSE, 1, 'OmitNaN'));
 
 % Perform paired t-tests
 if ~dispcont
@@ -113,7 +115,7 @@ end
 
 % Customize the axes
 if     strcmpi(mes, 'abruptness'), ylim([0.01,1].*1e-3);
-elseif strcmpi(mes, 'falsealarm'), ylim([3,100] .*1e-3);
+elseif strcmpi(mes, 'falsealarm'), ylim([2,200] .*1e-3);
 end
 set(gca, 'YScale', 'Log', 'Box', 'Off', 'Layer', 'Bottom');
 if dispcont, set(gca, 'XScale', 'log');
