@@ -32,6 +32,10 @@ __MACOSX
 *.jpg
 *.ai
 
+# Ignore documents
+*.doc*
+*.pages
+
 # Ignore automatically backup MATLAB files
 *.m~
 
