@@ -207,7 +207,7 @@ if strcmpi(prior, 'Bayes-Laplace')
 elseif strcmpi(prior, 'Size-principle')
     
     % We want to satisfy 2 constraints:
-    %   1) We want a pattern whose length equals i+1 to be 1/3 more likely
+    %   1) We want a pattern whose length equals i+1 to be 1/3 less likely
     %      (a priori) than a pattern whose length equals i.
     %   2) We want the sum of prior probabilities over all (entirely
     %      observed and partialy observed) patterns equal to 1.
@@ -229,8 +229,8 @@ end
 p_pRio = p_pRi(1:nlRo);
 p_pRiu = p_pRi((nlRo+1):nu);
 
-%% SEQUENCE'S MARGINAL LIKELIHOOD
-%  ==============================
+%% SEQUENCE MARGINAL LIKELIHOOD
+%  ============================
 
 % Entirely observed patterns
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~

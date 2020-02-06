@@ -15,8 +15,8 @@ function [ pY, pAgY ] = Emergence_IO_Null( K, scaleme )
 % By default, return model evidence in log scale
 if nargin < 2, scaleme = 'log'; end
 
-%% SEQUENCE'S MARGINAL LIKELIHOOD
-%  ==============================
+%% SEQUENCE MARGINAL LIKELIHOOD
+%  ============================
 
 % Compute the marginal likelihood of a sequence of length K under a 
 % p(y) = (1/2)^N(A) + (1/2)^N(B)

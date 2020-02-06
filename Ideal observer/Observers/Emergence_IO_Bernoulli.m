@@ -122,8 +122,8 @@ elseif usegrid
     if islog, pT = log(pT); end
 end
 
-%% SEQUENCE'S MARGINAL LIKELIHOOD
-%  ==============================
+%% SEQUENCE MARGINAL LIKELIHOOD
+%  ============================
 
 % Initialization
 % ~~~~~~~~~~~~~~

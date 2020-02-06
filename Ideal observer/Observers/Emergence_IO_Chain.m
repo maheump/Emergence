@@ -79,8 +79,8 @@ elseif isa(prior, 'double') && numel(prior) == ncond*2
 else, error('The prior input has the wrong form.');
 end
 
-%% SEQUENCE'S MARGINAL LIKELIHOOD
-%  ==============================
+%% SEQUENCE MARGINAL LIKELIHOOD
+%  ============================
 
 % Get the likelihood of the first observations (chance) for which the chain
 % cannot account for
