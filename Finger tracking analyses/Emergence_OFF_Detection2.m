@@ -59,13 +59,34 @@ fprintf('BF in favour of the null: %1.2f\n', bf01);
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare a new window
-figure('Position', [835 806 120 200]);
+figure('Position', [835 806 240 200]);
+
+% Display middle of the sequence
+subplot(1,2,1);
+plot([0,3], 100.*ones(1,2), '-', 'Color', g, 'LineWidth', 1); hold('on');
+
+% Display the change point position in missed versus detected regularities
+Emergence_PlotSubGp(avgcp, tricol(1,:));
+
+% Customize the axes
+axis([0,3,60,140]);
+set(gca, 'XTick', 1:2, 'XTickLabel', {'Undetected', 'Detected'}, ...
+    'XTickLabelRotation', 30);
+set(gca, 'Box', 'Off');
+
+% Display whether the difference is significant or not
+Emergence_DispStatTest(avgcp);
+
+% Add some text labels
+xlabel({'Probabilistic', 'regularities'});
+ylabel('Change point position');
 
 % Display chance level
+subplot(1,2,2);
 plot([0,3], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
 
 % Display difference in IO's beliefs between missed versus detected
-% regulartieis
+% regularities
 Emergence_PlotSubGp(avgbel, tricol(1,:));
 
 % Customize the axes
@@ -110,7 +131,7 @@ entdetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{1}(x),:) == 1, 1)', ..
     entgpidx, 'uni', 0));
 
 % Prepare a window
-figure('Position', [956 806 240 200]);
+figure('Position', [1076 806 240 200]);
 
 % Display chance level
 subplot(1,2,1);
@@ -119,13 +140,13 @@ plot([0,3], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
 % Display difference in detection rate according to entropy levels
 Emergence_PlotSubGp(entdetecrate, tricol(1,:));
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(entdetecrate);
+
 % Customize the axes
 axis([0,3,0,1]);
 set(gca, 'XTick', 1:2, 'XTickLabel', entgpttl, 'XTickLabelRotation', 30);
 set(gca, 'Box', 'Off');
-
-% Display whether the difference is significant or not
-Emergence_DispStatTest(entdetecrate);
 
 % Add some labels
 xlabel('Entropy levels');
@@ -151,13 +172,17 @@ plot([0,4], ones(1,2)./3, '-', 'Color', g, 'LineWidth', 1); hold('on');
 % Display difference in detection rate according to biased dimensions
 Emergence_PlotSubGp(biasdetecrate, tricol(1,:));
 
+% Display whether the difference is significant or not
+Emergence_DispStatTest(biasdetecrate);
+[~,pval,tci,stats] = ttest(biasdetecrate(:,2)-biasdetecrate(:,1));
+Emergence_PrintTstats(pval,tci,stats);
+[~,pval,tci,stats] = ttest(biasdetecrate(:,2)-biasdetecrate(:,3));
+Emergence_PrintTstats(pval,tci,stats);
+
 % Customize the axes
 axis([0,4,0,1]);
 set(gca, 'XTick', 1:nGp, 'XTickLabel', biasgpttl, 'XTickLabelRotation', 30);
 set(gca, 'Box', 'Off');
-
-% Display whether the difference is significant or not
-Emergence_DispStatTest(entdetecrate);
 
 % Add some labels
 xlabel('Biased dimension');
@@ -184,7 +209,7 @@ lendetecrate = cell2mat(cellfun(@(x) mean(estgenproc(cidx{2}(x),:) == 2, 1)', ..
     lengpidx, 'uni', 0));
 
 % Prepare a new window
-figure('Position', [1196 806 240 200]);
+figure('Position', [1317 806 240 200]);
 
 % Display chance level
 subplot(1,2,1);
