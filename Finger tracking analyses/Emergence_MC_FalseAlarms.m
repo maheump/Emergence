@@ -96,9 +96,9 @@ ScaleAxis('c');
 
 % Overlap the top 10% of the histogram
 sp = subplot(1,nMod+1,nMod+1); hold('on');
-toto = cellfun(@(x) x ./ max(x(:)), avgtrihist, 'uni', 0);
+tophist = cellfun(@(x) x ./ max(x(:)), avgtrihist, 'uni', 0);
 for iMod = 1:nMod
-    contour(xgrid, ygrid, toto{iMod}, [0.9,1], ...
+    contour(xgrid, ygrid, tophist{iMod}, [0.9,1], ...
         'EdgeColor', modc(iMod,:), 'LineWidth', 1); hold('on');
 end
 
