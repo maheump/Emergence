@@ -69,8 +69,8 @@ for iHyp = 1:2
     
     % Customize the axes
     set(gca, 'Box', 'Off');
-    if     iHyp == 1, ylim([0,0.012]);
-    elseif iHyp == 2, ylim([0,80]);
+    if     iHyp == 1, ylim([0,0.012]); title('Update');
+    elseif iHyp == 2, ylim([0,80]); title('Lag');
     end
 	
     % Add some text labels
@@ -110,6 +110,7 @@ for iHyp = 1:2
     % Customize the axes
     axis([0,2,-1,1]);
     set(gca, 'XTick', [], 'XColor', 'None');
+    ylabel('Correlation coefficient'),
 end
 
 % Save the figure
