@@ -933,6 +933,8 @@ pAgYMsd = cat(2, ones(1,2) ./ 2, pAgYMsd(2:N-1)); % p(A|y_0,Msd) = 1/2
 pAgY = (pAgYMss .* pMssgY) + ...   % p(A|y,Mss) * p(Mss|y)
        (pAgYMsp .* pMspgY) + ...   % p(A|y,Msp) * p(Msp|y)
        (pAgYMsd .* pMsdgY) ;       % p(A|y,Msd) * p(Msd|y)
+pAgY(pAgY < 0) = 0; % make sure prediction evolves between 0 ...
+pAgY(pAgY > 1) = 1; % ... and 1
 
 % Posterior Bernoulli distributions
 pXgYMsp = [pAgYMsp; 1-pAgYMsp];
@@ -1170,6 +1172,6 @@ toc;
 out.in.exectime = toc;
 
 % Go back to line
-if verbose == 1, fprintf('%s\n', repmat('=', 1, eqnum)); end
+if verbose == 1, fprintf('%s\n', repmat('=', 1, eqnum+3)); end
 
 end
