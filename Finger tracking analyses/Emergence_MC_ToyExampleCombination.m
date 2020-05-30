@@ -44,7 +44,7 @@ pHpgY = 1 ./ (1 + exp(-sigmparam .* differ));
 % Display the link functions
 subplot(4,1,3); hold('on');
 l = plot(differ, pHpgY, 'LineWidth', 1);
-col = winter(nParam);
+col = cool(nParam);
 for i = 1:nParam, set(l(i), 'Color', col(i,:)); end
 
 % Add some text labels
