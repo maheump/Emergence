@@ -10,6 +10,9 @@ function trajlocked = Emergence_LockOnPoint( traj, lockobs, win )
 % 
 % Copyright (c) 2018 Maxime Maheu
 
+% By default, use all the data
+if nargin < 3, win = [0, max(size(traj))-lockobs]; end
+
 % If only the limits of the window are specified
 if numel(win) == 2, win = win(1):win(2); end
 
