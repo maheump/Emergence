@@ -96,7 +96,9 @@ for iHyp = 1:2
     
     % For each subject and each regularity of this category
     for i = 1:numel(data)
-        disp(i/numel(data));
+        if any(i == round(linspace(1, numel(data), 20)))
+            fprintf('%1.0f%%|', 100*i/numel(data));
+        end
         
         % Compute the sum/mean squared error between all simulated sigmoid
         % functions and the observed beliefs dynamics
@@ -109,6 +111,7 @@ for iHyp = 1:2
         % observations post-change point, which can vary from one sequence
         % to the next)
     end
+    fprintf('\n');
 end
 
 %% DISPLAY THE RESULTS OF THE GRID-SEARCH FIT PROCEDURE
@@ -142,6 +145,7 @@ end
 
 % Prepare a new window
 figure('Position', [702 905 120*4 200]);
+pname = {'Slope', 'Intercept', 'Offset', 'Scaling'};
 
 % For each parameter
 for iParam = 1:4
@@ -161,6 +165,7 @@ for iParam = 1:4
     
     % Customize the axes
     set(gca, 'XLim', [0,3], 'XTick', [], 'XColor', 'None');
+    ylabel(sprintf('%s parameter', pname{iParam}));
 end
 
  % Save the figure
@@ -175,7 +180,7 @@ end
 sigm = @(x,p) (1 ./ (1 + exp(p(1).*(-x'+p(2))))) .* p(4) + p(3);
 
  % Prepare a new window
-figure('Position', [933 905 220 200]); lgd = NaN(1,2); hold('on');
+figure('Position', [1183 905 220 200]); lgd = NaN(1,2); hold('on');
 
  % Draw some help lines
 plot(x([1,end]),    ones(1,2)./2, '-',  'Color', g, 'LineWidth', 1/2); 
@@ -223,13 +228,13 @@ end
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare new figure
-figure('Position', [933 905 220 200]);
+figure('Position', [1404 905 220 200]);
 
 % For each regularity
 for iHyp = 1:2
     
     % Minimize MSE over the other parameters
-    paramcomb = cellfun(@(x) min(x,[],2:4), MSE{iHyp}, 'uni', 0);
+    paramcomb = cellfun(@(x) squeeze(min(x,[],2:4)), MSE{iHyp}, 'uni', 0);
     
     % Restrict to regularities accurately labeled
     detecmask = (filter{iHyp} == 3);
