@@ -2,7 +2,7 @@
 % repetitions of the same pattern) ideal Bayesian observer presented with
 % various sequences made of the repetition of different patterns.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

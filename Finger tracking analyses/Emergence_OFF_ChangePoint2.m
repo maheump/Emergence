@@ -4,7 +4,7 @@
 % change point. Moreover, we show that the confidence in that estimate is
 % higher in the case of deterministic than probabilistic regularities.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% CORRELATION BETWEEN ESTIMATED AND REAL CHANGE POINT'S POSITION
 %  ==============================================================

@@ -3,7 +3,7 @@
 % one hand and detection lag of deterministic regularities form human
 % subjects and the ideal observer on the other hand.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% RUN THE PREVIOUS SCRIPT SEPARATELY FOR SUBJECTS AND THE IO
 %  ==========================================================

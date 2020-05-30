@@ -6,7 +6,7 @@
 % much more ballistic in case of deterministic compared to probabilistic
 % regularities.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% SIMULATE DIFFERENT DETECTION DYNAMICS USING SIGMOID FUNCTIONS
 %  =============================================================

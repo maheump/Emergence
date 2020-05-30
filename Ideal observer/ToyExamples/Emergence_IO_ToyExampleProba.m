@@ -3,7 +3,7 @@
 % input sequence that is biased in terms of first-order transition
 % probabilities.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

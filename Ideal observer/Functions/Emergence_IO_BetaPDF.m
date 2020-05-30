@@ -9,7 +9,7 @@ function  y = Emergence_IO_BetaPDF(x,a,b,n)
 %   - "b": second parameter.
 %   - "n": number of values to be evaluated (for efficiency).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 if nargin < 4, n = numel(x); end
 

@@ -16,7 +16,7 @@ function leak = Emergence_IO_Leak( pErr, N )
 %        current estimates) decrease such that the most recent observations
 %        have more influence in the current estimate.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Prepare the output variable
 leak = NaN(1,N);

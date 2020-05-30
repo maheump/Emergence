@@ -10,7 +10,7 @@ function [ pYgMp, pAgYMp, mpTgY, H_pTgY, pXgX ] = Emergence_IO_Chain( y, scaleme
 %       transitions (expressed in pseudo-counts).
 %   - "i": a scalar specifying the order of the Markov chain to estimate.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

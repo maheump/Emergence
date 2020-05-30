@@ -9,7 +9,7 @@ function [ marghist, bars ] = Emergence_PlotMargHist( marghist, tricc, tricol )
 %   - "tricol": a 3x3 matrix specifying the RGB (columns) of each vertex of
 %       the triangle.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Fill in the inputs
 % ~~~~~~~~~~~~~~~~~~

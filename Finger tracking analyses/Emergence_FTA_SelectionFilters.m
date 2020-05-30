@@ -3,7 +3,7 @@
 % classified by subjects and/or which for which sequences we were able to
 % find a detection point for the subjects and the ideal observer.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define colors to use
 cmap = Emergence_Colormap('Greys');

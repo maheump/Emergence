@@ -15,7 +15,7 @@ function [ pY, pAgY, pRigY, HpRigY, R ] = Emergence_IO_Tree( y, nu, scaleme, use
 %   - "corout": a boolean specifying whether to correct the output
 %       variables when the result of the inference is singular.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % In order to understand the nomenclature used troughout the function,
 % let's consider the following example

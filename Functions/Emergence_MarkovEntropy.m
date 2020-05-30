@@ -4,7 +4,7 @@ function H = Emergence_MarkovEntropy( pAgB, pBgA )
 %   - "pAgB": a scalar specifying the value of p(A|B).
 %   - "pBgA": a scalar specifying the value of p(B|A).
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Compute frequency of all transitions
 pAgA = 1 - pBgA;

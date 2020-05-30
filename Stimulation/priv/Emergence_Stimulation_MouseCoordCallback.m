@@ -3,7 +3,7 @@ function Emergence_Stimulation_MouseCoordCallback( timerObj, event, trial, txtfi
 % position actually) in the background in order to reach high sampling
 % rate.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Read the coordinates
 coords = get(0, 'PointerLocation');

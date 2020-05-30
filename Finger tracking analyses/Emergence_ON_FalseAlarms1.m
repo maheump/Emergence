@@ -4,7 +4,7 @@
 % alarms becomr more likely to happen as time has passed since the
 % beginning of the sequence.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define options
 % ~~~~~~~~~~~~~~

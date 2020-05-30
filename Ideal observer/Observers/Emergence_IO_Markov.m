@@ -16,7 +16,7 @@ function [ pY, pAgY, mpTgY, H_pTgY ] = Emergence_IO_Markov( y, scaleme, usegrid,
 %   - "dt": a scalar specifying the grid precision for the posterior
 %       distributions over theta.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

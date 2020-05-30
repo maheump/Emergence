@@ -1,4 +1,4 @@
-% This script finds finds the correspondnace between the p(error) parameter
+% This script finds finds the correspondance between the p(error) parameter
 % (a probability substitution parameter used in Emergence) to the omega (w)
 % (an exponential leak strength parameter used in previous projects). Both
 % implements (exponentially) leaky integrations.
@@ -9,7 +9,7 @@
 %   - Maheu, M., Dehaene, S., & Meyniel, F. (2019). Brain signatures of a
 %       multiscale process of sequence learning in humans. eLife, 8, e41541.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define the number of observations
 N = 50;

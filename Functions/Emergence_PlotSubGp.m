@@ -13,7 +13,7 @@ function Emergence_PlotSubGp( y, col, xon, ms, aval )
 %   - "ms": the marker size for group-average dots.
 %   - "aval": the level of transparency for subject-level data.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Get the size of the input data matrix
 [nSub,nCond] = size(y);

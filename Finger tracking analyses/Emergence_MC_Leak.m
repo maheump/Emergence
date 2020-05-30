@@ -5,7 +5,7 @@
 % sequence is fully-stochastic) and the detection dynamics of probabilistic
 % regularities.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

@@ -1,7 +1,7 @@
 % Display the triangle as well as remarkable boundaries and locations of
 % the triangle.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============
@@ -47,7 +47,7 @@ figure;
 Emergence_PlotTrajOnTri(ones(1,3), NaN, tricol, 10, {'v', 'p', '^'}, false);
 
 % Display landmarks
-% ~~~~~~~~~~~~~~~~~
+% ~~~~~~~~~~~~~~~~~
 if plotlandm
     
     % For each side of the triangle
@@ -120,7 +120,7 @@ if plotlandm
 end
 
 % Display example trajectory
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~
 if plotexpseq
     
     % Make sure data from bad subjects is available

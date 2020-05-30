@@ -2,7 +2,7 @@
 % higher-order transitions on the likelihood of false alarms, in
 % particular, the likelihood of deterministic false alarms.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define options
 % ~~~~~~~~~~~~~~

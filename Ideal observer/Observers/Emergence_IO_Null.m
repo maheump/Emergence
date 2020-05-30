@@ -7,7 +7,7 @@ function [ pY, pAgY ] = Emergence_IO_Null( K, scaleme )
 %   - "scaleme": a string ('lin' or 'log') specifying whether the model
 %       evidence sould be computed on a linear or logarithmic scale.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

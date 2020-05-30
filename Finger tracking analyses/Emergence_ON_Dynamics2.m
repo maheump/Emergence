@@ -6,7 +6,7 @@
 % regularities (the update can thus vary), abruptly for deterministic
 % regularities (the lag can thus vary).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

@@ -1,7 +1,7 @@
 % This is the stimulation script. It presents auditory sequences and record
 % finger motions.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZE THE MATLAB ENVIRONMENT
 %  =================================

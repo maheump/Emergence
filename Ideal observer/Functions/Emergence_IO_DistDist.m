@@ -14,7 +14,7 @@ function [ D_JS, D_KL ] = Emergence_IO_DistDist( varargin )
 %       - dimN (N>2) = other non-relevant dimensions that are not used by
 %           the function but that should be conserved.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

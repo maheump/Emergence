@@ -3,7 +3,7 @@ function [ cols ] = Emergence_Colormap( cmap, N )
 %   - "cmap": a string of characeters specifying the name of the colormap.
 %   - "N": a scalar specifying the size of the colormap to return.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 if strcmpi(cmap, 'Blues')
    cols = [ 247   251   255 ;...

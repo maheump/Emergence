@@ -5,7 +5,7 @@
 % the same even though detection dynamics look steeper in the case of
 % deterministic regularities.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% GET TRAJECTORIES LOCKED ON PARTICULAR POINTS AND ASSESS THEIR PROPERTIES
 %  ========================================================================

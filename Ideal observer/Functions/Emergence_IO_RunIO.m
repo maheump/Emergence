@@ -10,7 +10,7 @@ function [ seqlh, predA, predent, pe, surp, margpost, jointpost, postent, update
 %   - "inputs": a cell array specifying the options to pass to the ideal
 %       observer function.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Avoid error when no inputs are provided
 if nargin < 3, inputs = {}; end

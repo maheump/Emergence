@@ -6,7 +6,7 @@
 % weighting from the subjects, even after taking into account several 
 % confounded variables in the regression.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% DISPLAY TRIANGULAR COLORMAPS OF PREDICTORS
 %  ==========================================

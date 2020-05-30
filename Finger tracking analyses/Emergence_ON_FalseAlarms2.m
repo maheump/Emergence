@@ -6,13 +6,13 @@
 % after controling for the effect of time elapsed since the beginning od
 % the sequence on the increase of false alarms.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% COMPARE FALSE ALARMS IN SUBJECTS AND IN THE IO
 %  ==============================================
 
 % Define options
-% ~~~~~~~~~~~~~~
+% ~~~~~~~~~~~~~~
 
 % The likelihood of the fully-stochastic hypothesis also quantifies the
 % extent of false alarms

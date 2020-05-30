@@ -9,7 +9,7 @@ function randidx = Emergence_SelectFullyStochSeq(data, filter, restopt)
 %       * 3: only fully-stochastic sequences that were correctly labeled
 %       * 4: only first-part of stochastic-to-regular sequences
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Select moment in which sequences do not entail any regularities
 randidx = cellfun(@(x) (x.Gen == 1)', data, 'uni', 0);

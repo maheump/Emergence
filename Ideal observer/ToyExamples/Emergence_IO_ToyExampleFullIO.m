@@ -10,7 +10,7 @@
 % addition, the full IO also returns posterior beliefs over change point's
 % positions, models' parameters, and identity of the future observation.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

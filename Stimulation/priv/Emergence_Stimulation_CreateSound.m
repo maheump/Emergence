@@ -6,7 +6,7 @@ function stim = Emergence_Stimulation_CreateSound( freq, rise, dur, audfreq )
 % (350, 700, and 1400 Hz, sound A; or 500, 1000, and 2000 Hz, sound B). 
 % All tones were prepared with 7-ms rise and 7-ms fall times.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Fill the inputs
 if nargin < 4

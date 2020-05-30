@@ -2,7 +2,7 @@
 % reflecting the inference scenario of ideal observers learning either
 % probabilistic or deterministic regularities.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

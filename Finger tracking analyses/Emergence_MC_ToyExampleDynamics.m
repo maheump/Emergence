@@ -1,7 +1,7 @@
 % This script shows example metrics use to quantify different aspects of
 % the trajectories
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Load simulations
 SimuType = 'PseudoDeterministic';

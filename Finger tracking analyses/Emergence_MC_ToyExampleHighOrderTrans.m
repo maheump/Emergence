@@ -4,7 +4,7 @@
 % probabilities that is considered and (b) the prior that is used (flat or
 % more or less biased).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% APPARENT TRANSITION PROBABILITIES (OF DIFFERENT ORDERS) OF A GIVEN PATTERN
 %  ==========================================================================

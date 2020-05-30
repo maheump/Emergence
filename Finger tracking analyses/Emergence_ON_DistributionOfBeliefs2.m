@@ -7,7 +7,7 @@
 % of the triangle, the ideal observer is also at the bottom of the
 % triangle? And is the reverse also true?
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Bin the barycentric dimensions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

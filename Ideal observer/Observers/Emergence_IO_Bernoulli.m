@@ -15,7 +15,7 @@ function [ pY, pAgY, pTgY, H_pTgY ] = Emergence_IO_Bernoulli( y, scaleme, usegri
 %   - "dt": a scalar specifying the grid precision for the posterior
 %       distributions over theta.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

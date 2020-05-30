@@ -8,7 +8,7 @@ function pval = Emergence_DispStatTest( y, ref )
 %   - "ref": the reference value against which "y" must be compared when
 %       there is only 1 column (default is 0).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Get the size of the input data matrix
 [nSub,nCond] = size(y);

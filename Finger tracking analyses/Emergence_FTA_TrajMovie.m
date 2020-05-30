@@ -2,7 +2,7 @@
 % sequence with progressively updating beliefs from an example subject and
 % the ideal observer.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % N.B. To be run without subject exclusion. To do so, turn the boolean
 % variable "rmbadsub" in "Emergence_FTA_LoadData" to false.

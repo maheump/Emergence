@@ -1,7 +1,7 @@
 % This script setups the MATLAB environment and figures' preferences
 % required to run Emergence_FTA_* analysis scripts.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Display info
 fprintf('Loading preprocessed data... ');

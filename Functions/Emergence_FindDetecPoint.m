@@ -3,7 +3,7 @@ function dp = Emergence_FindDetecPoint(bel)
 %   - "bel": the 1xN array of posterior probabilities as a function of
 %       time.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % The belief threshold to exceed in order to "detect" a regularity
 threshold = 1/2;

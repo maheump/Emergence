@@ -5,7 +5,7 @@
 % violates or confirms the pattern is processed by the deterministic versus
 % probabilistic observers.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

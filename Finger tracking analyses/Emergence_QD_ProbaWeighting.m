@@ -5,7 +5,7 @@
 % what has been shown by economic theory: they overestimate small
 % probabilities and underestimate large ones.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Compute error over parameters grid
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -6,7 +6,7 @@ function Emergence_PrintTstats( pval, ci, stats )
 %   - "ci": a 2xN matrix specifying the confidence intervals.
 %   - "stats": a 1xN cell array specifying several metrics from the t-test.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Get the number of tests' results to display
 I = numel(pval);
@@ -29,7 +29,7 @@ cohend = avgx ./ stdx;
 % Display statistical results in the command window
 for i = 1:I
     idx = find(pval(i) < lima, 1, 'first');
-    fprintf('m = %1.2f ± [%1.2f,%1.2f], d = %1.2f, t(%2.0f) = %1.2f, ', ...
+    fprintf('m = %1.2f, CI = [%1.2f,%1.2f], d = %1.2f, t(%2.0f) = %1.2f, ', ...
         avgx(i), ci(:,i), cohend(i), stats.df(i), stats.tstat(i));
     if     pval(i) >= 0.001, fprintf('p = %1.3f %s\n', pval(i), stars{idx});
     elseif pval(i) <  0.001, fprintf('p = %1.2d %s\n', pval(i), stars{idx});

@@ -9,7 +9,7 @@ function out = Emergence_Regress( y, x, method, outvar )
 %       depending on the type of analysis that has been chosen and
 %       specified in the "method" field.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Check that the explaining variable and the variable to explain have the
 % same size

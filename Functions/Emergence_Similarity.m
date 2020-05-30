@@ -16,7 +16,7 @@ function [ out, gro, idx ] = Emergence_Similarity( pb, qb, metric, optim )
 %       delay or an array of integers specifying the temporal delays over
 %       which to optimize (in terms of observation #, see Emergence_Shift).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Make sure the variables are N*3 matrices
 if isstruct(pb), pb = pb.BarycCoord; end

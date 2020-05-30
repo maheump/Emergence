@@ -3,7 +3,7 @@
 % marginal histograms (along the relevant dimension) for the two types of
 % regularity (probabilistic and deterministic ones) are compared.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define option
 % ~~~~~~~~~~~~~

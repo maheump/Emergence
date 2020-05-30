@@ -6,7 +6,7 @@ function [ xp, yp ] = Emergence_Shift( x, y, d )
 %   - "d": a scalar specifying the amount of shift (in terms of number of
 %       observations) of one with respect to the other.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Number of observations
 n = size(x,1);

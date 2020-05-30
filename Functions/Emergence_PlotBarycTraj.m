@@ -7,7 +7,7 @@ function f = Emergence_PlotBarycTraj( pMgY, tricol, x )
 %       each hypothesis.
 %   - "x": a 1xN vector specifying the positions of observations.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % By default, display cumulative probabilities starting at x = 1
 nObs = size(pMgY, 1);

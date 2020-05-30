@@ -1,7 +1,7 @@
 % This script shows examples of the different link functions that are used
 % to combine the independently-combined likelihood 
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Prepare a new window
 figure('Position', [1 895 200 450]);

@@ -1,7 +1,7 @@
 % Script showing the effect of the type of deterministic hypothesis and the
 % strength of prior beliefs over frequency of transitions 
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

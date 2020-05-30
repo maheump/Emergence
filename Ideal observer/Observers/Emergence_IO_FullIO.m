@@ -93,7 +93,7 @@ function out = Emergence_IO_FullIO( ...
 % predictions, surprise and entropy levels and (4) update-related
 % quantities.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% Check the inputs
 %  ================
@@ -692,7 +692,7 @@ for K = obs
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
     % Normalize the posterior distribution over change point's positions %
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-    % for all i E {P,D} and Jk E {1,2,...,N}:
+    % for all i E {P,D} and Jk E {1,2,...,N}:
     % p(Jk|y,Msi) = (p(y|Jk,Msi) * p(Jk)) / p(y|Msi)
     % where p(y|Msi) = sum_{Jk=1:N} p(y|Jk,Msi) * p(Jk)
     
@@ -715,7 +715,7 @@ for K = obs
     %  driven by the (uniform) prior distribution over change point's
     %  positions thus resulting in uniform distribution over models'
     %  parameters as well.
-    %  for all i E {P,D} and Jk E {1,2,...,K-1}:
+    %  for all i E {P,D} and Jk E {1,2,...,K-1}:
     %  p(theta|y,Msi) = sum_{Jk=1:K-1} p(theta|y,Jk,Msi) * p(Jk|y,Msi)
     
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
@@ -752,12 +752,12 @@ for K = obs
     %% Compute predictions regarding the identity of the forthcoming observation
     %  =========================================================================
     %  The prediction is computed after receiving the observation K:
-    %  for all i E {P,D}: p(A|y,Msi) = p(y_K+1=A|y_1:K,Msi) = 1 - p(B|y,Msi)
+    %  for all i E {P,D}: p(A|y,Msi) = p(y_K+1=A|y_1:K,Msi) = 1 - p(B|y,Msi)
     %  
     %  It is obtained by deriving the expectation of a A given the
     %  observations following the change point times the posterior
     %  probability of the change point being at that point:
-    %  for all i E {P,D}: p(y(K+1)=A|y,Jk,Msi) = p(y_K+1=A|y,Msi) * p(Jk|y)
+    %  for all i E {P,D}: p(y(K+1)=A|y,Jk,Msi) = p(y_K+1=A|y,Msi) * p(Jk|y)
     
     % for the stochastic-to-probabilistic observer
     pAgYMsp(K) = pAgJkYp2Mp * pJkgYMsp(:,K);

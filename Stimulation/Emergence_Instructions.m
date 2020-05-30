@@ -1,6 +1,6 @@
 % This script presents the different conditions to the subjects.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% PREPARE THE AUDITORY STIMULI
 %  ============================

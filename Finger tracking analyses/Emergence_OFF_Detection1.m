@@ -6,7 +6,7 @@
 % detection theory approach in which possible (and existing) response
 % biases are taken into account.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% LABELING THE 3 TYPES OF SEQUENCES
 %  =================================
@@ -304,7 +304,7 @@ text(mean([Pcoord(1), Dcoord(1)]), mean([Pcoord(2), Dcoord(2)]), ...
     sprintf('d'' = %1.2f', Dpd), 'Rotation', Aspd-rotang, 'VerticalAlignment', 'Bottom');
 
 % Display the value of the (non-)indenpendancy angle determined by d' values
-text(0, -0.2, ['\theta', sprintf(' = %1.0f°', theta)], 'FontSize', 12, ...
+text(0, -0.2, ['\theta', sprintf(' = %1.0f', theta)], 'FontSize', 12, ...
     'VerticalAlignment', 'Top', 'HorizontalAlignment', 'Center');
 
 % Display criterion

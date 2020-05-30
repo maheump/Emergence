@@ -4,7 +4,7 @@
 % account the temporal shift between the two may help to maximize the
 % similarity between the two.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Initialization
 % ~~~~~~~~~~~~~~

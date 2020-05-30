@@ -4,7 +4,7 @@
 % regarding the update of their beliefs compared to the ideal observer (at
 % least partly because of the rapid auditory presentation).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Correlate subjects' with ideal observer's beliefs
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

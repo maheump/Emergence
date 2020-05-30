@@ -35,7 +35,7 @@
 %   - "Leak": uses an exponential leak when counting observations in the
 %       case of the probabilistic hypothesis.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% DEFINE OPTIONS OF THE IDEAL OBSERVERS TO SIMULATE
 %  =================================================

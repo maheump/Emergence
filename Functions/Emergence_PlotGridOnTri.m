@@ -9,7 +9,7 @@ function lines = Emergence_PlotGridOnTri( nGrid, dims, col, tricc )
 %       each vertex of the triangle. By default the width is 1, the height
 %       sqrt(3)/2 and it is drawn at (0,0).
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Default number of sectors
 if nargin < 1 || isempty(nGrid), nGrid = 10; end

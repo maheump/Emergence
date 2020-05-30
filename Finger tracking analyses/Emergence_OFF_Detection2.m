@@ -9,7 +9,7 @@
 % regularities, it depends on the length of the repeating rule and its
 % inner organisation.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % The following script must be run beforehand
 Emergence_OFF_Detection1;

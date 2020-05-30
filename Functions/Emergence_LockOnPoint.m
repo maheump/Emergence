@@ -8,7 +8,7 @@ function trajlocked = Emergence_LockOnPoint( traj, lockobs, win )
 %   - "win": an array specifying either the limit of the window (e.g.
 %       [-20,20]) or the index of the window (e.g. -20:20).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % By default, use all the data
 if nargin < 3, win = [0, max(size(traj))-lockobs]; end

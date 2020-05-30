@@ -10,7 +10,7 @@
 % not produce a trivial discrimination behviour betwen probabilistic and
 % deterministic regularities.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% SHOW THAT DETERMINISTIC REGULARITIES ARE (ALSO) CHARACTERIZED BY DIFFERENT ENTROPY LEVELS
 %  =========================================================================================

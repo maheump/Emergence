@@ -4,7 +4,7 @@
 % probability of the deterministic rule hypothesis in the fully-random
 % parts of sequences
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Initialization
 % ~~~~~~~~~~~~~~

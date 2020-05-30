@@ -3,7 +3,7 @@ function Emergence_PrintFstats( RMtbl )
 % of a repeated measures ANOVA.
 %   - "RMtbl": a table from ranova.m.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Get factors of interest
 facidx = find(contains(RMtbl.Properties.RowNames, '(Intercept):'));

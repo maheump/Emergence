@@ -12,7 +12,7 @@ function H = Emergence_IO_Entropy( dist, isindep, corr )
 %   - "corr": (default: true) a boolean specifying whether to correct
 %       pathological values such as 0s or Inf.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % By default, take care of pathological values.
 if nargin < 3, corr = true; end

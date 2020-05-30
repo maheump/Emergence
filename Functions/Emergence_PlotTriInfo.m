@@ -6,7 +6,7 @@ function tr = Emergence_PlotTriInfo( tricc, tricol, fs )
 %       each triangle's vertex (rows).
 %   - "fs": a scalar specifying the size of the font.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Coordinates of the triangles limits (cartesian coordinates)
 if nargin < 1 || isempty(tricc)

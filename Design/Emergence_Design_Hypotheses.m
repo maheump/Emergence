@@ -2,7 +2,7 @@
 % conditions (fully-stochastic, probabilistic and deterministic ones) in
 % terms of Shannon's entropy.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% INITIALIZATION
 %  ==============

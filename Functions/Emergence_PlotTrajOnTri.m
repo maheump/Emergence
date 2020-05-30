@@ -26,7 +26,7 @@ function lgd = Emergence_PlotTrajOnTri( pMgY, J, tricol, ms, markers, lgd, fs )
 %   - "fs": a scalar specifyong the size of the fonts (default = default
 %       of "Emergence_PlotTriInfo").
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define properties of the triangle
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

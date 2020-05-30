@@ -4,7 +4,7 @@
 % coordinates plot) as well as the responses (s)he gave at the
 % post-sequence questions.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % N.B. To be run without subject exclusion. To do so, turn the boolean
 % variable "rmbadsub" in "Emergence_FTA_LoadData" to false.

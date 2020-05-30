@@ -13,7 +13,7 @@ function [ density, barc, Xgrid, Ygrid, mask ] = Emergence_TriHist( barc, gridpr
 %   - "tric": a 3x2 matrix specifying the cartesian coordintes of the
 %       triangle vertices.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Initialization
 % ~~~~~~~~~~~~~~

@@ -1,7 +1,7 @@
 % This script shows the error of regressions between belief difference in
 % subjects and different models.
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Define options
 % ~~~~~~~~~~~~~~

@@ -6,7 +6,7 @@
 % this effect is subtended by how biased in terms of transition
 % probabilities the rules (i.e. their entropies).
 % 
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 %% RUN THE PREVIOUS SCRIPT SEPARATELY FOR SUBJECTS AND THE IO
 %  ==========================================================
