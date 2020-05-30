@@ -17,6 +17,8 @@ xwin = -wwin/2:wwin/2;
 nwin = wwin+1;
 
 % Prepare output variables
+cp          = cell(1,2);
+cppos       = cell(2);
 pcppos      = cell(2);
 pcpposwrtcp = NaN(nSub,nwin,2);
 precpcppos  = NaN(nSub,2);
@@ -25,11 +27,15 @@ precpcppos  = NaN(nSub,2);
 for iHyp = 1:2
     
     % Get the position of the change points
-    cp = cellfun(@(x) x.Jump-1/2, G(cidx{iHyp},:));
+    cp{iHyp} = cellfun(@(x) x.Jump-1/2, G(cidx{iHyp},:));
     
     % Get beliefs about the change point's position at the end of each
     % sequence
     bel = cellfun(@(x) x.CPbelief(:,end)', IO(cidx{iHyp},:), 'uni', 0);
+    
+    % Get inferred change position from the model and the subjects
+    cpposmod = cellfun(@(x) x.Questions(3), IO(cidx{iHyp},:));
+    cppossub = cellfun(@(x) x.Questions(3), G( cidx{iHyp},:));
     
     % Get sequences that were correctly labeled 
     detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
@@ -37,14 +43,25 @@ for iHyp = 1:2
     % Get the posterior distribution of change point's position separately
     % for (in)correctly labeled sequences
     for d = [0,1]
+        
+        % Restric analyses to particular sequence (either incorrectly or
+        % correctly labeled)
         cbel = bel(detecmask == d);
-        [~,idx] = sort(cp(detecmask == d));
+        
+        % Sort sequences by change point position
+        [~,idx] = sort(cp{iHyp}(detecmask == d));
         pcppos{d+1,iHyp} = cell2mat(cbel(idx));
+        
+        % Same for most likely position
+        mlpos = cpposmod(detecmask == d);
+        cppos{1,iHyp} = mlpos(idx);
+        mlpos = cppossub(detecmask == d);
+        cppos{2,iHyp} = mlpos(idx);
     end
     
     % Get a distibution of change point's position restricted around true
     % change point's position
-    winbel = cellfun(@(b,c) b(c+xwin), bel, num2cell(cp), 'uni', 0);
+    winbel = cellfun(@(b,c) b(c+xwin), bel, num2cell(cp{iHyp}), 'uni', 0);
     
     % Remove posterior beliefs about change point's positions from
     % sequences that were mislabeled
