@@ -98,8 +98,8 @@ fpos = [sc0(1)+mrg(1)       sc0(2)+mrg(2)+fh(1) fw(1)                    magfac(
         sc0(1)+mrg(1)+fw(2) sc0(2)+mrg(2)       magfac(1)-2*mrg(1)-fw(2) fh(2)                   ];    % lower right
 
 % Define models' name and variables to be displayed
-lmlab = {'Probabilistic', 'Deterministic', 'Fully-stochastic'};
-smlab = {'p', 'd', 's'};
+lmlab = {'Fully-stochastic', 'Probabilistic', 'Deterministic'};
+smlab = {'s', 'p', 'd'};
 fname = {'Posterior model probability', ...
          'Posterior distribution over change point''s position', ...
          'Posterior distribution over model''s parameters', ...
@@ -154,12 +154,13 @@ plot(1:N, abs(sequence-3), 'k.-', 'LineWidth', wid1);
 text(-5, 1.5, 'Sequence $y$', txtopt{:});
 
 % Display the best model
-for imod = 1:3
-    plot(find(io.Mhat == imod), zeros(1, sum(io.Mhat == imod)), 's', ...
-        'MarkerEdgeColor', 'None', 'MarkerFaceColor', tricol(imod,:));
-    tp = io.(['dMs',smlab{imod}]);
+for iMod = 1:3
+    stricol = tricol(circshift(1:3,1),:);
+    plot(find(io.Mhat == iMod), zeros(1, sum(io.Mhat == iMod)), 's', ...
+        'MarkerEdgeColor', 'None', 'MarkerFaceColor', stricol(iMod,:));
+    tp = io.(['dMs',smlab{iMod}]);
     plot(find(tp), zeros(1,sum(tp))-1, 's', ...
-        'MarkerEdgeColor', 'None', 'MarkerFaceColor', tricol(imod,:));
+        'MarkerEdgeColor', 'None', 'MarkerFaceColor', stricol(iMod,:));
 end
 text(-5, 0,  'Best model $\mathcal{M}$',         txtopt{:});
 text(-5, -1, 'Signif. best model $\mathcal{M}$', txtopt{:});
@@ -181,15 +182,15 @@ thr = 0 + double(strcmpi(io.in.scaleme, 'lin'));
 % First part of the barplot (same signs)
 idx = io.BFspss < thr & io.BFsdss < thr | io.BFspss > thr & io.BFsdss > thr;
 t = bar(find(idx), [io.BFspss(idx); io.BFsdss(idx)]', 1, 'Stacked');
-for imod = 1:2
-    set(t(imod), 'FaceColor', tricol(imod,:), 'EdgeColor', 'k', 'LineWidth', wid1);
+for iMod = 1:2
+    set(t(iMod), 'FaceColor', tricol(iMod,:), 'EdgeColor', 'k', 'LineWidth', wid1);
 end
 
 % Second part of the barplot (different signs)
 idx = io.BFspss < thr & io.BFsdss > thr | io.BFspss > thr & io.BFsdss < thr;
-for imod = 1:2 
-    bar(find(idx), io.(['BFs',smlab{imod},'ss'])(idx), 1, 'EdgeColor', 'k', ...
-        'FaceColor', tricol(imod,:), 'LineWidth', wid1);
+for iMod = 1:2 
+    bar(find(idx), io.(['BFs',smlab{iMod+1},'ss'])(idx), 1, 'EdgeColor', 'k', ...
+        'FaceColor', tricol(iMod,:), 'LineWidth', wid1);
 end
 
 % Display zero level
@@ -226,7 +227,7 @@ Emergence_PlotTrajOnTri([], J, tricol, 10, [], false, fs*1.5); alpha(3/4);
 Emergence_PlotGridOnTri(3);
 
 % Convert barycentric coordinates to cartesian ones
-pMgY = cell2mat(arrayfun(@(x) io.(['pMs',smlab{x},'gY'])', 1:3, 'uni', 0));
+pMgY = cell2mat(arrayfun(@(x) io.(['pMs',smlab{x},'gY'])', [2:3,1], 'uni', 0));
 tricc = [0, sqrt(3)/2; 1, sqrt(3)/2; 1/2, 0];
 cartcoor = pMgY*tricc;
 
@@ -260,7 +261,8 @@ ylabel({'Model', 'posterior', 'probability', '$p(\mathcal{M}|y_{1:K})$'}, txtopt
 
 % Display the Jensen-Shannon distance
 subplot(9,3,16+[0,1,3,4]); hold('on');
-plot(1:N, sqrt(io.JSpMgY), 'k.-', 'MarkerSize', 10, 'LineWidth', wid2);
+%plot(1:N, sqrt(io.JSpMgY), 'k.-', 'MarkerSize', 10, 'LineWidth', wid2);
+plot(1:N, sqrt(io.eqAlpha), 'k.-', 'MarkerSize', 10, 'LineWidth', wid2);
 
 % Customize the axes
 defaxprop(gca);
@@ -307,11 +309,11 @@ h = pie(pMgY(end,:));
 x = find(pMgY(end,:) ~= 0);
 
 % Customize the pie chart
-for imod = 1:numel(x)
-    set(h(imod+(imod-1)), 'FaceColor', tricol(x(imod),:), 'LineWidth', wid2);
-    str = get(h(imod*2), 'String');
+for iMod = 1:numel(x)
+    set(h(iMod+(iMod-1)), 'FaceColor', tricol(x(iMod),:), 'LineWidth', wid2);
+    str = get(h(iMod*2), 'String');
     str = ['$' str(1:end-1) '\' str(end) '$'];
-    set(h(imod*2), 'String', str, cbrlabopt{:});
+    set(h(iMod*2), 'String', str, cbrlabopt{:});
 end
 
 %% POSTERIOR DISTRIBUTIONS OVER MODELS' PARAMETERS
@@ -402,19 +404,19 @@ varlab = {{'Posterior', 'distribution', 'over already', 'observed change', ...
 ffun(2);
 
 % For each pair of model and variable
-for imod = 1:3
+for iMod = 1:3
     for ivar = 1:3
-        subplot(6,3,imod+3*(ivar-1)); hold('on');       
+        subplot(6,3,iMod+3*(ivar-1)); hold('on');       
         
         % Display the dynamic of that variable
-        tp = io.([var{ivar}, 'pJk', mod{imod}]);
+        tp = io.([var{ivar}, 'pJk', mod{iMod}]);
         if ivar == 1
             tp = mat2cell(tp, N, ones(N,1));
             tp = cellfun(@(x,y) sum(x(1:y)), tp, num2cell(1:N));
         elseif ivar == 3
             tp = sqrt(tp); 
         end
-        plot(1:N, tp, '-', 'Color', modcol(imod,:), 'LineWidth', wid2);
+        plot(1:N, tp, '-', 'Color', modcol(iMod,:), 'LineWidth', wid2);
         
         % Display other help lines
         if ivar == 1
@@ -432,8 +434,8 @@ for imod = 1:3
         plot(repmat(J,1,2), ylim, 'k-', 'LineWidth', wid1);
         
         % Add some text labels
-        if imod == 1, ylabel(varlab{ivar}, txtopt{:}); end
-        if ivar == 1, title(modlab{imod}, 'Interpreter', 'LaTeX'); end
+        if iMod == 1, ylabel(varlab{ivar}, txtopt{:}); end
+        if ivar == 1, title(modlab{iMod}, 'Interpreter', 'LaTeX'); end
         if ivar == 4, xlabel('Observation ($K$)', 'Interpreter', 'LaTeX'); end
     end
     
@@ -441,8 +443,8 @@ for imod = 1:3
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     % Plot the posterior distribution of change point's position
-    subplot(6,3,imod+(9:3:3*6-imod)); hold('on');
-    tp = io.(['pJk',mod{imod}]);
+    subplot(6,3,iMod+(9:3:3*6-iMod)); hold('on');
+    tp = io.(['pJk',mod{iMod}]);
     imagesc(1:N, 1:N, tp); 
     caxis([0, max(tp(:))]);
     
@@ -456,9 +458,9 @@ for imod = 1:3
     % Display the colorbar
     colormap(cmap2);
     cbr = colorbar('Location', 'SouthOutside', cbropt{:});
-    if imod <= 2, mathlab = ['$p(j_{k}|y_{1:K},\mathcal{M}_', ...
-            '{\mathrm{S} \rightarrow \mathrm{', lmlab{imod}(1), '}})$'];
-    elseif imod == 3, mathlab = '$p(j_{k}|y_{1:K})$';
+    if iMod <= 2, mathlab = ['$p(j_{k}|y_{1:K},\mathcal{M}_', ...
+            '{\mathrm{S} \rightarrow \mathrm{', lmlab{iMod}(1), '}})$'];
+    elseif iMod == 3, mathlab = '$p(j_{k}|y_{1:K})$';
     end
     set(cbr.Label, cbrlabopt{:}, 'String', ...
         {'Posterior distribution over', 'change point''s position', mathlab});
@@ -469,7 +471,7 @@ for imod = 1:3
     
     % Add some text labels
     xlabel('Observation ($K$)', 'Interpreter', 'LaTeX');
-    if imod == 1, ylabel({'Change point''s', 'position ($j_{k}$)'}, txtopt{:}); end 
+    if iMod == 1, ylabel({'Change point''s', 'position ($j_{k}$)'}, txtopt{:}); end 
 end
 
 %% MODELS' PREDICTIONS
@@ -492,20 +494,20 @@ slev = [1/2, 1, 1, 0]; % level of those variables for the fully-stochastic model
 ffun(4);
 
 % For the 2 non-fully-stochastic models and the BMA
-for imod = 1:3
+for iMod = 1:3
     for ivar = 1:4
-        subplot(4,3,imod+3*(ivar-1)); hold('on');
+        subplot(4,3,iMod+3*(ivar-1)); hold('on');
         
         % Display the same variable in the case of the fully-stochastic model
-        if imod < 3
+        if iMod < 3
             plot([1,N], repmat(slev(ivar),1,2), '-', ...
                 'Color', tricol(end,:), 'LineWidth', wid2);
         end
         
         % Display expectation related quantities
-        tp = io.([var{ivar}, 'pA', mod{imod}]);
+        tp = io.([var{ivar}, 'pA', mod{iMod}]);
         if ivar == 4, tp = sqrt(tp); end
-        plot(1:N, tp, '-', 'Color', modcol(imod,:), 'LineWidth', wid2);
+        plot(1:N, tp, '-', 'Color', modcol(iMod,:), 'LineWidth', wid2);
         
         % Customize the axes
         defaxprop(gca);
@@ -517,8 +519,8 @@ for imod = 1:3
         plot(repmat(J,1,2), ylim, 'k-', 'LineWidth', wid1);
         
         % Add some text labels
-        if imod == 1, ylabel(varlab{ivar}, txtopt{:}); end
-        if ivar == 1, title(modlab{imod}, 'Interpreter', 'LaTeX'); end
+        if iMod == 1, ylabel(varlab{ivar}, txtopt{:}); end
+        if ivar == 1, title(modlab{iMod}, 'Interpreter', 'LaTeX'); end
         if ivar == 4, xlabel('Observation ($K$)', 'Interpreter', 'LaTeX'); end
     end
 end
