@@ -262,6 +262,9 @@ for iSub = 1:nSub
         % Create a variable with posterior distribution of chance point position
         IO{iSeq,iSub}.CPbelief = io.pJkgY;
         
+        % Create a variable with equivalent learning rate
+        IO{iSeq,iSub}.EqLearnRate = io.eqAlpha';
+        
         % Create a variable with (corrected) cartesian coordinates
         traj = round(IO{iSeq,iSub}.BarycCoord * tricoord);
         IO{iSeq,iSub}.DiscreteMouseCoord = traj;
@@ -282,9 +285,9 @@ for iSub = 1:nSub
             % 1 for probabilistic, 2 for deterministic
         end
         
-        % 3) p(Jump)?
-        pJump = io.pJkgY(:,end);
-        [val,idx] = max(pJump);
+        % 3) p(change)?
+        pChange = io.pJkgY(:,end);
+        [val,idx] = max(pChange);
         IO{iSeq,iSub}.Questions(3) = idx; % change point's position
         IO{iSeq,iSub}.Questions(4) = val; % confidence in change point's position
     end
