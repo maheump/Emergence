@@ -11,8 +11,8 @@ function [ D_JS, D_KL ] = Emergence_IO_DistDist( varargin )
 %       - dim1 = grid (histogram-like distribution) over which the
 %       distribution is defines
 %       - dim2 = dimension over which to iterate (e.g. time-points),
-%       - dimN (N>2) = other non-relevant dimensions that are not used by the
-%       function but that must be conserved.
+%       - dimN (N>2) = other non-relevant dimensions that are not used by
+%           the function but that should be conserved.
 % 
 % Copyright (c) 2018 Maxime Maheu
 
