@@ -179,7 +179,6 @@ for lock = 1:3
             'BoundaryCorrection',   'Reflection');	% type of correction for the boundaries
         fill([xout(1),xout,xout(end)], [0,fout0.*10,0], 'k', 'FaceColor', g);
         
-        
         % Draw barycentric coordinates
         lt = repmat({'--'}, 1, 3);
         lt{iHyp} = '-';
