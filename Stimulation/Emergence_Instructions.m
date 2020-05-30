@@ -6,7 +6,7 @@
 %  ============================
 
 % Add the stimulation folder to the MATLAB path
-addpath(genpath('~/Documents/My projects/Emergence/Stimulation'));
+addpath(genpath('~/Emergence/Stimulation'));
 
 % Initialize the PTB module
 InitializePsychSound(1);
