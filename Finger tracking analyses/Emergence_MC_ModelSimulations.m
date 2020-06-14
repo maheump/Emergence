@@ -396,6 +396,21 @@ end
 modc = [modc; zeros(1,3)];
 nMod = size(pMgY, 3);
 
+% Get model names
+if contains(SimuType, 'PseudoDeterministic') ...
+|| contains(SimuType, 'DifferentPriors'), idx = 4;
+elseif contains(SimuType, 'Independent'), idx = 12;
+elseif contains(SimuType, 'TreeDepth'),   idx = 3;
+elseif contains(SimuType, 'Leak'),        idx = 2;
+end
+modlab = cell(1,nMod);
+for iMod = 1:nMod
+    x = options{idx,iMod};
+    if ~ischar(x), modlab{iMod} = sprintf('%1.2f', x);
+    else,          modlab{iMod} = x;
+    end
+end
+
 % Make all trajectories to start at the bottom tip of the triangle
 for i = 1:numel(pMgY), pMgY{i}(1,:) = [0,0,1]; end
 
