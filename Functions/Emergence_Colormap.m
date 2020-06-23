@@ -1,4 +1,4 @@
-function [ cols ] = Emergence_Colormap( cmap, N )
+function cols = Emergence_Colormap( cmap, N )
 % EMERGENCE_COLORMAP returns a Nx3 RGB colormap matrix
 %   - "cmap": a string of characeters specifying the name of the colormap.
 %   - "N": a scalar specifying the size of the colormap to return.
