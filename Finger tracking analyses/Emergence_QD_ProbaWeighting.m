@@ -31,7 +31,7 @@ for ga = 1:nGamma
         
         % Apply the probability weighting on ideal observer estimated
         % posterior probabilities
-        transfproba = cellfun(@(x) probaweight(x.BarycCoord, ...
+        transfproba = cellfun(@(x) Emergence_ProbWeighFun(x.BarycCoord, ...
             GammaGrid(ga), P0Grid(p0)), IO, 'uni', 0);
         
         % Measure similarity between IO's weighted probabilities and
@@ -201,7 +201,7 @@ P0Grid2 = 0:0.01:1;
 % Transform posterior probabilities from the ideal observer
 trueproba = avgbinbel(:,1);
 trueproba = reshape(trueproba, [1 1 numel(trueproba)]);
-transfproba = probaweight(trueproba, GammaGrid2', P0Grid2);
+transfproba = Emergence_ProbWeighFun(trueproba, GammaGrid2', P0Grid2);
 
 % Get probabilities estimated by subjects
 estproba = avgbinbel(:,2);
@@ -219,7 +219,7 @@ P = [GammaGrid2(pI); P0Grid2(gI)];
 % Display probability weighting function obtained with group-average
 % parameters
 pgrid = linspace(0, 1, 1001);
-fp = probaweight(pgrid, P(1), P(2));
+fp = Emergence_ProbWeighFun(pgrid, P(1), P(2));
 plot(pgrid, fp, 'k-', 'LineWidth', 2);
 
 % Display averaged bins and related error
@@ -236,25 +236,3 @@ xlabel('Beliefs from IO'); ylabel('Beliefs from subjects');
 
 % Save the figure
 save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgPWFit.pdf'));
-
-% Probability weighting function
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% See: https://en.wikipedia.org/wiki/Prospect_theory
-% See: Gonzalez, R., & Wu, G. (1999). On the shape of the probability
-%   weighting function. Cognitive psychology, 38(1), 129-166.
-function y = probaweight(x, gamma, p0)
-y = logitinv(gamma .* logit(x) + (1 - gamma) .* logit(p0));
-end
-
-% Inverse of the logit transformation
-function u = logitinv(v)
-maxcut = -log(eps);
-mincut = -log(1/realmin - 1);
-u = 1 ./ (1 + exp(-max(min(v,maxcut),mincut)));
-end
-
-% Logit function
-function a = logit(b)
-a = log(b./(1-b));
-a(real(a)~=a) = NaN;
-end
