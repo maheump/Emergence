@@ -36,7 +36,7 @@ title('Maximum');
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Compute sigmoid functions
-sigmparam = 10.^[0;1/2;1];
+sigmparam = 10.^[0;1/4;1/2;3/4;1];
 nParam = numel(sigmparam);
 differ = -1:0.001:1;
 pHpgY = 1 ./ (1 + exp(-sigmparam .* differ));
@@ -57,7 +57,7 @@ title('Softmax(Difference)');
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Compute sigmoid functions
-sigmparam = 10.^[0;1/2;1];
+sigmparam = 10.^[0;1/4;1/2;3/4;1];
 nParam = numel(sigmparam);
 ratio = 0:0.01:4;
 pHpgY = 1 ./ (1 + exp(-sigmparam .* log(ratio)));
