@@ -265,6 +265,11 @@ for iSub = 1:nSub
         % Create a variable with equivalent learning rate
         IO{iSeq,iSub}.EqLearnRate = io.eqAlpha';
         
+        % Create a variable with the prediction
+        IO{iSeq,iSub}.PredA = [io.pAgYMsp', ... % 1: probabilistic component
+                               io.pAgYMsd', ... % 2: deterministic component
+                               ones(N,1)./2];   % 3: stochastic    component
+        
         % Create a variable with (corrected) cartesian coordinates
         traj = round(IO{iSeq,iSub}.BarycCoord * tricoord);
         IO{iSeq,iSub}.DiscreteMouseCoord = traj;
