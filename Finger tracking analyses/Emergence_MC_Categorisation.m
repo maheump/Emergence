@@ -42,7 +42,7 @@ for iReg = 1:3
             simu = cellfun(@(x) cell2mat(x'), simu, 'uni', 0);
             
             % Compute categorisation profiles
-            dist = cellfun(@Emergence_GetModelCategorisation, simu, 'uni', 0);
+            [~,dist] = cellfun(@Emergence_GetModelCategorisation, simu, 'uni', 0);
             dist = cell2mat(dist');
         end
         
