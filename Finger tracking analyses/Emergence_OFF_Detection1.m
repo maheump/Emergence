@@ -241,27 +241,15 @@ Dcoord = [ cosd(rotang)*Dsd, sind(rotang)*Dsd];
 Pcoord = [-cosd(rotang)*Dsp, sind(rotang)*Dsp];
 XYcoord = [Pcoord; Dcoord; Scoord]; % combine them in a single matrix
 
-% Display the results
-% ~~~~~~~~~~~~~~~~~~~
-
-% Create colormaps based on used colors
-cmaprec = 1000;
-vec = linspace(0, 1, cmaprec);
-cmap = repmat({NaN(cmaprec,3)}, 1, 3);
-for iHyp = 1:3
-    for rgb = 1:3
-        cmap{iHyp}(:,rgb) = pchip(0:1, [1, tricol(iHyp,rgb)], vec);
-    end
-end
-
 % Prepare the window
-figure('Position', [353 806 360 300]);
+figure('Position', [353 806 360 300]);  hold('on');
 
 % Display underlying distributions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Prepare gaussian distributions
-X = -3:0.01:3; % grid for the gaussian distribution
+prec = 201;
+X = linspace(-5,5,prec); % grid for the gaussian distribution
 Y = normpdf(X, 0, 1); % 1D gaussian distribution
 Y = Y./ max(Y); % easier to scale below
 Y = Y'*Y; % 2D gaussian distribution
@@ -269,8 +257,8 @@ Y = Y'*Y; % 2D gaussian distribution
 % Overlap underlying gaussian distributions that gave rise to the observed
 % d' sensitivity values
 for iHyp = 1:3
-    image(X+XYcoord(iHyp,1), X+XYcoord(iHyp,2), ...
-        imagesc2image(Y, cmap{iHyp}), 'AlphaData', 3*Y/4); hold('on');
+    col = repmat(reshape(tricol(iHyp,:), [1 1 3]), prec, prec);
+    image(X+XYcoord(iHyp,1), X+XYcoord(iHyp,2), col, 'AlphaData', Y);
 end
 
 % Display standard deviations of these distributions
@@ -348,7 +336,7 @@ plot([Xmid-a, Xmid+a], [Ymid-b, Ymid+b], 'k-', 'LineWidth', 1/2);
 
 % Customize the axes
 axis('xy'); axis('equal'); axis('off');
-axis([-4,4,-2,5]);
+axis(repmat(X([1,end]), [1,2]));
 
 % Add a scale at the bottom
 ax = get(gca, 'Position');
