@@ -1,7 +1,7 @@
 % Setup default options and add required functions and scripts to the
 % MATLAB path.
 %
-% Copyright (c) 2018 Maxime Maheu
+% Copyright (c) 2020 Maxime Maheu
 
 % Welcome message
 fprintf('\n');
