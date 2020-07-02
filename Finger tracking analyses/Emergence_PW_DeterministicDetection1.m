@@ -112,7 +112,7 @@ save2pdf(fullfile(ftapath, 'figs', 'F_HW_DeterRegTP.pdf'));
 % ~~~~~~~~~~~~~~~~~~~~~
 
 % Find positions of change and detection points
-cp = cellfun(@(x) x.Jump+1/2, G(cidx{2},:));
+cp = cellfun(@(x) x.Jump, G(cidx{2},:));
 lag = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,2)), ...
     D(cidx{2},:), num2cell(cp));
 dp = cp + lag;

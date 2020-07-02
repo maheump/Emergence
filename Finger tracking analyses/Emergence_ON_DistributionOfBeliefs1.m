@@ -27,7 +27,7 @@ for iHyp = 1:2
     cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:));
     
     % Get logical indices of post-change-point observations
-    idx = arrayfun(@(c) [false(c-1/2,1); true(N-c+1/2,1)], cp, 'uni', 0);
+    idx = arrayfun(@(c) [false(c,1); true(N-c,1)], cp, 'uni', 0);
     
     % Keep only indices for sequences with the current type of regularity
     idxtrimap{iHyp}(cidx{iHyp},:) = idx;

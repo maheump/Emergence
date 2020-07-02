@@ -77,7 +77,7 @@ for iHyp = 1:3
         
         % CRITERION 2: keep only sequences for which we have a regular
         % detection point for the subjects AND the ideal observer
-        cp = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'uni', 0);
+        cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'uni', 0);
         subdp = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,iHyp)),  G(cidx{iHyp},:), cp);
         iodp  = cellfun(@(x,c) Emergence_FindDetecPoint(x.BarycCoord(c:end,iHyp)), IO(cidx{iHyp},:), cp);
         onlinedetecmask = ~isnan(subdp) & ~isnan(iodp);

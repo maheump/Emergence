@@ -27,7 +27,7 @@ precpcppos  = NaN(nSub,2);
 for iHyp = 1:2
     
     % Get the position of the change points
-    cp{iHyp} = cellfun(@(x) x.Jump-1/2, G(cidx{iHyp},:));
+    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:));
     
     % Get beliefs about the change point's position at the end of each
     % sequence

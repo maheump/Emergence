@@ -247,7 +247,7 @@ for iSub = 1:nSub
             pEd, pEp, patlen, stat, pR, pT, pJ, comp, scale, pgrid, verb);  % options
         
         % Append the "Jump" subfield (the IO does not know its true position)
-        IO{iSeq,iSub}.Jump = G{iSeq,iSub}.Jump;
+        IO{iSeq,iSub}.Jump = G{iSeq,iSub}.Jump - 1/2;
         
         % Create a variable with all models' posterior probability
         IO{iSeq,iSub}.BarycCoord = [io.pMspgY', ... % 1: probabilistic component

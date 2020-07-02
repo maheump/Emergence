@@ -89,7 +89,7 @@ for iHyp = 1:2
     % Get post-change point posterior likelihood in the corresponding
     % (correct) hypothesis
     data = cellfun(@(p,c) Emergence_LockOnPoint(p.BarycCoord(:,iHyp), ...
-        c.Jump+1/2, [0,145]), D(cidx{iHyp},:), G(cidx{iHyp},:), 'uni', 0);
+        c.Jump, [0,145]), D(cidx{iHyp},:), G(cidx{iHyp},:), 'uni', 0);
     
     % Preallocate matrices
     MSE{iHyp} = cell(size(data));
@@ -157,8 +157,8 @@ for iParam = 1:4
     
     % Perform a paired t-test between slope parameters for probabilistis vs.
     % deterministic regularities
-    [h,pval,ci,stats] = ttest(diff(currparam, 1, 2));
-    Emergence_PrintTstats(pval,ci,stats);
+    [h,pval,tci,stats] = ttest(diff(currparam, 1, 2));
+    Emergence_PrintTstats(pval,tci,stats);
     
     % Display the paired difference in slope parameters
     Emergence_PlotSubGp(currparam, tricol(1:2,:));
@@ -257,7 +257,7 @@ for iHyp = 1:2
     plot(pgrid{1}(s), m, '.', 'MarkerEdgeColor', tricol(iHyp,:), 'MarkerSize', 20);
     
     % Customize the axes
-    axis('tight'); xlim([0.1,1]);
+    axis('tight'); xlim([0.1,0.9]);
     set(gca, 'YColor', tricol(iHyp,:), 'YScale', 'log', 'Box', 'Off');
 end
 

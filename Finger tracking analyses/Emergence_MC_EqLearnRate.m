@@ -139,7 +139,7 @@ for iReg = 1:2
         eqAlpha2 = eqAlpha1(curgenproc == 2);
             
         % Get the position of the change-point
-        cp = cellfun(@(x) x.Jump + 1/2, G(cidx{iReg},iSub), 'uni', 0);
+        cp = cellfun(@(x) x.Jump, G(cidx{iReg},iSub), 'uni', 0);
         
         % Get equivalent learning rate aroung change-points (with a
         % temporal smoothing average)

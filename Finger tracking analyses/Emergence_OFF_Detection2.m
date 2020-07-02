@@ -44,9 +44,12 @@ avgbel = cat(2, cellfun(@(x,y) mean(x(y == 0)), ultibel, corest)', ...
 [~,pval,tci,stats] = ttest(diff(avgbel, 1, 2));
 Emergence_PrintTstats(pval, tci, stats);
 
+% Get the position of the change points
+cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:));
+
 % Check whether missed regularities can be explained by a latter change
 % point position
-subcp = mat2cell(cp{iHyp} + 1/2, numel(cidx{iHyp}), ones(1,nSub));
+subcp = mat2cell(cp, numel(cidx{iHyp}), ones(1,nSub));
 avgcp = cat(2, cellfun(@(x,y) mean(x(y == 0)), subcp, corest)', ...
                cellfun(@(x,y) mean(x(y == 1)), subcp, corest)');
 [~,pval,tci,stats] = ttest(diff(avgcp, 1, 2));
