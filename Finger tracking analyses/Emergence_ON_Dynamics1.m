@@ -7,8 +7,8 @@
 % 
 % Copyright (c) 2020 Maxime Maheu
 
-%% GET TRAJECTORIES LOCKED ON PARTICULAR POINTS AND ASSESS THEIR PROPERTIES
-%  ========================================================================
+%% GET TRAJECTORIES LOCKED ON PARTICULAR POINTS
+%  ============================================
 
 % Define properties of windows to look into
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,7 +34,7 @@ for iHyp = 1:2
     ep{iHyp} = repmat(N, numel(cidx{iHyp}), nSub);
     
     % Get change point positions
-    cp{iHyp} = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:));
+    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:));
     
     % Measure important quantities
     % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,8 +88,8 @@ end
 % number of repetitions of the rule
 lag2 = lag{2} ./ cellfun(@numel, dr);
 
-%% DISPLAY AVERAGE LIKELIHOODS IN THE RELEVANT HYPOTHESIS
-%  ======================================================
+%% GRAND AVERAGE OF THE POSTERIOR PROBABILITY IN THE RELEVANT HYPOTHESIS
+%  =====================================================================
 
 % Average over sequences for each type of regularity
 avgfingerwrtp = cellfun(@(x) squeeze(mean(x, 3, 'OmitNaN')), fingerposwrtp, 'uni', 0);
@@ -184,7 +184,7 @@ for lock = 1:3
         lt{iHyp} = '-';
         for iDim = 1:3
             plotMSEM(xval, avgsubtraj{iHyp,lock}(:,iDim), ...
-                        semsubtraj{iHyp,lock}(:,iDim), ...
+                           semsubtraj{iHyp,lock}(:,iDim), ...
                 0.15, tricol(iDim,:), tricol(iDim,:), 1+1*(iDim == iHyp), 1, lt{iDim}, 'none');
         end
         
@@ -218,14 +218,15 @@ if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordS.pdf'))
 else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordIO.pdf'));
 end
 
-%% DISPLAY INDIVIDUAL TRIALS LIKELIHOODS IN THE RELEVANT HYPOTHESIS
-%  ================================================================
+%% POSTERIOR PROBABILITY IN THE RELEVANT HYPOTHESIS FOR EACH INDIVIDUAL TRIAL
+%  ==========================================================================
 
-% Prepare output variable
-cp          = cell(1,2);
-sortedcp    = cell(1,2);
-idxcp       = cell(1,2);
-belincorhyp = cell(1,2);
+% Get posterior probability for each individual sequence
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+% Prepare output variables
+BEL = cell(2,2,2);
+CPP = cell(2,2);
 
 % For each type of regularity
 for iHyp = 1:2
@@ -234,47 +235,65 @@ for iHyp = 1:2
     detecmask = (filter{iHyp} == 1 | filter{iHyp} == 3);
     
     % Order according to change point's position and detected/undetected
-    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'uni', 1);
-    [sortedcp{iHyp}, idxcp{iHyp}] = sortrows([cp{iHyp}(:), ...
-        detecmask(:)], [2,1]);
+    cp = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'uni', 1);
+    [sortedcp, idxcp] = sortrows([cp(:), detecmask(:)], [2,1]);
     
     % Get the beliefs in the corresponding (correct) hypothesis ordered
     % according to the position the change point
-    belincorhyp{iHyp} = cellfun(@(x) x.BarycCoord(:,iHyp)', ...
+    belincorhyp = cellfun(@(x) x.BarycCoord(:,iHyp)', ...
         D(cidx{iHyp},:), 'uni', 0);
+    
+    % Separately for sequences that were detected/undetected
+    for du = 1:2
+        idx = idxcp(sortedcp(:,2) == (du-1));
+        bel = belincorhyp(idx)';
+        cpp = num2cell(cp(idx))';
+        CPP{du,iHyp} = cell2mat(cpp)';
+        BEL{du,iHyp,1} = cellfun(@(p,c) [p(1:c-1), NaN(1,N-c+1)], bel, cpp, 'uni', 0);
+        BEL{du,iHyp,2} = cellfun(@(p,c) [NaN(1,c-1),   p(c:end)], bel, cpp, 'uni', 0);
+    end
 end
 
-% Prepare a new window
-figure('Position', [702 381 230 400]);
+% Display dynamics of beliefs in the correct hypothesis
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-% For sequences with a probabilistic/deterministic regularity
-for iHyp = 1:2
-    
-    % Display the change in beliefs as a heatmap 
-    sp = subplot(2,1,iHyp);
-    bel = belincorhyp{iHyp}(idxcp{iHyp});
-    imagesc(cell2mat(bel)); hold('on');
-    
-    % Customize the colormap
-    colorbar('Location', 'EastOutside'); caxis([0,1]);
-    colormap(sp, Emergence_Colormap('Inferno'));
-    
-    % Display the position of the change points
-    for d = [0,1]
-        x = cp{iHyp}(idxcp{iHyp}(sortedcp{iHyp}(:,2) == d));
-        y = find(sortedcp{iHyp}(:,2) == d);
-        stairs([x(1);x], [y(1)-1;y], 'k-');
+% Combine all sequences together
+BEL = cellfun(@(x) cell2mat(x'), BEL, 'uni', 0);
+
+% Prepare a new window
+figure('Position', [702 381 460 400]);
+
+% For each type of regularity
+for iHyp = 1:2 % probabilistic/deterministic
+    for ba = 1:2 % before/after
+        for du = 1:2 % detected/undetected
+            sp = subplot(1,2,iHyp); del = 10;
+            
+            % Display beliefs in the correct hypothesis for all sequences
+            c = BEL{du,iHyp,ba};
+            x1 = (1:N)+del*(ba-1);
+            ns = size(c,1);
+            y1 = (1:ns) - ns*(du==1) - del*(du==1);
+            imagesc(x1, y1, c, 'AlphaData', ~isnan(c)); hold('on'); 
+            
+            % Display change point position
+            p = CPP{du,iHyp};
+            for t = 0:1
+                x2 = [p(1);   p;  p(end)] - 1/2 + del * t;
+                y2 = [y1(1)-1; y1' ;y1(end)] + 1/2;
+                stairs(x2, y2, '-', 'Color', g, 'LineWidth', 1);
+            end
+            
+            % Customize the axes
+            axis('xy'); axis('tight'); axis('on'); ScaleAxis('y');
+            colormap(sp, Emergence_Colormap('Inferno'));
+            
+            % Add some text labels
+            xlabel('Observation #');
+            ylabel({'Sequence # (sorted by change point''s position)'});
+            title(sprintf('%s sequences', proclab{iHyp}));
+        end
     end
-	
-    % Display limits between detected and undetected sequences
-    lim = find(abs(diff(sortedcp{iHyp}(:,2))) == 1) + 1/2;
-    plot([0,N+1], repmat(lim, 1, 2), 'k-');
-    
-    % Add some text labels
-    axis('xy'); set(gca, 'XTick', [1, get(gca, 'XTick')], 'YTick', [1,50]);
-    xlabel('Observation #');
-    ylabel({'Sequence # (sorted by', 'change point''s position)'});
-    title(sprintf('%s sequences', proclab{iHyp}));
 end
 
 % Save the figure
