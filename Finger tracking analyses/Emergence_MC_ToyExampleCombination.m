@@ -3,6 +3,9 @@
 % 
 % Copyright (c) 2020 Maxime Maheu
 
+%% COMBINATION FUNCTIONS
+%  =====================
+
 % Prepare a new window
 figure('Position', [1 895 200 450]);
 
@@ -72,3 +75,54 @@ for i = 1:nParam, set(l(i), 'Color', col(i,:)); end
 xlabel('p(Hd|y)/p(Hp|y)');
 ylabel('p(Hd|y)');
 title('Sigmoid(log(Ratio))');
+
+%% EXAMPLE PROJECTION IN THE TRIANGLE
+%  ==================================
+
+% Define independently computed pseudo posteriors
+qHpgY = 3/4;
+qHdgY = 1/2;
+
+% Define value of the slope parameter for functions which use it
+slope = 4.5;
+
+% Prepare output variable
+cc = NaN(4,2);
+
+for iFun = 1:4
+    
+    % Get weight
+    if     iFun == 1, Wp = qHpgY ./ (qHpgY + qHdgY);
+    elseif iFun == 2, Wp = double((qHpgY - qHdgY) > 0);
+    elseif iFun == 3, Wp = 1 ./ (1 + exp(-slope .* (qHpgY - qHdgY)));
+    elseif iFun == 4, Wp = 1 ./ (1 + exp(-slope .* log(qHpgY ./ qHdgY)));
+    end
+    
+    % Compute posterior probabilities
+    pHsgY = (1 - qHpgY) .* Wp + (1 - qHdgY) .* (1 - Wp);
+    pHpgY = (1 - pHsgY) .* Wp;
+    pHdgY = (1 - pHsgY) .* (1 - Wp);
+    bc = [pHpgY pHdgY pHsgY];
+    
+    % Transform to cartesian coordinates
+    cc(iFun,:) = bc*tricc;
+end
+
+% Prepare a new window
+figure;
+
+% Display the pseudo posteriors
+subplot(1,2,1); hold('on');
+b = bar([zeros(1,2); ones(1,2)], [qHpgY, 1-qHpgY; zeros(1,2)], 'stacked');
+set(b(1), 'FaceColor', tricol(1,:));
+set(b(2), 'FaceColor', tricol(3,:));
+b = bar([zeros(1,2); ones(1,2)], [zeros(1,2); qHdgY, 1-qHdgY], 'stacked');
+set(b(1), 'FaceColor', tricol(2,:));
+set(b(2), 'FaceColor', tricol(3,:));
+set(gca, 'XColor', 'none'); axis('square');
+ylabel('Pseudo posterior probabilities');
+
+% Display the output posteriors
+subplot(1,2,2);
+Emergence_PlotTriInfo;
+plot(cc(:,1), cc(:,2), 'ko');
