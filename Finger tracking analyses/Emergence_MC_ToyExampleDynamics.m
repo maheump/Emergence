@@ -15,7 +15,7 @@ staircaseness = @(p) mean(abs(diff(p,2,1)));
 % Get change point positions
 cp = cell(1,2);
 for iHyp = 1:2
-    cp{iHyp} = cellfun(@(x) x.Jump+1/2, G(cidx{iHyp},:), 'uni', 0);
+    cp{iHyp} = cellfun(@(x) x.Jump, G(cidx{iHyp},:), 'uni', 0);
 end
 
 % Define colormaps to use
