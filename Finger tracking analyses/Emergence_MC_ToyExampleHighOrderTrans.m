@@ -107,3 +107,62 @@ set(gca, 'XTickLabel', axl, 'Box', 'Off');
 xlabel('Prior pseudo-counts');
 ylabel('Prior log-likelihood');
 legend(arrayfun(@(x) sprintf('Order %1.0f', x), orders, 'uni', 0));
+
+%% AVERAGE POSTERIOR PROBABILITY IN A RANDOM SEQUENCE FOR DIFFERENT TP LEARNING
+%  ============================================================================
+
+% Specify simulation parameters
+nSeq = 3000; % number of sequences
+nObs = 200;  % number of observations in each sequence
+nOrd = 9;    % up to which transition order to simulate
+
+% Generate fully random sequences
+seq = 1 + (rand(nSeq,nObs) > 1/2);
+
+% Define options of the Markov chain
+opt = {'log', ...        % scale of the sequence likelihood
+       'Bayes-Laplace'}; % prior over transition counts
+
+% Prepare the output varyable
+LLHgHs = NaN(nSeq,nObs,nOrd);
+
+% For each transition order
+for iOrd = 1:nOrd
+    fprintf('Order %1.0f/%1.0f... ', iOrd, nOrd);
+    
+    % For each generated sequence
+    for iSeq = 1:nSeq
+        
+        % For each observation in the sequence
+        for iObs = 1:nObs
+            
+            % Get sequence likelihood of the Markov chain
+            y = seq(iSeq,1:iObs);
+            LLHgHs(iSeq,iObs,iOrd) = Emergence_IO_Chain(y, opt{:}, iOrd);
+        end
+    end
+    fprintf('Done!\n');
+end
+
+% Compute posterior probabilities (against a null random hypothesis)
+LLHgHS = -log(2.^(1:nObs));
+pHpgY = exp(LLHgHs) ./ (exp(LLHgHs) + exp(LLHgHS));
+
+% Average over simulations
+m = squeeze(mean(pHpgY, 1));
+s = squeeze(sem(pHpgY,1));
+
+% Prepare a new window
+figure; 
+
+% Plot the average posterior probabilities
+for iOrd = 1:nOrd
+    plotMSEM(1:nObs, m(:,iOrd), s(:,iOrd), 1/10, col(iOrd,:), col(iOrd,:));
+end
+
+% Customize the axes
+set(gca, 'Box', 'Off', 'YLim', [0,1/2]);
+
+% Add some text labels
+xlabel('Observation number');
+ylabel('Posterior probability');
