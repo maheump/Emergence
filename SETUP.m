@@ -21,7 +21,7 @@ fprintf('Done!\n');
 if ismatlabold
     fprintf(['Your version of MATLAB is older than the one on which ', ...
         'the toolbox was developed. If it is too old, some functions ', ...
-        'might not run. Consider to update it if it is the case.\n\n']);
+        'might not run. Consider to update if it is the case.\n\n']);
 elseif ~ismatlabold
     fprintf(['Your version of MATLAB is at least as recent than the one ', ...
         'on which the toolbox was developed. All scripts should work ', ...
@@ -37,9 +37,7 @@ fprintf('Done!\n\n');
 % Check if the dependencies have are available
 fprintf('Checking that the dependencies are available... ');
 depenfolder = fullfile(folderpath, 'Dependencies');
-availdep = exist('cbrewer2.m', 'file') & ... % toolbox with colormaps
-           exist('pat2str.m', 'file') & ...  % toolbox with home-made functions
-           exist('VBA_setup.m', 'file');     % toolbox for variational inference
+availdep = exist('pat2str.m', 'file'); % toolbox with home-made functions
 fprintf('Done! \n');
 if availdep
     fprintf('All dependencies are available.\n\n');
