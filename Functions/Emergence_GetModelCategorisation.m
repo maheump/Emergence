@@ -46,7 +46,7 @@ EstGenProc(Indecision3) = 7;
 % If we have to export the distribution
 if nargout > 1
     
-    % Get the frequency of each 
+    % Get the frequency of each cell in the reponse/sequence matrix
     odist = histc(EstGenProc, 1:7);
     
     % Indecision between statistical bias and deterministic rule
