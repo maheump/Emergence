@@ -104,9 +104,6 @@ for iParam = 1:2
     Emergence_PrintTstats(pval,tci,stats);
 end
 
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_QD_GpPWFit.pdf'));
-
 % Display the average error map over parameters grid
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -139,9 +136,6 @@ colorbar; colormap(flipud(pink));
 % Add some text labels
 xlabel('p_{0} parameter');
 ylabel('\gamma parameter');
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgErrMap.pdf'));
 
 % Display binned probabilities from subjects versus the ideal observer
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,6 +227,3 @@ set(gca, 'Box', 'Off');
 
 % Add some text labels
 xlabel('Beliefs from IO'); ylabel('Beliefs from subjects');
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_QD_AvgPWFit.pdf'));

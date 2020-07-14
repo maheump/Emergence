@@ -138,11 +138,6 @@ for lock = 1:3
     end
 end
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_TriS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_TriIO.pdf'));
-end
-
 % Display corresponding Barycentric coordinates
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -211,11 +206,6 @@ for lock = 1:3
         end
         
     end
-end
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_CoordIO.pdf'));
 end
 
 %% POSTERIOR PROBABILITY IN THE RELEVANT HYPOTHESIS FOR EACH INDIVIDUAL TRIAL
@@ -296,11 +286,6 @@ for iHyp = 1:2 % probabilistic/deterministic
     end
 end
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_MapS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_MapIO.pdf'));
-end
-
 %% DISPLAY BELIEF UPDATE FOR THE TWO TYPES OF REGULARITIES
 %  =======================================================
 
@@ -322,8 +307,3 @@ set(gca, 'XLim', [0,3], 'YLim', [2,12].*1e-3,'XTick', [], 'XColor', 'none');
 
 % Add a text label
 ylabel('Belief update');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SlopeS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_SlopeIO.pdf'));
-end

@@ -119,9 +119,6 @@ for iHyp = 1:2
     ylabel('p(j_k|H_i,y)');
 end
 
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_CP_AvgCtrPostCP.pdf'));
-
 %% DISPLAY SINGLE-TRIAL FULL POSTERIOR DISTRIBUTIONS
 %  =================================================
 
@@ -154,9 +151,6 @@ for iHyp = 1:2
     title(sprintf('%s sequences', proclab{iHyp}));
 end
 
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_CP_SingTrlPostCP.pdf'));
-
 %% DISPLAY AVERAGED PRECISION OF POSTERIOR DISTRIBUTIONS
 %  =====================================================
 
@@ -175,9 +169,6 @@ Emergence_DispStatTest(precpcppos);
 
 % Add some text labels
 ylabel('Log-precision');
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_CP_PrecPostCP.pdf'));
 
 % Compute a paired t-test on the precision of posterior distributions
 % between the 2 types of regularities

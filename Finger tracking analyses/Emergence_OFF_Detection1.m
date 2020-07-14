@@ -89,11 +89,6 @@ xlabel('Type of sequence');
 ylabel('Average report rates');
 legend(lgd, proclab, 'Location', 'SouthOutside');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DetS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DetIO.pdf'));
-end
-
 % Display labeling of each sequence and each subject
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -120,11 +115,6 @@ for iHyp = 1:3
     text(mean(1:nSub), nR+1, 'Subjects');
     text(0, nR/2, 'Sequences', 'Rotation', 90);
     title(sprintf('%s sequences', proclab{iHyp}));
-end
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_SeqS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_SeqIO.pdf'));
 end
 
 %% MULTI-DIMENSIONAL SIGNAL DETECTION THEORY
@@ -345,11 +335,6 @@ axis(repmat([0,1],1,2));
 set(gca, 'XTick', 0:1, 'YTick', 0:1, 'TickLen', zeros(1,2), 'Box', 'Off');
 ylabel('z-units');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_MsdtS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_MsdtIO.pdf'));
-end
-
 % Compare d' between the detection of probabilistic versus deterministic
 % regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -376,8 +361,3 @@ Emergence_DispStatTest(dprime(:,1:2));
 
 % Add some text labels
 ylabel('Detection d''');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DpS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DpIO.pdf'));
-end

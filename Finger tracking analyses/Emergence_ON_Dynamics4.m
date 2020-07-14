@@ -168,11 +168,6 @@ for iParam = 1:4
     ylabel(sprintf('%s parameter', pname{iParam}));
 end
 
- % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_ParamSigmS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_ParamSigmIO.pdf'));
-end
-
 % Display average sigmoid function
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -219,11 +214,6 @@ xlabel('# observation w.r.t. change point');
 ylabel('Fitted posterior belief p(M_i|y)');
 legend(lgd, proclab, 'Location', 'NorthWest');
 
- % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_AvgSigmS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_AvgSigmIO.pdf'));
-end
-
 % Display MSE over the grid for the slope parameter
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -263,8 +253,3 @@ end
 
 % Add some text labels
 xlabel('Slope parameter');
-
- % Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_GridSigmS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_Dyn_GridSigmIO.pdf'));
-end

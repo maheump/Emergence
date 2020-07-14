@@ -124,9 +124,6 @@ scatter(cartavgcoord(:,1), cartavgcoord(:,2), dotsize, ...
 axis('tight');
 ylim([0,(sqrt(3)/2)/2]);
 
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_FA_Tri.pdf'));
-
 %% CONTROL FOR TIME ELAPSED SINCE THE BEGINNING OF THE SEQUENCE
 %  ============================================================
 
@@ -234,9 +231,6 @@ axis('square'); set(gca, 'Box', 'Off');
 xlabel('Beliefs from the IO');
 ylabel('Beliefs from subjects (residuals)');
 
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_FA_Corr.pdf'));
-
 % Display the distribution of correlation coefficients over subjects
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -264,9 +258,6 @@ Emergence_DispStatTest(coefofint);
 % Add some text label
 xlabel('Regression models');
 ylabel('Regression coefficient for p(H_{S}|y)');
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_FA_Gp.pdf'));
 
 % Perform a t-test (against chance) on correlation coefficients
 [~,pval,tci,stats] = ttest(coefofint);

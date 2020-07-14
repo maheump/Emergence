@@ -102,9 +102,6 @@ set(gca, 'XTick', 0:0.2:1, 'YTick', 0:0.2:1);
 % Add some text labels
 xlabel('p(A|B)'); ylabel('p(B|A)');
 
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_HW_DeterRegTP.pdf'));
-
 %% SHOW THE TRANSIENT TENSION BETWEEN REGULAR HYPOTHESES
 %  =====================================================
 
@@ -177,11 +174,6 @@ plot(cc(:,1), cc(:,2), 'k-', 'LineWidth', 2);
 axis([0, 1, 0, sqrt(3)/2]);
 axis('xy'); axis('off'); axis('equal');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_AvgTriIO.pdf'));
-end
-
 % Display the P/D ratio locked on the detection of deterministic regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -223,11 +215,6 @@ set(gca, 'Box', 'Off');
 % Add text labels
 xlabel('Observation w.r.t. detection point');
 ylabel('Ratio P versus D');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratioS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_PDratioIO.pdf'));
-end
 
 %% SHOW THAT THE TRANSIENT TENSION DEPENDS UPON THE ENTROPY OF THE RULES
 %  =====================================================================
@@ -279,11 +266,6 @@ l = Emergence_PlotGridOnTri(2, 2); set(l(1,2), 'LineWidth', 2);
 % Make sure the triangle is equilateral and the axes invisible
 axis('equal'); axis('off');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_TriS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_TriIO.pdf'));
-end
-
 % Display corresponding barycentric coordinates
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -310,11 +292,6 @@ set(gca, 'Box', 'Off');
 % Add some text labels
 xlabel('Observation w.r.t. detection point');
 ylabel('Posterior beliefs p(M_i|y)');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_DynS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_DynIO.pdf'));
-end
 
 % Average beliefs in the probabilistic hypothesis between the change and
 % the detection points
@@ -363,8 +340,3 @@ set(gca, 'XTick', 1:nEnt, 'XTickLabel', EntLab, 'Box', 'Off');
 
 % Add some text labels
 ylabel('Posterior beliefs p(M_P|y)');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_HW_EntS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_HW_EntIO.pdf'));
-end

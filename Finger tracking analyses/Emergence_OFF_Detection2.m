@@ -14,8 +14,8 @@
 % The following script must be run beforehand
 Emergence_OFF_Detection1;
 
-%% GET THE IO'S POTERIOR BELIEFS IN DETECTED AN UNDETECTED PROBABILISTIC REGULARITIES
-%  ==================================================================================
+%% GET THE IO'S POSTERIOR BELIEFS IN DETECTED AN UNDETECTED PROBABILISTIC REGULARITIES
+%  ===================================================================================
 
 % Focus on probabilistic regularities because these are those that are most
 % often missed by the ideal observer
@@ -105,11 +105,6 @@ Emergence_DispStatTest(avgbel);
 xlabel({'Probabilistic', 'regularities'});
 ylabel('Belief p(M_P|y) from the IO');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_BelUndetS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_BelUndetIO.pdf'));
-end
-
 %% DETERMINANTS OF DETECTION FOR PROBABILISTIC REGULARITIES
 %  ========================================================
 
@@ -191,11 +186,6 @@ set(gca, 'Box', 'Off');
 xlabel('Biased dimension');
 ylabel('Average detection rate');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_ProbRegS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_ProbRegIO.pdf'));
-end
-
 %% DETERMINANTS OF DETECTION FOR DETERMINISTIC REGULARITIES
 %  ========================================================
 
@@ -263,8 +253,3 @@ Emergence_DispStatTest(lendetecrate);
 % Add some labels
 xlabel('Rule''s difficulty');
 ylabel('Average detection rate');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DetRegS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DetRegIO.pdf'));
-end

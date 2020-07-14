@@ -172,11 +172,6 @@ bar((x(1:end-1) + x(2:end)) / 2, n, 'EdgeColor', 'None', 'FaceColor', 'k', 'Face
 set(gca, 'YColor', 'None');
 axis([x([1,end]), 0, 1]);
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr1S.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr1IO.pdf'));
-end
-
 % Display individual correlation coefficient from the correlation between
 % real and estimated change point's position
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,11 +199,6 @@ Emergence_DispStatTest(corrcoef);
 
 % Add text labels
 ylabel('Correlation coefficient');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr2S.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_Corr2IO.pdf'));
-end
 
 %% CONFIDENCE IN THE ESTIMATE
 %  ==========================
@@ -301,11 +291,6 @@ set(gca, 'YAxisLocation', 'Origin', 'Box', 'Off');
 xlabel('Confidence (a.u.)');
 ylabel('Density');
 
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfDistS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfDistIO.pdf'));
-end
-
 % Display reported confidence in the estimation for the two types of regularities
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -328,8 +313,3 @@ Emergence_DispStatTest(avgConf);
 
 % Add some labels
 ylabel('Average confidence in the estimate');
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfAvgS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_CP_ConfAvgIO.pdf'));
-end

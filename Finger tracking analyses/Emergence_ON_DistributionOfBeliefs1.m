@@ -148,8 +148,3 @@ end
 
 % Use the same zoom level for all the maps
 ScaleAxis('x'); ScaleAxis('y'); ScaleAxis('c', 1:nMap);
-
-% Save the figure
-if isfield(D{1}, 'Seq'), save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsS.pdf'));
-else, save2pdf(fullfile(ftapath, 'figs', 'F_D_DensityMapsIO.pdf'));
-end
