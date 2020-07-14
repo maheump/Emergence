@@ -123,41 +123,50 @@ seq = 1 + (rand(nSeq,nObs) > 1/2);
 opt = {'log', ...        % scale of the sequence likelihood
        'Bayes-Laplace'}; % prior over transition counts
 
-% Prepare the output varyable
-LLHgHs = NaN(nSeq,nObs,nOrd);
+% Try to load previously generated simulations
+try
+    load('Emergence_MC_LLH.mat');
 
-% For each transition order
-for iOrd = 1:nOrd
-    fprintf('Order %1.0f/%1.0f... ', iOrd, nOrd);
-    
-    % For each generated sequence
-    for iSeq = 1:nSeq
+% Otherwise, run the (time-consuming) simulations
+catch
+	
+    % Prepare the output varyable
+    LLHgHp = NaN(nSeq,nObs,nOrd);
+	
+    % For each transition order
+    for iOrd = 1:nOrd
+        fprintf('Order %1.0f/%1.0f... ', iOrd, nOrd);
         
-        % For each observation in the sequence
-        for iObs = 1:nObs
+        % For each generated sequence
+        for iSeq = 1:nSeq
             
-            % Get sequence likelihood of the Markov chain
-            y = seq(iSeq,1:iObs);
-            LLHgHs(iSeq,iObs,iOrd) = Emergence_IO_Chain(y, opt{:}, iOrd);
+            % For each observation in the sequence
+            for iObs = 1:nObs
+                
+                % Get sequence likelihood of the Markov chain
+                y = seq(iSeq,1:iObs);
+                LLHgHp(iSeq,iObs,iOrd) = Emergence_IO_Chain(y, opt{:}, iOrd);
+            end
         end
+        load('Emergence_MC_LLH.mat', 'LLHgHp');
+        fprintf('Done!\n');
     end
-    fprintf('Done!\n');
 end
 
 % Compute posterior probabilities (against a null random hypothesis)
-LLHgHS = -log(2.^(1:nObs));
-pHpgY = exp(LLHgHs) ./ (exp(LLHgHs) + exp(LLHgHS));
+LLHgHs = -log(2.^(1:nObs));
+pHpgY = exp(LLHgHp) ./ (exp(LLHgHp) + exp(LLHgHs));
 
 % Average over simulations
 m = squeeze(mean(pHpgY, 1));
 s = squeeze(sem(pHpgY,1));
 
 % Prepare a new window
-figure; 
+figure('Position', [1301 432 354 302]);
 
 % Plot the average posterior probabilities
 for iOrd = 1:nOrd
-    plotMSEM(1:nObs, m(:,iOrd), s(:,iOrd), 1/10, col(iOrd,:), col(iOrd,:));
+    plotMSEM(1:nObs, m(:,iOrd), s(:,iOrd), 1/10, col(iOrd,:), col(iOrd,:), 2);
 end
 
 % Customize the axes
