@@ -6,12 +6,31 @@
 % Define options
 % ~~~~~~~~~~~~~~
 
-% Get model simulations
-SimuType = 'IndependentDifferenceDiscrete';
-Emergence_MC_ModelSimulations;
+% Get model simulations, i.e. choose among:
+% - PredictabilityLin
+% - PredictabilityMax
+% - PredictabilityUshape
+% - PredictabilityAshape
+% - PseudoDeterministic
+% - BiasedPseudoDeterministic
+% - DifferentPriors
+% - IndependentDiffDiscrete
+% - IndependentDiffContinuous
+% - IndependentRatioDiscrete
+% - IndependentRatioContinuous
+% - Leak
+% - TreeDepth
+SimuType = 'IndependentDiffContinuous';
 
-% Whether models are discrete or continuous
-dispcont = contains(SimuType, 'Continuous', 'IgnoreCase', true);
+% Define properties of the plots based on the model to simulate
+lab = {'Continuous', 'Shape', 'Leak'};
+dispcont = any(contains(SimuType, lab, 'IgnoreCase', true));
+useXlog = false;
+useYlog = false;
+lab = {'Ashape', 'Independent'};
+if any(contains(SimuType, lab, 'IgnoreCase', true)), useXlog = true; end
+lab = {'Predictability', 'PseudoDeterministic', 'DifferentPriors'};
+if any(contains(SimuType, lab, 'IgnoreCase', true)), useYlog = true; end
 
 % Define the number of bins to use when plotting the results
 nBin = 10;
@@ -19,12 +38,20 @@ nBin = 10;
 % Define the type of binning method
 binmeth = 'equil';
 
+% Whether to display the fit between subjects' and model's belief
+% difference
+dispfit = false;
+
 % Select the sequences to look at
 % 1: all fully-stochastic parts
 % 2: only fully-stochastic sequences
 % 3: only fully-stochastic sequences that were correctly labeled
 % 4: only first-part of stochastic-to-regular sequences
 restopt = 1;
+
+% Run simulations
+% ~~~~~~~~~~~~~~~
+Emergence_MC_ModelSimulations;
 
 % Perform subject-specific regressions
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +65,6 @@ pHpgYpHdgYsub = cellfun(@(x,i) ...
     G, randidx, 'uni', 0);
 
 % Prepare output variable
-coef    = NaN(     nSub,nMod);
 MSE     = NaN(     nSub,nMod);
 subavg  = NaN(nBin,nSub,nMod);
 modavg  = NaN(nBin,nSub,nMod);
@@ -65,67 +91,77 @@ for iMod = 1:nMod
         modratioPD(isnan(modratioPD)) = 0;
         
         % Create design matrix by adding additional confound regressors
-        iobelinS  = cell2mat(pHsgYmod(:,iSub));
+        iobelinS = cell2mat(pHsgYmod(:,iSub));
         iointerac = modratioPD .* iobelinS;
-        offset    = ones(numel(modratioPD), 1);    
-        desmat    = [offset, modratioPD, iobelinS, iointerac];
+        offset = ones(numel(modratioPD), 1);    
+        desmat = [offset, modratioPD, iobelinS, iointerac];
         
         % Center predictors
         desmat = desmat - [0, mean(desmat(:,2:end), 1)];
+        coi = 2; % regression coefficient of interest
         
-        % Get probability bins
-        regofint = 2;
-        if strcmpi(binmeth, 'unif') % bins of the same amplitude
-            edges = linspace(-1, 1, nBin+1);
-        elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
-            edges = prctile(desmat(:,regofint), linspace(0, 100, nBin+1));
-        else, error('Please check the binnig method that is provided');
-        end
-        
-        % In the case the number of bins is larger than the number of
-        % unique values predicted by the model (e.g. in the case of the max
-        % version of the independent two-system model), use less bins
-        unval = unique(desmat(:,regofint));
-        ncb = numel(unval);
-        if nBin > ncb
-            edges = movmean(unval, 2);
-            edges = [edges(1)-1; edges(2:end); edges(end)+1];
-        else, ncb = nBin;
-        end
-        
-        % Regress subject's P/D ratio against several IO predictors
+        % Remove variance from all the predictors except the P/D ratio
         beta = regress(subratioPD, desmat);
-        coef(iSub,iMod) = beta(2);
-        
-        % Compute error of the regression model
-        nullmse = (subratioPD - mean(subratioPD)) .^2;
-        modmse  = (subratioPD - (desmat * beta))  .^2;
-        MSE(iSub,iMod) = mean(modmse - nullmse);
-        
-        % Remove variance from all the predictiors except the P/D ratio
-        pidx = setdiff(1:numel(beta), regofint);
+        pidx = setdiff(1:numel(beta), coi);
         pred = desmat(:,pidx) * beta(pidx); % predictions based on beta values
         subratioPD2 = subratioPD - pred; % pseudo-residuals
         
+        % Fit a regression model which restricts the regression coefficient
+        % to be null or positive
+        demeanmodratioPD = modratioPD - mean(modratioPD); % demean
+        beta = regress(subratioPD2, demeanmodratioPD); % regress
+        beta = max([0,beta]); % restrict the coefficient to be null or positive
+        pred = demeanmodratioPD .* beta; % predicted values
+        error = (subratioPD2 - pred) .^ 2; % compute SE
+        MSE(iSub,iMod) = mean(error); % compute MSE
+        
+        % Get probability bins to later plot subjects vs. model
+        % N.B. This deals with model predictions that lack variance: e.g.
+        % in the case of the max version of the independent two-system
+        % model, belief difference can only take 3 values: –1, 0, or 1
+        if strcmpi(binmeth, 'unif') % bins of the same amplitude
+            edges = linspace(-1, 1, nBin+1);
+        elseif strcmpi(binmeth, 'equil') % bins with the same number of observations
+            if numel(unique(modratioPD)) < nBin
+                edges = movmean(unique(modratioPD), 2);
+                edges = [edges(1)-1; edges(2:end); edges(end)+1];
+            else, edges = prctile(modratioPD, linspace(0, 100, nBin+1));
+            end
+        else, error('Please check the binnig method that is provided');
+        end
+        prec = 0.001;
+        edges = uniquetol(edges, prec);
+        ncb = numel(edges) - 1;
+        
         % Average IO P/D ratio and subject's residual P/D ratio
-        [~,~,bins] = histcounts(desmat(:,regofint), edges);
+        [~,~,bins] = histcounts(modratioPD, edges);
         subavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(subratioPD2(bins == i)), 1:ncb);
         modavg(1:ncb,iSub,iMod) = arrayfun(@(i) mean(modratioPD( bins == i)), 1:ncb);
     end
 end
 
+% Center the MSE from the alternative models relatively to the normative
+% two-system model
+MSE = MSE(:,1:end-1) - MSE(:,end);
+
 % Perform paired t-tests
-if ~dispcont
-    [h,pval,tci,stats] = ttest(MSE(:,1:end-1) - MSE(:,end));
-    Emergence_PrintTstats(pval,tci,stats);
+[h,pval,tci,stats] = ttest(MSE);
+Emergence_PrintTstats(pval,tci,stats);
+
+% In case of models with 2 dimensions
+nCrv = 1;
+if dispcont && contains(SimuType, 'Predictability', 'IgnoreCase', true)
+   nCrv = numel(unique(options(4,1:end-1)));
+   nMod = (nMod-1) / nCrv;
+   MSE = reshape(MSE, [nSub,nCrv,nMod]);
 end
 
 % Display correlation between subjects' residual ratio and ideal observer's
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Create a new window
-if ~dispcont
-    figure('Position', [302 905 800 200]);
+if dispfit
+    figure('Position', [1 631 1920 200]);
     
     % For each model
     for iMod = 1:nMod
@@ -136,34 +172,22 @@ if ~dispcont
         ym = mean(subavg(:,:,iMod), 2)';
         ys = sem( subavg(:,:,iMod), 2)';
         
-        % Regress average P/D ratio from subjects and the ideal observer
-        B = Emergence_Regress(ym, xm, 'TLS', {'beta0', 'beta1'});
-        confint = Emergence_Regress(ym, xm, 'TLS', 'confint');
-        xval = Emergence_Regress(ym, xm, 'TLS', 'confintx');
-        
         % Create colormap used to color bins according to IO belief
         prec = 100;
         gege = [flipud(Emergence_Colormap('Blues', prec)); Emergence_Colormap('Reds', prec)];
         grid = linspace(-1, 1, prec*2);
         [~,colidx] = min(abs(xm'-grid), [], 2);
         
-        % Display origin (because variables are centered)
-        subplot(1,nMod,iMod); hold('on');
-        
-        % Display the regression line
-        fill([xval, fliplr(xval)], [confint(1,:), fliplr(confint(2,:))], 'k', ...
-               'EdgeColor', 'none', 'FaceColor', g, 'FaceAlpha', 1/2);
-        plot(xval, xval.*B(2) + B(1), 'k-', 'LineWidth', 3);
-        
         % Show correlation between subjects' P/D residual ratio and IO P/D ratio
+        subplot(1,nMod,iMod); hold('on');
         plot(xm+[-xs;xs], repmat(ym,2,1), 'k-'); % horizontal error bars
         plot(repmat(xm,2,1), ym+[-ys;ys], 'k-'); % vertical   error bars
         plot(xm, ym, 'k-', 'LineWidth', 1);
         scatter(xm, ym, 100, gege(colidx,:), 'filled', 'MarkerEdgeColor', 'k');
         
         % Customize the axes
-        ylim(max(abs(ylim)) .* [-1,1]);
-        set(gca, 'Box', 'Off'); axis('square');
+        set(gca, 'Box', 'Off', 'Layer', 'Bottom');
+        axis('square');
         
         % Add some text labels
         xlabel('Beliefs from IO');
@@ -171,53 +195,52 @@ if ~dispcont
     end
 end
 
-% Display mean squared error of the regression
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-% Get data to plot
-modidx = 1:nMod-1;
-
-% Get x-values
-if dispcont, x = sigmparam';
-else, x = modidx';
-end
-
-% Get models' color
-c = modc(modidx,:);
+% Display the mean squared error
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Average MSE over subjects
-m = mean(MSE(:,modidx))';
-s = sem( MSE(:,modidx))';
+m = squeeze(mean(MSE));
+s = squeeze(sem( MSE));
 
 % Prepare a new window
 figure('Position', [1 905 300 200]); hold('on');
 
-% Display error made by the fully deterministic hypothesis
-plotMSEM(x([1,end]), repmat(mean(MSE(:,end)),1,2), ...
-    repmat(sem(MSE(:,end)),1,2), 1/2, modc(end,:));
-
 % If continuous models, use lines
 if dispcont
-    y = (1:numel(x))';
-    fill([x', flipud(x)'], [(m+s)', flipud(m-s)'], 'k', 'EdgeColor', 'None', ...
-        'CData', [y;flipud(y)], 'FaceColor', 'Interp'); alpha(1/10);
-    surface('XData', [x x], 'YData', [m m], 'ZData', zeros(numel(x),2), ...
-            'CData', [y y], 'FaceColor', 'None', 'EdgeColor', 'Interp', ...
-            'Marker', 'none', 'LineWidth', 2);
-    colormap(c); caxis(y([1,end]));
+    x = contparam';
+    for i = 1:nCrv
+        plotMSEM(x, m(i,:), s(i,:), 0.15, modc(i,:), modc(i,:), 2);
+    end
+    xlim(sort(x([1,end]))); xlabel('Parameters');
     
 % If discrete models, use dots instead
 elseif ~dispcont
-    plot(repmat(x', [2,1]), m'+s'.*[-1;1], 'k-');
-    scatter(x, m, 100, c, 'Filled', 'MarkerEdgeColor', 'k');
+    x = 1:size(MSE,2);
+    plot(x, m, 'k-', 'LineWidth', 2);
+    plot(repmat(x, [2,1]), m+s.*[-1;1], 'k-');
+    scatter(x, m, 100, modc(x,:), 'Filled', 'MarkerEdgeColor', 'k');
+    xlim([0,nMod]); xlabel('Models');
+end
+
+% Overlap p-values on top of the plot
+if nCrv == 1
+    lima = [0.001 0.01 0.05];
+    sz = [6,4,2];
+    for i = 1:numel(lima)
+        idx = pval < lima(i);
+        limy = ylim;
+        plot(x(idx), repmat(max(limy), [1,sum(idx)]), 'ks', ...
+           'MarkerEdgeColor', 'None', ...
+           'MarkerFaceColor', 'k', 'MarkerSize', sz(i));
+       ylim(limy);
+    end
 end
 
 % Customize the axes
-set(gca, 'YScale', 'Log', 'Box', 'Off', 'Layer', 'Bottom');
-if dispcont, set(gca, 'XScale', 'log');
-else, xlim([0,nMod]); end
-ylim([-0.02,-0.007]);
+set(gca, 'Box', 'Off', 'Layer', 'Top');
+lab = {'Continuous', 'Predictability'};
+if dispcont && useXlog, set(gca, 'XScale', 'log'); end
 
 % Add some text labels
-xlabel('Models');
 ylabel('Mean squared error');
+title(sprintf('%s - %s', SimuType, mes));
