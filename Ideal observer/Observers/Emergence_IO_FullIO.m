@@ -652,7 +652,7 @@ for K = obs
     
     % For the stochastic-to-deterministic observer
     if     islin, pYgMsd(K) =     sum(    ppobsJkgYMsd  );
-	elseif islog, pYgMsd(K) = log(sum(exp(ppobsJkgYMsd)));
+  	elseif islog, pYgMsd(K) = log(sum(exp(ppobsJkgYMsd)));
     end
     
     %% Compute posterior beliefs regarding the change point's position
@@ -885,8 +885,7 @@ covpMsi = [NaN, cellfun(@(x) x(2,1), covpMsi, 'UniformOutput', 1)];
 % regarding the position of the change point:
 % p(Jk|y) propto p(Jk|y,Msp) * p(Msp) + p(Jk|y,Msd) * p(Msd)
 pJkgY = (pJkgYMsp .* pMspgY + ... % p(Jk|y,Msp) * p(Msp|y)
-         pJkgYMsd .* pMsdgY) ...  % p(Jk|y,Msd) * p(Msd|y)
-        ./ (pMspgY + pMsdgY);     % normalized by p(Msp|y) + p(Msd|y)
+         pJkgYMsd .* pMsdgY);     % p(Jk|y,Msd) * p(Msd|y)
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 % Entropy of the posterior distribution over change point's position %
