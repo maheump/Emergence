@@ -116,6 +116,3 @@ for iMap = 1:2
     % Add some text labels
     title(sprintf('Beliefs from %s conditioned on %s', lab{iMap}{:}));
 end
-
-% Save the figure
-save2pdf(fullfile(ftapath, 'figs', 'F_D_CondMaps.pdf'));
