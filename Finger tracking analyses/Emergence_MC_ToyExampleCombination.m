@@ -68,7 +68,6 @@ pHpgY = 1 ./ (1 + exp(-sigmparam .* log(ratio)));
 % Display the link functions
 subplot(4,1,4); hold('on');
 l = plot(ratio, pHpgY, 'LineWidth', 1);
-col = cool(nParam);
 for i = 1:nParam, set(l(i), 'Color', col(i,:)); end
 
 % Add some text labels
@@ -89,6 +88,7 @@ slope = 4.5;
 % Prepare output variable
 cc = NaN(4,2);
 
+% For each weighting function
 for iFun = 1:4
     
     % Get weight
