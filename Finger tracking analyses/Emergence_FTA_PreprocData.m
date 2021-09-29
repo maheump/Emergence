@@ -204,6 +204,9 @@ for iSub = 1:nSub
         % 2: deterministic component
         % 3: stochastic component
         G{iSeq,iSub}.BarycCoord = lambda;
+        
+        % Make sure change point position is an integer
+        G{iSeq,iSub}.Jump = floor(G{iSeq,iSub}.Jump);
     end
 end
 
@@ -247,14 +250,14 @@ for iSub = 1:nSub
             pEd, pEp, patlen, stat, pR, pT, pJ, comp, scale, pgrid, verb);  % options
         
         % Append the "Jump" subfield (the IO does not know its true position)
-        IO{iSeq,iSub}.Jump = G{iSeq,iSub}.Jump - 1/2;
+        IO{iSeq,iSub}.Jump = G{iSeq,iSub}.Jump;
         
         % Create a variable with all models' posterior probability
         IO{iSeq,iSub}.BarycCoord = [io.pMspgY', ... % 1: probabilistic component
                                     io.pMsdgY', ... % 2: deterministic component
                                     io.pMssgY'];    % 3: stochastic    component
         
-        % Create a variable with sequence likelihood under each models
+        % Create a variable with sequence likelihood under each model
         IO{iSeq,iSub}.SeqLLH = [io.pYgMsp', ... % 1: probabilistic component
                                 io.pYgMsd', ... % 2: deterministic component
                                 io.pYgMss'];    % 3: stochastic    component
