@@ -8,7 +8,7 @@
 avgseq = false;
 
 % Get alternative model simulations
-SimuType = 'DifferentPriors';
+SimuType = 'PseudoDeterministic';
 Emergence_MC_ModelSimulations;
 
 % Add subjects to the list of models
