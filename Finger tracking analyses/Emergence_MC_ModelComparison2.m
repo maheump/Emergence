@@ -20,7 +20,7 @@
 % - IndependentRatioContinuous
 % - Leak
 % - TreeDepth
-SimuType = 'IndependentDiffContinuous';
+SimuType = 'PseudoDeterministic';
 
 % Define properties of the plots based on the model to simulate
 lab = {'Continuous', 'Shape', 'Leak'};
@@ -243,4 +243,4 @@ if dispcont && useXlog, set(gca, 'XScale', 'log'); end
 
 % Add some text labels
 ylabel('Mean squared error');
-title(sprintf('%s - %s', SimuType, mes));
+title(sprintf('%s - %s', SimuType, 'RelativeWeighting'));

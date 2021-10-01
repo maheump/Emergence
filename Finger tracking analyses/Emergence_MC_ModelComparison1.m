@@ -26,7 +26,7 @@ mes = 'Categorisation'; % 'Categorisation', 'Abruptness', or 'FalseAlarm'
 % - IndependentRatioContinuous
 % - Leak
 % - TreeDepth
-SimuType = 'PredictabilityMax';
+SimuType = 'PseudoDeterministic';
 
 % Define properties of the plots based on the model to simulate
 lab = {'Continuous', 'Shape', 'Leak'};
